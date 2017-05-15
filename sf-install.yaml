@@ -1,0 +1,7 @@
+- hosts: localhost
+  tasks:
+    - include: tasks/install_sf_release.yaml
+    - include: tasks/install_sf_config.yaml
+    - include: tasks/init_sf_config_playbooks.yaml
+
+- include: /var/lib/software-factory/ansible/sf_install.yml

@@ -1,0 +1,20 @@
+- name: Temporary enable SF repository
+  yum_repository:
+    name: temp-software-factory
+    description: Temporary Software Factory repository
+    baseurl: http://46.231.133.231/kojifiles/repos/{{ sf_repository }}/latest/x86_64/
+    gpgcheck: False
+    enabled: True
+
+- name: Install sf-release package
+  yum:
+    name: sf-release
+    state: latest
+
+- name: Disable temporary SF repository
+  yum_repository:
+    name: temp-software-factory
+    description: Temporary Software Factory repository
+    baseurl: http://46.231.133.231/kojifiles/repos/{{ sf_repository }}/latest/x86_64/
+    enabled: False
+
