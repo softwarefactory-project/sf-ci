@@ -1,0 +1,11 @@
+- name: Fetch SF Serverspec scripts
+  git:
+    repo: https://softwarefactory-project.io/r/software-factory/software-factory
+    dest: /tmp/checkout/software-factory
+    update: yes
+
+- name: Install SF Serverspec scripts
+  synchronize:
+    src: /tmp/checkout/software-factory/serverspec/
+    dest: /etc/serverspec/
+  delegate_to: localhost
