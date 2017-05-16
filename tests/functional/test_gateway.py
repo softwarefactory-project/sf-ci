@@ -20,6 +20,8 @@ import shlex
 
 import config
 from utils import Base
+from utils import skipIfServiceMissing
+from utils import services
 from utils import ManageSfUtils
 from utils import skipIfProvisionVersionLesserThan
 from utils import ssh_run_cmd
@@ -52,12 +54,20 @@ class TestGateway(Base):
         url = "%s/cauth/config.py" % config.GATEWAY_URL
         self._url_is_not_world_readable(url)
 
-    # TODO(XXX) this is not up to date and can change with config
     def test_topmenu_links_shown(self):
         """ Test if all service links are shown in topmenu
         """
-        subpaths = ["/r/", "/jenkins/",
-                    "/zuul/", "/etherpad/", "/paste/", "/docs/", "/app/kibana"]
+        subpaths = ["/r/", "/jenkins/", "/zuul/", "/docs/"]
+        if "etherpad" in services:
+            subpaths.append("/etherpad/")
+        if "lodgeit" in services:
+            subpaths.append("/paste/")
+        if "kibana" in services:
+            subpaths.append("/app/kibana")
+        if "repoxplorer" in services:
+            subpaths.append("/repoxplorer/")
+        if "storyboard" in services:
+            subpaths.append("/storyboard/")
         url = config.GATEWAY_URL + "/topmenu.html"
         resp = requests.get(url)
         self.assertEqual(resp.status_code, 200)
@@ -169,6 +179,7 @@ class TestGateway(Base):
                 auth_pubtkt=config.USERS[config.USER_1]['auth_cookie']))
         self.assertEqual(resp.status_code, 503)
 
+    @skipIfServiceMissing('kibana')
     def test_kibana_accessible(self):
         """ Test if Kibana is accessible on gateway host
         """
@@ -191,6 +202,7 @@ class TestGateway(Base):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('<title>Zuul Status</title>' in resp.text)
 
+    @skipIfServiceMissing('etherpad')
     def test_etherpad_accessible(self):
         """ Test if Etherpad is accessible on gateway host
         """
@@ -202,6 +214,7 @@ class TestGateway(Base):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('<title>SF - Etherpad</title>' in resp.text)
 
+    @skipIfServiceMissing('lodgeit')
     def test_paste_accessible(self):
         """ Test if Paste is accessible on gateway host
         """
@@ -227,6 +240,7 @@ class TestGateway(Base):
             resp = requests.get(url)
             self.assertEqual(resp.status_code, 200)
 
+    @skipIfServiceMissing('lodgeit')
     def test_static_dir_for_paste_accessible(self):
         """ Test if static dir for paste is accessible on gateway host
         """
@@ -295,9 +309,8 @@ class TestGateway(Base):
         js = requests.get(url).text
         # add a comment at the end of the js
         cmd = "echo '// this is a useless comment' >> /var/www/static/js/%s"
-        ssh_run_cmd(os.path.expanduser("~/.ssh/id_rsa"),
-                    "root",
-                    config.GATEWAY_HOST, shlex.split(cmd % script))
+        ssh_run_cmd(config.SERVICE_PRIV_KEY_PATH,
+                    "root", "gateway", shlex.split(cmd % script))
         newjs = requests.get(url).text
         self.assertTrue(len(newjs) > len(js),
                         "New js is %s" % newjs)
