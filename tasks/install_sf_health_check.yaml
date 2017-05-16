@@ -1,0 +1,11 @@
+- name: Fetch SF Health Check scripts
+  git:
+    repo: https://softwarefactory-project.io/r/software-factory/software-factory
+    dest: /tmp/checkout/software-factory
+    update: yes
+
+- name: Install SF Health Check scripts
+  synchronize:
+    src: /tmp/checkout/software-factory/health-check
+    dest: /tmp/
+  delegate_to: localhost
