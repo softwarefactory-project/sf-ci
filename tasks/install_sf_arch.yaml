@@ -1,0 +1,4 @@
+- name: Install SF architecture file {{ sf_arch }}.yaml
+  file:
+    src: "{{ sf_arch }}.yaml"
+    dest: /etc/software-factory/arch.yaml
