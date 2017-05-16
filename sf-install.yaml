@@ -1,0 +1,2 @@
+# Run sf_install tasks on nodes defined in the arch
+- include: /var/lib/software-factory/ansible/sf_install.yml
