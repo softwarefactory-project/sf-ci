@@ -1,0 +1,4 @@
+- hosts: localhost
+  tasks:
+    - include: tasks/install_sf_serverspec.yaml
+    - include: tasks/run_sf_serverspec.yaml
