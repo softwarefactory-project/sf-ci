@@ -1,0 +1,9 @@
+- name: Run SF Serverspec
+  # Something to fix here. The ssh to make rspec use the root user
+  # to connect on the remote instead of centos user.
+  command: ssh root@managesf "cd /etc/serverspec; rake spec"
+  register: result
+
+- name: Serverspec result
+  debug:
+    var: result
