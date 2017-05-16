@@ -1,0 +1,16 @@
+description: Minimal Software Factory deployment
+inventory:
+- ip: 192.168.135.101
+  name: managesf
+  roles:
+  - install-server
+  - mysql
+  - gateway
+  - cauth
+  - managesf
+  - gerrit
+  - gitweb
+  - zuul
+  - zuul-merger
+  - nodepool
+  - jenkins
