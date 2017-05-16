@@ -1,0 +1,4 @@
+*.retry
+*.py[co]
+*.swp
+sfmanager.log
