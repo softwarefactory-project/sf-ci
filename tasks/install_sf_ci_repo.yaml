@@ -1,0 +1,26 @@
+- name: Install {{ sf_ci_repo_yum_path }} in /etc/yum.repos.d/
+  file:
+    src: "{{ sf_ci_repo_yum_path }}"
+    dest: /etc/yum.repos.d/
+
+# Replace koji hostname by its IP
+- replace:
+    dest: /etc/yum.repos.d/zuul-built.repo
+    regexp: 'koji.softwarefactory-project.io'
+    replace: "{{ koji_ip }}"
+
+# This is today pkg deps of the sf-release pkg
+# This should be installed by sf-base IMO
+- name: Install additionnal repos
+  yum:
+    name: centos-release-openstack-newton, centos-release-opstools
+    state: latest
+
+# Install sf-release package (needed by sfconfig.py) /etc/sf-release
+# After the install of sf-release two SF repos are installed
+# http://46.231.133.231/kojifiles/repos/sf-master-el7/
+# http://46.231.133.231/kojifiles/repos/sf-master-el7-build/latest/x86_64/
+- name: Install sf-release
+  yum:
+    name: sf-release
+    state: latest
