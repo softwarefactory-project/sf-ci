@@ -1,0 +1,4 @@
+- name: Run data checker
+  command: python checker.py
+  args:
+    chdir: tests/functional/provisioner/

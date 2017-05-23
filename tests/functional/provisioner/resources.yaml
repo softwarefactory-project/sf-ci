@@ -1,7 +1,4 @@
 local_users:
- - username: finn
-   password: mathematical
-   email: finn@candykingdom.ooo
  - username: adev
    password: adevpass
    email: adev@softwarefactory-project.io
@@ -57,8 +54,8 @@ resources:
       name: tdpw-core
       description: Core developers for project tdpw
       members:
-      - finn@candykingdom.ooo
       - adev@softwarefactory-project.io
+      - alead@softwarefactory-project.io
     tdpw-ptl:
       name: tdpw-ptl
       description: Project team lead for project tdpw
@@ -107,22 +104,10 @@ projects:
     - name: Issue1
       review: true
     - name: Issue2
-      review: true
+      review: false
    files:
     - name: file1
     - name: file2
- - name: dummy_project2
-   issues:
-    - name: Issue3
-      review: true
-    - name: Issue4
-      review: false
-   files:
-    - name: file3
-    - name: file4
-etherpads:
- - name: pad1
- - name: pad2
 users:
  - name: admin
  - name: user2
