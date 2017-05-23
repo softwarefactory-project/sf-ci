@@ -3,7 +3,7 @@
 import os
 import yaml
 
-SF_BOOTSTRAP_DATA = "%s/sf-bootstrap-data" % os.getcwd()
+SF_BOOTSTRAP_DATA = "/var/lib/software-factory/bootstrap-data/"
 SF_TESTS_DIR = "./tests"
 
 # Remove http[s] proxy settings for functional tests
