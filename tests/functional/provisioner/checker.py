@@ -15,11 +15,11 @@
 # under the License.
 
 import os
-import shlex
 import requests
 import sys
 import yaml
 from bs4 import BeautifulSoup
+import subprocess
 
 pwd = os.path.dirname(os.path.abspath(__file__))  # flake8: noqa
 sys.path.append(os.path.dirname(pwd))             # flake8: noqa
@@ -29,7 +29,6 @@ from utils import get_cookie
 from pysflib.sfgerrit import GerritUtils
 from utils import GerritGitUtils
 from utils import is_present
-from utils import ssh_run_cmd
 
 from pysflib.sfstoryboard import SFStoryboard
 
@@ -101,24 +100,16 @@ class SFchecker:
             exit(1)
         print "OK"
 
-    def check_pads(self, amount):
-        pass
-
-    def check_pasties(self, amount):
-        pass
-
     def command(self, cmd):
-        return ssh_run_cmd(os.path.expanduser("~/.ssh/id_rsa"),
-                           "root",
-                           config.GATEWAY_HOST, shlex.split(cmd))
+        return subprocess.check_output(cmd, shell=True)
 
     def compute_checksum(self, f):
-        out = self.command("md5sum %s" % f)[0]
+        out = self.command("md5sum %s" % f)
         if out:
             return out.split()[0]
 
     def read_file(self, f):
-        return self.command("cat %s" % f)[0]
+        return file(f).read()
 
     def simple_login(self, user, password):
         """log as user"""
@@ -195,8 +186,6 @@ class SFchecker:
                 self.check_issues_on_project(project['name'],
                                              project['issues'])
             self.check_reviews_on_project(project['name'], project['issues'])
-        self.check_pads(2)
-        self.check_pasties(2)
         for user in self.resources['local_users']:
             print "Check user %s can log in ..." % user['username'],
             if self.simple_login(user['username'],
