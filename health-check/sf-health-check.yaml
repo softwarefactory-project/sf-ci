@@ -1,0 +1,5 @@
+- name: Run heatlh-check zuul
+  include: zuul.yaml 
+
+- include: gerritbot.yaml 
+  when: '"gerritbot" in roles'
