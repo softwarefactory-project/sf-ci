@@ -1,0 +1,9 @@
+- name: Install sf-bootstrap-data
+  copy:
+    src: /var/lib/software-factory/ansible/group_vars/all.yaml
+    dest: /var/lib/software-factory/bootstrap-data/
+
+- name: Install functional tests dependencies
+  yum:
+    name: python-nose
+    state: latest
