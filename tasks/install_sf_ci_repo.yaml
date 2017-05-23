@@ -1,0 +1,26 @@
+- name: Install {{ sf_ci_repo_yum_path }} in /etc/yum.repos.d/
+  shell: "[ -f /etc/yum.repos.d/sf-release.repo ] || mv {{ sf_ci_repo_yum_path }} /etc/yum.repos.d/sf-release.repo"
+
+- name: Replace koji hostname by its IP
+  replace:
+    dest: /etc/yum.repos.d/sf-release.repo
+    regexp: 'koji.softwarefactory-project.io'
+    replace: "{{ koji_ip }}"
+
+- name: Remove local_build repo
+  file:
+    path: /etc/yum.repos.d/sf-local-build.repo
+    state: absent
+
+- name: Check for locally built packages
+  stat:
+    path: /var/lib/sf/zuul-rpm-build/repodata
+  register: local_build
+
+- name: Add local_build repo
+  yum_repository:
+    name: "sf-local-build"
+    description: "Local build repo"
+    baseurl: "file:///var/lib/sf/zuul-rpm-build/"
+    gpgcheck: "0"
+  when: local_build.stat.exists

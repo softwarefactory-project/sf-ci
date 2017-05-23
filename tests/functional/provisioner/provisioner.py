@@ -15,10 +15,10 @@
 # under the License.
 
 import os
-import shlex
 import random
 import sys
 import yaml
+import subprocess
 
 pwd = os.path.dirname(os.path.abspath(__file__))  # flake8: noqa
 sys.path.append(os.path.dirname(pwd))             # flake8: noqa
@@ -29,8 +29,6 @@ from utils import ResourcesUtils
 from utils import GerritGitUtils
 from utils import get_cookie
 from utils import is_present
-from utils import ssh_run_cmd
-from utils import cmp_version
 
 from pysflib.sfstoryboard import SFStoryboard
 
@@ -61,11 +59,6 @@ class SFProvisioner(object):
             config.USERS[config.ADMIN_USER]['auth_cookie'])
 
     def create_resources(self):
-        print " Creating resources ..."
-        if cmp_version(os.environ.get("PROVISIONED_VERSION", "0.0"), "2.4.0"):
-            # Remove review-dashboard
-            for p in self.resources['resources']['projects'].values():
-                del p['review-dashboard']
         self.ru.create_resources("provisioner",
             {'resources': self.resources['resources']})
         # Create review for the first few repositories
@@ -109,15 +102,6 @@ class SFProvisioner(object):
                 issue = (random.randint(1,100), random.randint(1,100))
             yield issue, i['review']
 
-    def create_pads(self, amount):
-        # TODO
-        pass
-
-    def create_pasties(self, amount):
-        # TODO
-        pass
-
-
     def simple_login(self, user, password):
         """log as user to make the user listable"""
         get_cookie(user, password)
@@ -140,22 +124,22 @@ class SFProvisioner(object):
         self.msu.create_user(username, password, email)
 
     def command(self, cmd):
-        return ssh_run_cmd(os.path.expanduser("~/.ssh/id_rsa"),
-                           "root",
-                           config.GATEWAY_HOST, shlex.split(cmd))
+        return subprocess.check_output(cmd, shell=True)
 
     def compute_checksum(self, f):
-        out = self.command("md5sum %s" % f)[0]
+        out = self.command("md5sum %s" % f)
         if out:
             return out.split()[0]
 
     def read_file(self, f):
-        return self.command("cat %s" % f)[0]
+        return file(f).read()
 
     def provision(self):
         for cmd in self.resources['commands']:
             print "Execute command %s" % cmd['cmd']
-            print self.command(cmd['cmd'])
+            out = self.command(cmd['cmd'])
+            if out:
+                print out
         checksum_list = {}
         for checksum in self.resources['checksum'] :
             print "Compute checksum for file %s" % checksum['file']
@@ -171,6 +155,7 @@ class SFProvisioner(object):
                                    user['password'],
                                    user['email'])
             self.simple_login(user['username'], user['password'])
+            print "log in as %s" % user['username']
         for u in self.resources['users']:
             print "log in as %s" % u['name']
             self.simple_login(u['name'], config.USERS[u['name']]['password'])
@@ -185,9 +170,8 @@ class SFProvisioner(object):
                     print "Create review for bug %s in %s" % (
                         i, project['name'])
                     self.create_review_for_issue(project['name'], i)
+
         self.create_resources()
-        self.create_pads(2)
-        self.create_pasties(2)
 
 p = SFProvisioner()
 p.provision()

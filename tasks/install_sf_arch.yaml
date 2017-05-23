@@ -1,0 +1,4 @@
+- name: Install SF architecture file {{ sf_arch }}.yaml
+  copy:
+    src: "/usr/share/sf-config/refarch/{{ sf_arch }}.yaml"
+    dest: /etc/software-factory/arch.yaml
