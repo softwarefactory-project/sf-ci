@@ -20,6 +20,8 @@ import shlex
 
 import config
 from utils import Base
+from utils import skipIfServiceMissing
+from utils import services
 from utils import ManageSfUtils
 from utils import skipIfProvisionVersionLesserThan
 from utils import ssh_run_cmd
@@ -52,12 +54,20 @@ class TestGateway(Base):
         url = "%s/cauth/config.py" % config.GATEWAY_URL
         self._url_is_not_world_readable(url)
 
-    # TODO(XXX) this is not up to date and can change with config
     def test_topmenu_links_shown(self):
         """ Test if all service links are shown in topmenu
         """
-        subpaths = ["/r/", "/jenkins/",
-                    "/zuul/", "/etherpad/", "/paste/", "/docs/", "/app/kibana"]
+        subpaths = ["/r/", "/jenkins/", "/zuul/", "/docs/"]
+        if "etherpad" in services:
+            subpaths.append("/etherpad/")
+        if "lodgeit" in services:
+            subpaths.append("/paste/")
+        if "kibana" in services:
+            subpaths.append("/app/kibana")
+        if "repoxplorer" in services:
+            subpaths.append("/repoxplorer/")
+        if "storyboard" in services:
+            subpaths.append("/storyboard/")
         url = config.GATEWAY_URL + "/topmenu.html"
         resp = requests.get(url)
         self.assertEqual(resp.status_code, 200)
@@ -150,7 +160,7 @@ class TestGateway(Base):
 
         # Ensure jenkins cli is disabled
         resp = requests.get(url + "cli/")
-        self.assertEqual(resp.status_code, 503)
+        self.assertEqual(resp.status_code, 403)
 
         # With SSO cookie
         resp = requests.get(
@@ -159,16 +169,24 @@ class TestGateway(Base):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('<title>Dashboard [Jenkins]</title>' in resp.text)
 
-        # User shouldn't be known in Jenkins if logged in with SSO
-        self.assertTrue(config.USER_1 not in resp.text)
+        # User1 (admin ) be known in Jenkins if logged in with SSO
+        self.assertTrue(config.USER_1 in resp.text)
+
+        # With SSO cookie as normal unpriviledge user
+        resp = requests.get(
+            url, cookies=dict(
+                auth_pubtkt=config.USERS[config.USER_2]['auth_cookie']))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(config.USER_2 not in resp.text)
 
         # Ensure jenkins cli is disabled for SSO user
         resp = requests.get(
             url + "cli/",
             cookies=dict(
                 auth_pubtkt=config.USERS[config.USER_1]['auth_cookie']))
-        self.assertEqual(resp.status_code, 503)
+        self.assertEqual(resp.status_code, 403)
 
+    @skipIfServiceMissing('kibana')
     def test_kibana_accessible(self):
         """ Test if Kibana is accessible on gateway host
         """
@@ -191,6 +209,7 @@ class TestGateway(Base):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('<title>Zuul Status</title>' in resp.text)
 
+    @skipIfServiceMissing('etherpad')
     def test_etherpad_accessible(self):
         """ Test if Etherpad is accessible on gateway host
         """
@@ -202,6 +221,7 @@ class TestGateway(Base):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('<title>SF - Etherpad</title>' in resp.text)
 
+    @skipIfServiceMissing('lodgeit')
     def test_paste_accessible(self):
         """ Test if Paste is accessible on gateway host
         """
@@ -227,6 +247,7 @@ class TestGateway(Base):
             resp = requests.get(url)
             self.assertEqual(resp.status_code, 200)
 
+    @skipIfServiceMissing('lodgeit')
     def test_static_dir_for_paste_accessible(self):
         """ Test if static dir for paste is accessible on gateway host
         """
@@ -295,9 +316,9 @@ class TestGateway(Base):
         js = requests.get(url).text
         # add a comment at the end of the js
         cmd = "echo '// this is a useless comment' >> /var/www/static/js/%s"
-        ssh_run_cmd(os.path.expanduser("~/.ssh/id_rsa"),
-                    "root",
-                    config.GATEWAY_HOST, shlex.split(cmd % script))
+        ssh_run_cmd(config.SERVICE_PRIV_KEY_PATH,
+                    "root", config.GATEWAY_HOST,
+                    shlex.split(cmd % script))
         newjs = requests.get(url).text
         self.assertTrue(len(newjs) > len(js),
                         "New js is %s" % newjs)

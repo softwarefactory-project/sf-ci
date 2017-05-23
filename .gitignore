@@ -1,0 +1,5 @@
+*.retry
+*.py[co]
+*.swp
+sfmanager.log
+nose_results.html
