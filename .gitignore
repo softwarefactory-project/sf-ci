@@ -1,0 +1,6 @@
+*.retry
+*.py[co]
+*.swp
+sfmanager.log
+nose_results.html
+pc_checksums.yaml

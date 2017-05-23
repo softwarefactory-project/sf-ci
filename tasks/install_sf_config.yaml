@@ -1,0 +1,5 @@
+- name: Install sf-config package
+  yum:
+    name: sf-config
+    state: latest
+    update_cache: yes
