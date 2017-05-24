@@ -1,2 +1,2 @@
 - name: Init sfconfig playbooks
-  command: sfconfig.py --skip-install --skip-setup
+  command: sfconfig.py --skip-apply
