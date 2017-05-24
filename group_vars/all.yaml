@@ -8,3 +8,7 @@ sf_mash_repo: sf-master-el7
 sf_ci_repo_yum_path: /etc/yum.repos.d/zuul-built.repo
 # SF architecture file
 sf_arch: minimal
+# SF version
+sf_version: master
+# Local repository path
+local_repo_path: ""
