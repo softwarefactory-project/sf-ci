@@ -1,0 +1,49 @@
+---
+- hosts: localhost
+  tasks:
+    # Install new release
+    - name: "Restore zuul-built.repo"
+      shell: "if [ -f /root/zuul-built.repo ]; then mv /root/zuul-built.repo /etc/yum.repos.d/; fi"
+
+    - name: "Check for zuul-built.repo"
+      stat:
+        path: /etc/yum.repos.d/zuul-built.repo
+      register: zuul_built_repo
+
+    - name: Replace koji hostname by its IP
+      replace:
+        dest: /etc/yum.repos.d/zuul-built.repo
+        regexp: 'koji.softwarefactory-project.io'
+        replace: "{{ koji_ip }}"
+      when: zuul_built_repo.stat.exists
+
+    - name: "Install master repo when no zuul-built.repo"
+      yum:
+        name: https://softwarefactory-project.io/repos/sf-release-master.rpm
+        state: latest
+      when: not zuul_built_repo.stat.exists
+
+    - name: Replace koji hostname by its IP
+      replace:
+        dest: /etc/yum.repos.d/sf-release.repo
+        regexp: 'koji.softwarefactory-project.io'
+        replace: "{{ koji_ip }}"
+
+    - name: Add local_build repo
+      yum_repository:
+        name: "local-build"
+        description: "Local build repo"
+        baseurl: "file://{{ local_repo_path }}"
+        gpgcheck: "0"
+      when: "local_repo_path != ''"
+
+    # Update sf-config
+    - name: "Update sfconfig.py"
+      yum:
+        name: sf-config
+        state: latest
+        update_cache: yes
+
+    # Run upgrade
+    - name: "Run upgrade"
+      command: sfconfig.py --skip-apply --upgrade
