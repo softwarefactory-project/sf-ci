@@ -1,0 +1,47 @@
+# Install SF repos on hosts
+- hosts: localhost
+  tasks:
+    - name: "Save zuul-built.repo"
+      shell: "if [ -f /etc/yum.repos.d/zuul-built.repo ]; then mv /etc/yum.repos.d/zuul-built.repo /root/; fi"
+
+    - name: "Remove local-build.repo"
+      file:
+        path: /etc/yum.repos.d/local-build.repo
+        state: absent
+
+- hosts: localhost
+  tasks:
+    - name: "Install {{ sf_version }} repo"
+      yum:
+        name: https://softwarefactory-project.io/repos/sf-release-{{ sf_version }}.rpm
+        state: present
+
+    - name: "Update all installed packages"
+      yum:
+        name: '*'
+        state: latest
+        exclude: jenkins
+        update_cache: yes
+
+# Init SF on the main node
+- hosts: localhost
+  tasks:
+    - include: tasks/install_sf_config.yaml
+    - include: tasks/install_sf_arch.yaml
+
+    # Special fix for 2.5.0
+    - block:
+      - file:
+          path: "{{ item }}"
+          mode: 0700
+          state: directory
+        with_items:
+          - /root/.ssh
+          - /etc/serverspec
+
+      - name: Fix arch
+        command: sed -i 's/managesf/managesf\n      - gitweb\n      - nodepool\n      - repoxplorer' /etc/software-factory/arch.yaml
+      when: "sf_version == '2.5.0'"
+
+    - name: Init sfconfig playbooks
+      command: sfconfig.py --skip-install --skip-setup
