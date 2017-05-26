@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_fb25485c",
+        "filename": "sf-init-stable.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-05-26T09:24:56Z",
+      "side": 1,
+      "message": "Can be replaced by:\n- include: tasks/init_sf_config_playbooks.yaml",
+      "range": {
+        "startLine": 48,
+        "startChar": 0,
+        "endLine": 49,
+        "endChar": 54
+      },
+      "revId": "d1917e267fd87ebda2ba33fa140018d1d5a55f76",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_db2a842c",
+        "filename": "sf-upgrade.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-05-26T09:24:56Z",
+      "side": 1,
+      "message": "So we will need the cron task for the mash of master",
+      "range": {
+        "startLine": 15,
+        "startChar": 7,
+        "endLine": 15,
+        "endChar": 76
+      },
+      "revId": "d1917e267fd87ebda2ba33fa140018d1d5a55f76",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_bbe7c011",
+        "filename": "sf-upgrade.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-05-26T09:24:56Z",
+      "side": 1,
+      "message": "Could we include /var/lib/software-factory/ansible/sf_upgrade.yaml. I fell convenient to have playbook output on the console. Using sfconfig it wont be the case.",
+      "range": {
+        "startLine": 36,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 49
+      },
+      "revId": "d1917e267fd87ebda2ba33fa140018d1d5a55f76",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
