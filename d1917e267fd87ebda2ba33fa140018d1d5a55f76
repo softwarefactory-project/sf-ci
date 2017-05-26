@@ -25,6 +25,24 @@
     },
     {
       "key": {
+        "uuid": "baa041b7_5bee74ed",
+        "filename": "sf-init-stable.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2017-05-26T09:30:42Z",
+      "side": 1,
+      "message": "This is for 2.5.0, master should use \"--skip-apply\". Then I find it hard to follow when single task are moved to a separate file, but that\u0027s another story...",
+      "parentUuid": "baa041b7_fb25485c",
+      "revId": "d1917e267fd87ebda2ba33fa140018d1d5a55f76",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "baa041b7_db2a842c",
         "filename": "sf-upgrade.yaml",
         "patchSetId": 8
@@ -48,6 +66,24 @@
     },
     {
       "key": {
+        "uuid": "baa041b7_3bba90e2",
+        "filename": "sf-upgrade.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2017-05-26T09:30:42Z",
+      "side": 1,
+      "message": "We should have the cron indeed, but this is just in case the zuul-built.repo doesn\u0027t exists.",
+      "parentUuid": "baa041b7_db2a842c",
+      "revId": "d1917e267fd87ebda2ba33fa140018d1d5a55f76",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "baa041b7_bbe7c011",
         "filename": "sf-upgrade.yaml",
         "patchSetId": 8
@@ -65,6 +101,24 @@
         "endLine": 36,
         "endChar": 49
       },
+      "revId": "d1917e267fd87ebda2ba33fa140018d1d5a55f76",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "baa041b7_fbb30809",
+        "filename": "sf-upgrade.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2017-05-26T09:30:42Z",
+      "side": 1,
+      "message": "That\u0027s already the case (see the run_tests.sh), --skip-apply prevents any ansible call from sfconfig.py.",
+      "parentUuid": "baa041b7_bbe7c011",
       "revId": "d1917e267fd87ebda2ba33fa140018d1d5a55f76",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
