@@ -7,3 +7,15 @@
   yum:
     name: python-nose
     state: latest
+
+# sfmanager needs to read that file as standard user
+- name: Set /etc/software-factory/sfconfig.yaml read perm
+  file:
+    path: /etc/software-factory/sfconfig.yaml
+    mode: 0644
+
+# Remove sfmanager.log as it might be created before and owned by root
+- name: Remove previous sfmanager.log
+  file:
+    path: sfmanager.log
+    state: absent

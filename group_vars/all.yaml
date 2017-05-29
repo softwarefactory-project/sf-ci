@@ -1,8 +1,5 @@
 # Set until we get proper name
 koji_ip: 46.231.133.231
-# This is a Mash repo name we use to fetch and install sf-release
-# This is only used by the task install_sf_release.yaml
-sf_mash_repo: sf-master-el7
 # This is the yum.repo file installed by zuul_rpm_setup.py
 # This is only used by the task install_sf_ci_repo.yaml
 sf_ci_repo_yum_path: /etc/yum.repos.d/zuul-built.repo

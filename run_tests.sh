@@ -2,8 +2,9 @@
 
 set -Ex
 
-TEST_TYPE="$1"
-ARCH="$2"
+TEST_TYPE="${1:-functional}"
+ARCH="${2:-minimal}"
+FUNC_TEST_CASE="${3:-tests/functional}"
 
 rm -Rf ~/.ara/
 export ara_location=$(python -c "import os,ara; print(os.path.dirname(ara.__file__))")
@@ -41,28 +42,24 @@ function terminate {
 
 trap 'terminate' ERR
 
-function run_functional_tests() {
-    ansible-playbook sf-prepare-functional-tests.yaml
-    chown -R ${SUDO_USER} /var/lib/software-factory/bootstrap-data
-    ./create_ns.sh nosetests --with-html --html-file=nose_results.html -sv tests/functional
-    mv nose_results.html ${ARTIFACTS}/
-}
-
 # TODO: make this a parameter
 if [ "${TEST_TYPE}" == "upgrade" ]; then
     VERSION="2.5.0"
-
+    export SF_JENKINS_EXECUTOR=1
     ansible-playbook -e "sf_arch=${ARCH} sf_version=${VERSION}" sf-init-stable.yaml
 else
     ansible-playbook -e "sf_arch=${ARCH}" sf-init-master.yaml
 fi
 
-
 # Deploy
 ansible-playbook /var/lib/software-factory/ansible/sf_install.yml
 ansible-playbook /var/lib/software-factory/ansible/sf_setup.yml
 
-# TODO: run provisioner
+env
+ansible-playbook sf-provisioner.yaml
+
+# Run backup ceate
+ansible-playbook sf-backup-create.yaml
 
 if [ "${TEST_TYPE}" == "upgrade" ]; then
     ansible-playbook sf-upgrade.yaml
@@ -72,16 +69,19 @@ if [ "${TEST_TYPE}" == "upgrade" ]; then
 
     rpm -qa | sort > package_upgraded
     diff /var/lib/software-factory/package_installed package_upgraded || true
-    # TODO: run provisioner check
+    ansible-playbook sf-checker.yaml
 fi
 
 ansible-playbook sf-serverspec.yaml
 ansible-playbook health-check/sf-health-check.yaml
-run_functional_tests
+ansible-playbook sf-functional-tests.yaml -e "func_test_case=${FUNC_TEST_CASE} artifacts_directory=${ARTIFACTS} sudo_user=${SUDO_USER}"
 
 if [ "${TEST_TYPE}" == "functional" ]; then
-    # TODO: erase deployment and recover backup test
-    echo pass
+    ansible-playbook /var/lib/software-factory/ansible/sf_erase.yml -e "sfconfig_batch=true"
+    ansible-playbook -e "sf_arch=${ARCH}" sf-init-master.yaml
+    ansible-playbook /var/lib/software-factory/ansible/sf_install.yml
+    ansible-playbook sf-backup-recover.yaml
+    ansible-playbook sf-checker.yaml
 fi
 
 terminate 'END'
