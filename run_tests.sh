@@ -2,8 +2,8 @@
 
 set -Ex
 
-TEST_TYPE="$1"
-ARCH="$2"
+TEST_TYPE="${1:-functional}"
+ARCH="${2:-minimal}"
 
 rm -Rf ~/.ara/
 export ara_location=$(python -c "import os,ara; print(os.path.dirname(ara.__file__))")
@@ -61,7 +61,11 @@ fi
 ansible-playbook /var/lib/software-factory/ansible/sf_install.yml
 ansible-playbook /var/lib/software-factory/ansible/sf_setup.yml
 
-# TODO: run provisioner
+# Run provisioner
+ansible-playbook sf-provisioner.yaml
+
+# Run backup ceate
+ansible-playbool sf-backup-create.yaml
 
 if [ "${TEST_TYPE}" == "upgrade" ]; then
     ansible-playbook sf-upgrade.yaml
@@ -71,7 +75,7 @@ if [ "${TEST_TYPE}" == "upgrade" ]; then
 
     rpm -qa | sort > package_upgraded
     diff /var/lib/software-factory/package_installed package_upgraded || true
-    # TODO: run provisioner check
+    ansible-playbook sf-checker.yaml
 fi
 
 ansible-playbook sf-serverspec.yaml
@@ -79,8 +83,10 @@ ansible-playbook health-check/sf-health-check.yaml
 run_functional_tests
 
 if [ "${TEST_TYPE}" == "functional" ]; then
-    # TODO: erase deployment and recover backup test
-    echo pass
+    ansible-playbook /var/lib/software-factory/ansible/sf_erase.yml
+    ansible-playbook /var/lib/software-factory/ansible/sf_install.yml
+    ansible-playbool sf-backup-recover.yaml
+    ansible-playbook sf-checker.yaml
 fi
 
 terminate 'END'
