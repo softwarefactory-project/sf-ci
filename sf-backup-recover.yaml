@@ -1,0 +1,4 @@
+- hosts: localhost
+  tasks:
+    - name: Run sfconfig --recover
+      command: sfconfig --recover ./sf_backup.tar.gz
