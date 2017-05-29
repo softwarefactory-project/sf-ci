@@ -1,0 +1,2 @@
+- name: Run sfconfig restore
+  include: /var/lib/software-factory/ansible/sf_restore.yml backup_file="sf_backup.tar.gz"
