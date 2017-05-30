@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_ac02e83c",
+        "filename": "run_tests.sh",
+        "patchSetId": 15
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-05-30T15:03:18Z",
+      "side": 0,
+      "message": "Is it installed by an element now ? Might be good to still have something to install running test deps, maybe a playbook ?",
+      "revId": "00c021d8c07ec2030fffc4282e8eea2d0caad57a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
