@@ -10,6 +10,6 @@
         group: "{{ sudo_user }}"
         recurse: yes
     - name: Start functional tests
-      command: ./create_ns.sh nosetests --with-html --html-file=nose_results.html -sv {{ func_test_case }}
+      command: ./create_ns.sh nosetests --with-timer --with-html --html-file=nose_results.html --logging-format "%(asctime)s: %(levelname)s - %(message)s" -sv {{ func_test_case }}
     - name: Move nose_results.html in artifacts directory
       command: mv nose_results.html {{ artifacts_directory }}/
