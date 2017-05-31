@@ -18,4 +18,4 @@ if [ "$1" == "stop" ]; then
 	exit 0
 fi
 
-ip netns exec local-test sudo -u $SUDO_USER $*
+ip netns exec local-test sudo -u $SUDO_USER "$@"
