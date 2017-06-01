@@ -1,0 +1,27 @@
+- name: Check for /etc/sf-release
+  stat:
+    path: /etc/sf-release
+  register: st
+- name: Get SF release version
+  command: cat /etc/sf-release
+  register: sfversion
+  when: st.stat.exists
+- name: Run data provisionner with SF_JENKINS_EXECUTOR=1
+  command: python provisioner.py
+  args:
+    chdir: "{{ sf_ci }}/tests/functional/provisioner/"
+  environment:
+    SF_JENKINS_EXECUTOR: 1
+  become: yes
+  become_user: root
+  register: executed
+  when: st.stat.exists and sfversion.stdout.find("2.5.0") == 0
+- name: Run data provisionner with SF_JENKINS_EXECUTOR=0
+  command: python provisioner.py
+  args:
+    chdir: "{{ sf_ci }}/tests/functional/provisioner/"
+  environment:
+    SF_JENKINS_EXECUTOR: 0
+  become: yes
+  become_user: root
+  when: executed|skipped
