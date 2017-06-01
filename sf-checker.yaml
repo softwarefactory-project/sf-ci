@@ -1,4 +1,0 @@
-- hosts: localhost
-  tasks:
-    - include: tasks/install_functional_test_env.yaml
-    - include: tasks/run_checker.yaml

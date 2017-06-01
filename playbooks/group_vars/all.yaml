@@ -1,11 +1,12 @@
 # Set until we get proper name
 koji_ip: 46.231.133.231
-# This is the yum.repo file installed by zuul_rpm_setup.py
-# This is only used by the task install_sf_ci_repo.yaml
-sf_ci_repo_yum_path: /etc/yum.repos.d/zuul-built.repo
 # SF architecture file
 sf_arch: minimal
 # SF version
 sf_version: master
 # Local repository path
 local_repo_path: ""
+
+# workspace
+workspace: "{{ lookup('env','WORKSPACE') }}"
+artifacts: "{{ workspace }}/artifacts"
