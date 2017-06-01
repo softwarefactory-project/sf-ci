@@ -1,0 +1,34 @@
+---
+- hosts: localhost
+  become_method: sudo
+  tasks:
+    - block:
+      - name: Prepare test env
+        include: tasks/prepare_test_env.yml
+      - name: Install SF CI repos
+        include: tasks/install_sf_ci_repo.yml
+      - name: Upgrade system packages
+        include: tasks/yum_update.yml
+      - name: Run sfconfig
+        include: tasks/run_sfconfig.yml
+      - name: Install test env
+        include: tasks/install_test_env.yml
+      - name: Run severspec validation
+        include: tasks/run_serverspec.yml
+      - name: Run provisioner
+        include: tasks/run_provisioner.yml
+      - name: Create a backup
+        include: tasks/run_backup_create.yml
+      - name: Run health check scenarios
+        include: tasks/run_health-check.yml
+      - name: Run functional tests
+        include: tasks/run_functional_tests.yml
+      - name: Erase SF
+        include: tasks/run_erase.yml
+      - name: Recover SF
+        include: tasks/run_sfconfig_recover.yml
+      - name: Run checker
+        include: tasks/run_checker.yml
+      always:
+      - name: End test tasks
+        include: tasks/finish_test.yml

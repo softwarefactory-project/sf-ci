@@ -1,0 +1,33 @@
+---
+- hosts: localhost
+  tasks:
+    - block:
+      - name: Prepare test env
+        include: tasks/prepare_test_env.yml
+      - name: Install SF stable release
+        include: tasks/install_stable_repo.yml
+      - name: Upgrade system packages
+        include: tasks/yum_update.yml
+      - name: Run sfconfig
+        include: tasks/run_sfconfig.yml
+      - name: Install test env
+        include: tasks/install_test_env.yml
+      - name: Run severspec validation
+        include: tasks/run_serverspec.yml
+      - name: Restore SF CI repos
+        include: tasks/restore_ci_repo.yml
+      - name: Install SF CI repos
+        include: tasks/install_sf_ci_repo.yml
+      - name: Run provisioner
+        include: tasks/run_provisioner.yml
+      - name: Run SF upgrade
+        include: tasks/run_sfconfig_upgrade.yml
+      - name: Run checker
+        include: tasks/run_checker.yml
+      - name: Run health check scenarios
+        include: tasks/run_health-check.yml
+      - name: Run functional tests
+        include: tasks/run_functional_tests.yml
+      always:
+      - name: End test tasks
+        include: tasks/finish_test.yml
