@@ -1,0 +1,21 @@
+- name: Include arch file vars
+  include_vars:
+    file: /etc/software-factory/arch.yaml
+
+- block:
+    - name: Install mosquitto_sub service
+      copy:
+        src: "{{ sf_ci }}/patches/mosquitto-client-tests.service"
+        dest: /lib/systemd/system/mosquitto-client-tests.service
+        mode: 064
+      become: yes
+      become_user: root
+
+    - name: Start mosquitto_sub service
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: mosquitto-client-tests
+      become: yes
+      become_user: root
+  when: '"firehose" in inventory[0]["roles"]'

@@ -1,0 +1,12 @@
+- name: Include arch file vars
+  include_vars:
+    file: /etc/software-factory/arch.yaml
+
+- block:
+    - name: Check whether /var/lib/software-factory/mosquitto_sub.log contains "review"
+      command: grep "review" /var/lib/software-factory/mosquitto_sub.log
+    - name: Check whether /var/lib/software-factory/mosquitto_sub.log contains "config-update"
+      command: grep "config-update" /var/lib/software-factory/mosquitto_sub.log
+    - name: Check whether /var/lib/software-factory/mosquitto_sub.log contains "PIPELINE"
+      command: grep "PIPELINE" /var/lib/software-factory/mosquitto_sub.log
+  when: '"firehose" in inventory[0]["roles"]'
