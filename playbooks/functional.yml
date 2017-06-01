@@ -12,7 +12,9 @@
       - include: tasks/run_provisioner.yml
       - include: tasks/run_backup_create.yml
       - include: tasks/run_health-check.yml
+      - include: tasks/run_firehose_listener.yml
       - include: tasks/run_functional_tests.yml
+      - include: tasks/check_firehose_events.yml
       - include: tasks/run_erase.yml
       - include: tasks/run_sfconfig_recover.yml
       - include: tasks/run_checker.yml
