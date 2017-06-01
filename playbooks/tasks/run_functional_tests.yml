@@ -1,0 +1,4 @@
+- name: Start functional tests
+  command: "{{ workspace }}/sf-ci/scripts/create_ns.sh nosetests --with-timer --with-html --html-file=nose_results.html --logging-format '%(asctime)s: %(levelname)s - %(message)s' -sv {{ workspace }}/sf-ci/{{ func_test_case }}"
+  become: yes
+  become_user: root

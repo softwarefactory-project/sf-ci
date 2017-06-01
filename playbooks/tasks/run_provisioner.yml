@@ -1,0 +1,6 @@
+- name: Run data provisionner
+  command: python provisioner.py
+  args:
+    chdir: "{{ workspace }}/sf-ci/tests/functional/provisioner/"
+  become: yes
+  become_user: root

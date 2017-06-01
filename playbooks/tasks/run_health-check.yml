@@ -1,0 +1,2 @@
+- name: Execute health-check
+  command: "ansible-playbook {{ workspace }}/sf-ci/health-check/sf-health-check.yaml"
