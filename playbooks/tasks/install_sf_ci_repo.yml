@@ -1,0 +1,55 @@
+- name: Check for zuul-built.repo
+  stat: path=/etc/yum.repos.d/zuul-built.repo
+  register: zuul_built_repo
+
+- name: Check for sf-release.repo
+  stat: path=/etc/yum.repos.d/sf-release.repo
+  register: sf_release_repo
+
+- name: Check for local-build.repo
+  stat: path=/etc/yum.repos.d/local-built.repo
+  register: local_built_repo
+
+- name: Install sf-release when no zuul-built
+  yum:
+    name: "https://softwarefactory-project.io/repos/sf-release-master.rpm"
+  when: not zuul_built_repo.stat.exists and not sf_release_repo.stat.exists
+  become: yes
+  become_user: root
+
+- name: Install zuul-built.repo in place of sf-release
+  command: mv /etc/yum.repos.d/zuul-built.repo /etc/yum.repos.d/sf-release.repo
+  when: zuul_built_repo.stat.exists
+  become: yes
+  become_user: root
+
+- name: Replace koji hostname by its IP
+  replace:
+    dest: /etc/yum.repos.d/sf-release.repo
+    regexp: 'koji.softwarefactory-project.io'
+    replace: "{{ koji_ip }}"
+  become: yes
+  become_user: root
+
+- name: Check for locally built packages
+  stat:
+    path: "{{ local_repo_path }}"
+  register: local_build
+
+- name: Remove local_built repo
+  file:
+    path: /etc/yum.repos.d/local-built.repo
+    state: absent
+  when: not local_build.stat.exists
+  become: yes
+  become_user: root
+
+- name: Add local_built repo
+  yum_repository:
+    name: "local-built"
+    description: "Local build repo"
+    baseurl: "file://{{ local_repo_path }}"
+    gpgcheck: "0"
+  when: local_build.stat.exists
+  become: yes
+  become_user: root

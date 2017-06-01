@@ -1,5 +1,0 @@
-- name: Install SF Serverspec scripts
-  synchronize:
-    src: serverspec/
-    dest: /etc/serverspec/
-  delegate_to: localhost

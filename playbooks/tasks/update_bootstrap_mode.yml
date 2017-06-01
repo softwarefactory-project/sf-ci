@@ -1,0 +1,18 @@
+- name: Copy group vars to bootstrap-data
+  copy:
+    src: /var/lib/software-factory/ansible/group_vars/all.yaml
+    dest: /var/lib/software-factory/bootstrap-data/
+    remote_src: True
+  become: yes
+  become_user: root
+
+- name: Change perm for /var/lib/software-factory/bootstrap-data
+  file:
+    path: "{{ item }}"
+    recurse: yes
+    owner: "{{ sf_user }}"
+  with_items:
+    - /var/lib/software-factory/bootstrap-data/
+    - /etc/software-factory/
+  become: yes
+  become_user: root

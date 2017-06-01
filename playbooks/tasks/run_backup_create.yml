@@ -1,0 +1,11 @@
+- name: Change perm for sfconfig.yaml
+  file:
+    path: /etc/software-factory/sfconfig.yaml
+    owner: "{{ sf_user }}"
+  become: yes
+  become_user: root
+
+- name: Run sfmanager backup start
+  command: sfmanager system backup_start
+- name: Run sfmanager backup get
+  command: sfmanager system backup_get
