@@ -1,0 +1,6 @@
+- name: Check whether /var/lib/software-factory/mosquitto_sub.log contains "review"
+  command: grep "review" /var/lib/software-factory/mosquitto_sub.log
+- name: Check whether /var/lib/software-factory/mosquitto_sub.log contains "config-update"
+  command: grep "config-update" /var/lib/software-factory/mosquitto_sub.log
+- name: Check whether /var/lib/software-factory/mosquitto_sub.log contains "PIPELINE"
+  command: grep "PIPELINE" /var/lib/software-factory/mosquitto_sub.log
