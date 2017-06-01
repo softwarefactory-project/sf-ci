@@ -1,0 +1,10 @@
+[Unit]
+Description=Firehose listener daemon
+
+[Service]
+User=root
+Group=root
+ExecStart=/bin/bash -c 'exec /usr/bin/mosquitto_sub -h sftests.com -t "#" > /var/lib/software-factory/mosquitto_sub.log'
+
+[Install]
+WantedBy=multi-user.target
