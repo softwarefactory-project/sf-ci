@@ -1,2 +1,0 @@
-- name: Init sfconfig playbooks
-  command: sfconfig.py --skip-apply

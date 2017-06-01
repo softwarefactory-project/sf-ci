@@ -1,4 +1,0 @@
-- name: Run data provisionner
-  command: python provisioner.py
-  args:
-    chdir: tests/functional/provisioner/

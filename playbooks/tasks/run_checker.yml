@@ -1,0 +1,6 @@
+- name: Run data checker
+  command: python checker.py
+  args:
+    chdir: "{{ sf_ci }}/tests/functional/provisioner/"
+  become: yes
+  become_user: root
