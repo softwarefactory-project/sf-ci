@@ -1,0 +1,15 @@
+- name: "Ensure test tools are installed"
+  yum:
+    name: "{{ item }}"
+  with_items:
+    - python-nose
+    - python-nose-timer
+    - python-nose-htmloutput
+  become: yes
+  become_user: root
+
+# Remove sfmanager.log as it might be created before and owned by root
+- name: Remove previous sfmanager.log
+  file:
+    path: "{{ sf_ci }}/playbooks/sfmanager.log"
+    state: absent
