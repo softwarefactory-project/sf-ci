@@ -1,0 +1,55 @@
+- name: Install sf-config package
+  yum:
+    name: sf-config
+    state: latest
+  become: yes
+  become_user: root
+
+- name: Install SF architecture file {{ sf_arch }}.yaml
+  copy:
+    src: "/usr/share/sf-config/refarch/{{ sf_arch }}.yaml"
+    dest: /etc/software-factory/arch.yaml
+  become: yes
+  become_user: root
+
+# Special fix for 2.5.0
+- block:
+  - file:
+      path: "{{ item }}"
+      mode: 0700
+      state: directory
+    with_items:
+      - /root/.ssh
+      - /etc/serverspec
+    become: yes
+    become_user: root
+
+  - name: Fix arch
+    copy:
+      src: "{{ sf_ci }}/patches/2.5.0-minimal.yaml"
+      dest: /etc/software-factory/arch.yaml
+    become: yes
+    become_user: root
+
+  - name: Fix gitweb install
+    replace:
+      dest: "/usr/share/sf-config/ansible/roles/sf-gitweb/tasks/install.yml"
+      regexp: " theme "
+      replace: " gitweb_theme "
+    become: yes
+    become_user: root
+  - name: Fix gitweb default
+    replace:
+      dest: "/usr/share/sf-config/ansible/roles/sf-gitweb/defaults/main.yml"
+      regexp: "^theme:"
+      replace: "gitweb_theme:"
+    become: yes
+    become_user: root
+  when: "sf_version == '2.5.0'"
+
+- name: Run sfconfig.py
+  command: sfconfig.py
+  become: yes
+  become_user: root
+
+- include: update_bootstrap_mode.yml
