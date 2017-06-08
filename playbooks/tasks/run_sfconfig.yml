@@ -12,6 +12,13 @@
   become: yes
   become_user: root
 
+- name: Install extra custom-vars for mirrors
+  copy:
+    src: "{{ sf_ci }}/patches/custom-vars.yaml"
+    dest: /etc/software-factory/custom-vars.yaml
+  become: yes
+  become_user: root
+
 # Special fix for 2.5.0
 - block:
   - file:
