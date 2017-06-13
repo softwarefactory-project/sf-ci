@@ -1,5 +1,3 @@
-#!/bin/env python
-#
 # Copyright (C) 2016 Red Hat
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -96,14 +94,6 @@ class TestResourcesWorkflow(Base):
             "Add new resources for functional tests")
         config_update_log = self.ju.wait_for_config_update(change_sha)
         self.assertIn("SUCCESS", config_update_log)
-
-    def wait_for_jenkins_note(self, change_id):
-        attempt = 0
-        while "jenkins" not in self.gu.get_reviewers(change_id):
-            if attempt >= 90:
-                break
-            time.sleep(1)
-            attempt += 1
 
     def propose_resources_change_check_ci(
             self, fpath, resources=None,
