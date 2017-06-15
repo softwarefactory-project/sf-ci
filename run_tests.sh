@@ -9,6 +9,7 @@ WORKSPACE=${WORKSPACE:-$(realpath $(pwd)/..)}
 ARTIFACTS=${WORKSPACE}/artifacts
 VERSION="${SF_VERSION:-master}"
 USER=${SUDO_USER:-${USER}}
+LOCAL_REPO_PATH="${LOCAL_REPO_PATH:-}"
 
 rm -Rf ~/.ara/ ${ARTIFACTS}/
 
@@ -36,6 +37,6 @@ if [ "${TEST_TYPE}" == "upgrade" ]; then
 fi
 
 trap 'terminate' ERR
-ansible-playbook -e "sf_user=${USER} workspace=${WORKSPACE} sf_ci=$(pwd) sf_arch=${ARCH} sf_version=${VERSION} func_test_case=${FUNC_TEST_CASE}" playbooks/${TEST_TYPE}.yml
+ansible-playbook -e "sf_user=${USER} workspace=${WORKSPACE} local_repo_path=${LOCAL_REPO_PATH} sf_ci=$(pwd) sf_arch=${ARCH} sf_version=${VERSION} func_test_case=${FUNC_TEST_CASE}" playbooks/${TEST_TYPE}.yml
 
 terminate 'END'
