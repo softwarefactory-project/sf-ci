@@ -5,8 +5,8 @@
       - include: tasks/prepare_test_env.yml
       - include: tasks/install_stable_repo.yml
       - include: tasks/yum_update.yml
-      - include: tasks/run_sfconfig.yml
       - include: tasks/install_test_env.yml
+      - include: tasks/run_sfconfig.yml
       - include: tasks/run_serverspec.yml
       - include: tasks/restore_ci_repo.yml
       - include: tasks/install_sf_ci_repo.yml

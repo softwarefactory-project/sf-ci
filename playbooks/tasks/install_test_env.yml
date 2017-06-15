@@ -2,6 +2,7 @@
   yum:
     name: "{{ item }}"
   with_items:
+    - ara
     - python-nose
     - python-nose-timer
     - python-nose-htmloutput
