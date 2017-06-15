@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baa041b7_820a3ad1",
+        "filename": "run_tests.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 68
+      },
+      "writtenOn": "2017-06-15T10:48:14Z",
+      "side": 1,
+      "message": "maybe /var/lib/sf/zuul-rpm-build/ as default value?",
+      "revId": "11360a178ff9f8cd28b0e3ed0608fc773e2ca782",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
