@@ -3,6 +3,7 @@
 import os
 import yaml
 
+SF_GROUPVARS = "/var/lib/software-factory/ansible/group_vars/all.yaml"
 SF_BOOTSTRAP_DATA = "/var/lib/software-factory/bootstrap-data/"
 SF_TESTS_DIR = "./tests"
 
@@ -16,7 +17,7 @@ requests_ca = "%s/certs/localCA.pem" % SF_BOOTSTRAP_DATA
 if "REQUESTS_CA_BUNDLE" not in os.environ and os.path.isfile(requests_ca):
     os.environ["REQUESTS_CA_BUNDLE"] = requests_ca
 
-groupvars = yaml.safe_load(open("%s/all.yaml" % SF_BOOTSTRAP_DATA))
+groupvars = yaml.safe_load(open(SF_GROUPVARS))
 
 GATEWAY_HOST = groupvars['fqdn']
 
