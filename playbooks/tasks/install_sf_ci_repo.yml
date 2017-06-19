@@ -10,7 +10,7 @@
   stat: path=/etc/yum.repos.d/local-built.repo
   register: local_built_repo
 
-- name: Install sf-release when no zuul-built
+- name: Install sf-release master when no zuul-built
   yum:
     name: "https://softwarefactory-project.io/repos/sf-release-master.rpm"
   when: not zuul_built_repo.stat.exists and not sf_release_repo.stat.exists
