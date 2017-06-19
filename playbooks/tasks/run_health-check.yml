@@ -1,2 +1,4 @@
 - name: Execute health-check
   command: "ansible-playbook {{ sf_ci }}/health-check/sf-health-check.yaml"
+  become: yes
+  become_user: root
