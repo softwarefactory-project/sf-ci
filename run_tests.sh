@@ -24,10 +24,12 @@ export ANSIBLE_ACTION_PLUGINS=$ara_location/plugins/actions
 export ANSIBLE_LIBRARY=$ara_location/plugins/modules
 
 function terminate {
-    pushd ${ARTIFACTS}
-        rm -Rf ara-report
-        ara generate html ara-report
-    popd
+    if which ara &> /dev/null; then
+        pushd ${ARTIFACTS}
+            rm -Rf ara-report
+            ara generate html ara-report
+        popd
+    fi
     sudo chown -R ${USER}:${USER} ${ARTIFACTS}
     [ "$1" == "END" ] && exit 0 || exit 1
 }
