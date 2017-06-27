@@ -1,6 +1,6 @@
 ---
 # * Check if a zuul jobs exists
-- hosts: zuul
+- hosts: zuul-server
   vars:
     job_name: "{{ job|default ('config-update') }}"
   tasks:

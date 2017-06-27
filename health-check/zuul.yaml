@@ -20,6 +20,7 @@
   when: hostvars[groups[jobs_host][0]]["job_created_" + jobs_host].rc != 0 or hostvars[groups["zuul"][0]]["zuul_created"].rc != 0
 
 - hosts: install-server
+  remote_user: root
   tasks:
     - block:
       - name: "Add config repo files"
@@ -75,6 +76,7 @@
 # * Fix bad change and verify Jenkins CI +1
 # * Check if change got merged
 - hosts: install-server
+  remote_user: root
   tasks:
     - name: Commit bad change and check for test error
       command: chdir={{ project_path }} {{ item }}
@@ -103,6 +105,7 @@
 
 # * Check logs export
 - hosts: jenkins
+  remote_user: root
   tasks:
     - name: "Get artifact url from console.log"
       when: test_log_export == 'yes'

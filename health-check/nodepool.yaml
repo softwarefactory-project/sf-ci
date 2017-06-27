@@ -1,12 +1,9 @@
 ---
-# * Setup provider with sfconfig.py
-- name: "Check nodepool configuration"
-  include: playbooks/sfconfig_nodepool_setup.yaml
-
-- hosts: nodepool
+- hosts: nodepool-launcher
+  remote_user: root
   tasks:
     - name: "Check service"
-      command: systemctl status nodepool
+      command: systemctl status nodepool-launcher
       register: nodepool_service
 
     - name: "Check service errors"
@@ -18,85 +15,86 @@
 
 # * Add image and node label to config-repo
 - hosts: install-server
+  remote_user: root
   tasks:
     - name: "Check if image is already defined"
-      shell: "grep -q '{{ node }}' {{ config_path }}/nodepool/nodepool.yaml && grep -q '{{ base_image_name }}' {{ config_path }}/nodepool/nodepool.yaml"
+      command: python -c "import yaml; exit(len(yaml.safe_load(open('{{ config_path }}/nodepool/nodepool.yaml'))['diskimages']) == 0)"
       register: sfconfiged
       failed_when: False
 
-    - name: Adds nodepool providers
+    - name: Adds nodepool configuration
+      template:
+        src: templates/nodepool.yaml.j2
+        dest: "{{ config_path }}/nodepool/nodepool.yaml"
       when: sfconfiged.rc
-      command: >
-        /usr/share/sf-config/scripts/hieraedit.py --yaml {{ config_path }}/nodepool/nodepool.yaml --eval providers "[{
-            'name': '{{ provider_name }}',
-            'boot-timeout': 120,
-            'clean-floating-ips': True,
-            'cloud': '{{ provider_name }}',
-            'pool': '{{ os_pool }}',
-            'boot-timeout': 120,
-            'max-servers': 3,
-            'rate': 3.0,
-            'networks': [{'name': '{{ os_slave_network }}'}],
-            'images': [{
-                'name': '{{ image_name }}',
-                'base-image': '{{ base_image_name }}',
-                'username': 'centos',
-                'setup': 'base.sh',
-                'min-ram': 2048,
-            }]
-        }]"
-
-    - name: Adds nodepool label
-      when: sfconfiged.rc
-      command: >
-        /usr/share/sf-config/scripts/hieraedit.py --yaml {{ config_path }}/nodepool/nodepool.yaml --eval labels "[{
-            'name': '{{ node }}',
-            'image': '{{ image_name }}',
-            'min-ready': 2,
-            'providers': [{'name': '{{ provider_name }}'}]
-        }]"
 
     - name: Update change
       when: sfconfiged.rc
       command: chdir={{ config_path }}  {{ item }}
       with_items:
-          - 'git commit -a -m "Add {{ node }} label to {{ provider_name }} provider"'
+          - 'git commit -a -m "Add {{ provider_name }} provider"'
       environment: {'EDITOR':'test'}
 
 - name: "Submit config repos"
   include: playbooks/config_submit_change.yaml
   when: sfconfiged.rc
 
-
-# * Check if slaves are running
-- hosts: nodepool
+- hosts: nodepool-builder
+  remote_user: root
   tasks:
-    - name: Wait for image build start
-      wait_for: path=/var/log/nodepool/nodepool.log search_regex="Creating image.*{{ image_name }}"
+    - name: "Wait for image build start"
+      wait_for:
+        path: /var/log/nodepool/builder.log
+        search_regex: "Building image.*dib-centos-7"
 
-    - name: "Check image is building"
-      command: nodepool image-list
-      register: imagelist
-      failed_when: imagelist.stdout.find("{{ image_name }}") == -1
+    - name: "Wait for image build to succeed"
+      wait_for:
+        path: /var/log/nodepool/builder.log
+        search_regex: "DIB image dib-centos-7 is built"
+        timeout: 1200
 
-    - name: "Wait for ssh connection to be okay for image build"
-      wait_for: path=/var/www/nodepool-log/default-{{ image_name }}.log timeout=1200 search_regex="{{ image_name }}.* access okay"
+    - name: "Wait for image upload start"
+      wait_for:
+        path: /var/log/nodepool/builder.log
+        search_regex: "Uploading DIB image build .*dib-centos-7"
+        timeout: 1200
 
-    - name: "Wait for image build to succeed: Base setup done."
-      wait_for: path=/var/www/nodepool-log/default-{{ image_name }}.log timeout=1200 search_regex="nodepool.image.build.{{ provider_name }}.{{ image_name }}.*Base setup done."
+    - name: "Wait for image upload to succeed"
+      wait_for:
+        path: /var/log/nodepool/builder.log
+        search_regex: "Image build dib-centos-7.* is ready"
+        timeout: 1200
 
-    - name: "Wait for snapshot to be ready"
-      wait_for: path=/var/log/nodepool/nodepool.log timeout=1200 search_regex="SnapshotImageUpdater.* Image .*{{ image_name }}.* in {{ provider_name }} is ready"
+- hosts: nodepool-launcher
+  remote_user: root
+  tasks:
+    - name: "Wait for node creation"
+      wait_for:
+        path: /var/log/nodepool/nodepool.log
+        search_regex: "Creating server .* from image dib-centos-7"
+        timeout: 1200
 
-    - name: "Wait for the first slave node to connect on Jenkins"
-      wait_for: path=/var/log/nodepool/nodepool.log timeout=1200 search_regex="NodeLauncher. Node .* is ready"
+    - name: "Wait for node ready"
+      wait_for:
+        path: /var/log/nodepool/nodepool.log
+        search_regex: "Node id.* added to jenkins"
+        timeout: 1200
 
+
+- hosts: jenkins
+  remote_user: root
+  tasks:
     - name: "Wait for the first slave to appear in Jenkins"
-      shell: for i in {1..100}; do sleep ${i}; curl -Ls https://{{ fqdn }}/jenkins/computer/api/json | python -c "import sys, json; d = json.loads(sys.stdin.read()); slaves = [s for s in d['computer'] if ('{{ node }}-default' in s['displayName'])]; len(slaves) > 0 and sys.exit(0) or sys.exit(1)" && exit 0; done; exit 1
+      shell: curl -Ls http://localhost:8082/jenkins/computer/api/json | python -c "import sys, json; d = json.loads(sys.stdin.read()); slaves = [s for s in d['computer'] if ('dib-centos-7' in s['displayName'])]; len(slaves) > 0 and sys.exit(0) or sys.exit(1)"
+      register: result
+      until: result|success
+      retries: 30
+      delay: 10
 
-    - name: "Wait for the first slave to appears online in Jenkins"
-      shell: for i in {1..100}; do sleep ${i}; curl -Ls https://{{ fqdn }}/jenkins/computer/api/json | python -c "import sys, json; d = json.loads(sys.stdin.read()); slaves = [s for s in d['computer'] if ('{{ node }}-default' in s['displayName'])]; any(s['offline'] == False for s in slaves) and sys.exit(0) or sys.exit(1)" && exit 0; done; exit 1
 
+- hosts: install-server
+  remote_user: root
+  tasks:
     - name: "Query the nodes REST API to get last node info"
       uri:
         url: http://managesf:20001/nodes/
@@ -116,11 +114,15 @@
     - name: "Create a test ssh key"
       command: ssh-keygen -N '' -f /tmp/{{ nodes_info.json['nodepool'][0]['node_name'] }}_id_rsa
 
+    - name: "Read test ssh key"
+      command: cat /tmp/{{ nodes_info.json["nodepool"][0]["node_name"] }}_id_rsa.pub
+      register: tmp_key
+
     - name: "Add the test ssh key to node's authorized keys with the REST API"
       uri:
         url: http://managesf:20001/nodes/id/{{ nodes_info.json['nodepool'][0]['node_id'] }}/authorize_key/
         method: POST
-        body: "public_key={{ lookup('file', '/tmp/' + nodes_info.json.nodepool.0.node_name + '_id_rsa.pub')|urlencode() }}"
+        body: "public_key={{ tmp_key.stdout|urlencode() }}"
         HEADER_X-Remote-User: admin
         return_content: yes
       register: ak_output

@@ -1,6 +1,7 @@
 ---
 # * Reset {{ config_path }} checkout and update to origin/master
 - hosts: install-server
+  remote_user: root
   tasks:
     - name: Clone config repo
       git: repo=http://{{ fqdn }}/r/config dest={{ config_path }} update=no

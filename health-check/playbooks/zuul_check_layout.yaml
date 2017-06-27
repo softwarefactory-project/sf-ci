@@ -1,6 +1,7 @@
 ---
 # * Check if a zuul job and project are defined
-- hosts: zuul
+- hosts: zuul-server
+  remote_user: root
   tasks:
     #- name: "Check if layout is already created"
     #  shell: echo status | nc zuul 4730
