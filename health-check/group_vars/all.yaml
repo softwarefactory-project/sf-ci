@@ -19,11 +19,10 @@ config_path: "/var/lib/software-factory/health-check/config"
 # Openstack access
 os_env:
   OS_AUTH_URL: "{{ os_auth_url|default(omit) }}"
-  OS_TENANT_NAME: "{{ os_tenant_name|default(omit) }}"
+  OS_PROJECT_NAME: "{{ os_project_name|default(omit) }}"
   OS_USERNAME: "{{ os_username|default(omit) }}"
   OS_PASSWORD: "{{ os_password|default(omit) }}"
 
-jobs_host: "zuul"
 config_update_log: "/var/www/logs/results/config-update/lastSuccessful"
 
 # Nodepool

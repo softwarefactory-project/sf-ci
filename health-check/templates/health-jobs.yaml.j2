@@ -7,8 +7,9 @@
     builders:
       - prepare-workspace
       - shell: mkdir artifacts; cd $ZUUL_PROJECT && ./run_tests.sh
-{% if test_log_export %}
     publishers:
+      - console-log
+{% if test_log_export %}
       - postbuildscript:
           builders:
             - shell: /usr/bin/zuul-swift-upload --verbose --name {{ os_container }} --delete-after 86400  artifacts
@@ -25,3 +26,5 @@
     builders:
       - prepare-workspace
       - shell: cd $ZUUL_PROJECT && ./run_functional-tests.sh
+    publishers:
+      - console-log

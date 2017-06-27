@@ -1,0 +1,221 @@
+---
+- hosts: localhost
+  tasks:
+    - fail: msg='OS_ env needs to be set'
+      when: not os_auth_url or not os_username or not os_password or not os_project_name
+
+    - fail: msg='OS_FLOATING_IP_ID and OS_FLOATING_IP needs to be set'
+      when: (floatingip and not floatingip_id) or (floatingip_id and not floatingip)
+
+    - block:
+        - name: "Check for local ssh key"
+          stat:
+            path: "{{ home }}/.ssh/id_rsa"
+          register: local_key
+
+        - name: "Create ssh key when missing"
+          command: "ssh-keygen -N '' -f {{ home }}/.ssh/id_rsa"
+          when: not local_key.stat.exists
+
+        - name: "Upload keypair"
+          os_keypair:
+            state: present
+            name: temp_id_rsa
+            public_key_file: "{{ home }}/.ssh/id_rsa.pub"
+      when: manage_key|default('yes') == 'yes'
+
+    - block:
+        - name: "Download image when missing"
+          get_url:
+            url: "{{ image_url }}"
+            dest: "{{ workspace }}/sf-{{ sf_version }}.qcow2"
+          register: new_image
+
+        - name: "Remove image"
+          os_image:
+            name: "sf-{{ sf_version }}"
+            state: absent
+          when: new_image|changed
+
+        - name: "Upload image"
+          os_image:
+            name: "sf-{{ sf_version }}"
+            container_format: bare
+            disk_format: qcow2
+            state: present
+            filename: "{{ workspace }}/sf-{{ sf_version }}.qcow2"
+          register: image
+      when: manage_image|default('yes') == 'yes'
+
+    - block:
+        - name: "Get image"
+          os_image:
+            name: "sf-{{ sf_version }}"
+          register: image
+
+        # Floating-ip needs to be manually detached when using fixed-ip stack...
+        - os_floating_ip:
+            state: absent
+            floating_ip_address: "{{ floatingip }}"
+            server: "managesf.{{ sf_domain }}"
+          when: reset_stack|default("yes") == "yes" and floatingip != ""
+          ignore_errors: yes
+          register: os_floating_ip_result
+          until: os_floating_ip_result|success
+          retries: 3
+          delay: 5
+
+        - name: "Clean nodepool resources"
+          command: "{{ sf_ci }}/scripts/clean_nodepool.sh"
+          when: reset_stack|default("yes") == "yes"
+
+        - name: "Destroy stacks"
+          os_stack:
+            name: "sf-{{ sf_version }}-{{ sf_arch }}"
+            state: "absent"
+          when: reset_stack|default("yes") == "yes"
+          register: os_stack_result
+          until: os_stack_result|success
+          retries: 3
+          delay: 5
+
+        - debug: msg="Deploying {{ stack_url }}"
+
+        - name: "Deploy stacks using fixed ip"
+          os_stack:
+            name: "sf-{{ sf_version }}-{{ sf_arch }}"
+            rollback: no
+            template: "{{ stack_url }}"
+            parameters:
+              key_name: "temp_id_rsa"
+              image_id: "{{ image.image.id }}"
+              floatingip_id: "{{ floatingip_id|default(omit) }}"
+              domain: "{{ sf_domain }}"
+              bootstrap: false
+          when: floatingip_id != ""
+          register: stack
+
+        - name: "Deploy stacks"
+          os_stack:
+            name: "sf-{{ sf_version }}-{{ sf_arch }}"
+            rollback: no
+            template: "{{ stack_url }}"
+            parameters:
+              key_name: "temp_id_rsa"
+              image_id: "{{ image.image.id }}"
+              domain: "{{ sf_domain }}"
+              bootstrap: false
+          when: not floatingip_id
+          register: stack
+
+      when: manage_stack|default('yes') == 'yes'
+
+    - name: "Get stack"
+      os_stack_get:
+        name: "sf-{{ sf_version }}-{{ sf_arch }}"
+      register: stack
+
+    - debug: var=stack
+
+    - name: "Get slave network"
+      set_fact:
+        slave_net: "{{ stack.stack.outputs[0]['output_value'].split()[-1] }}"
+      when: floatingip != ""
+
+    - name: "Get ip addresses"
+      set_fact:
+        managesf_ip: "{{ stack.stack.outputs[0]['output_value'].split()[-1] }}"
+      when: floatingip == ""
+
+    - name: "Set ip addresses"
+      set_fact:
+        managesf_ip: "{{ floatingip }}"
+      when: floatingip != ""
+
+    - name: "Get slave network"
+      set_fact:
+        slave_net: "{{ stack.stack.outputs[-2]['output_value'].split()[-1] }}"
+      when: floatingip == ""
+
+    - name: "Wait for ssh"
+      wait_for:
+        host: "{{ managesf_ip }}"
+        port: 22
+        search_regex: OpenSSH
+        delay: 10
+
+    - name: Wait for SSH on the Instance
+      command: ssh -oBatchMode=yes -oStrictHostKeyChecking=no root@{{ managesf_ip }} true
+      register: result
+      until: result|success
+      retries: 30
+      delay: 10
+
+    - add_host:
+        name: "{{ managesf_ip }}"
+        group: "{{ item }}"
+      with_items:
+        - install-server
+        - nodepool-launcher
+        - nodepool-builder
+        - jenkins
+        - zuul-server
+
+
+- hosts: install-server
+  remote_user: centos
+  tasks:
+    - debug: msg="slave net is {{ hostvars.get('localhost', {}).get('slave_net', 'default') }}"
+
+    # TODO: remove
+    - name: Install fixes
+      yum:
+        name: "http://46.231.132.68:8080/v1/AUTH_b50e80d3969f441a8b7b1fe831003e0a/zuul-build/{{ item }}"
+      with_items:
+        - check/8713/1/python2-shade-1.22.2-1.el7.noarch.rpm
+        - check/8712/1/nodepool-builder-0.4.0-9.20170515.1cb82d6.el7.noarch.rpm
+        - check/8713/1/shade-1.22.2-1.el7.noarch.rpm
+        - check/8729/2/sf-config-2.5.0.80.g5ba6d60-1.el7.noarch.rpm
+        - gate/8730/2/sf-elements-0.1.0.8.g7821634-1.el7.noarch.rpm
+      become: yes
+      become_user: root
+
+    - name: Allow root access
+      command: sed -i 's/^.*rather than the user ..root.* ssh-rsa/ssh-rsa/' /root/.ssh/authorized_keys
+      become: yes
+      become_user: root
+
+    - include: tasks/customize_latest.yml
+
+    - name: Run sfconfig.py --skip-install
+      command: sfconfig.py
+      become: yes
+      become_user: root
+      when: skip_sfconfig|default("no") == "no"
+
+    # Specifying a destination path
+    - name: Fetch deployment group_vars
+      fetch:
+        src: /var/lib/software-factory/ansible/group_vars/all.yaml
+        dest: "{{ workspace }}/all.yaml"
+        flat: yes
+      become: yes
+      become_user: root
+
+    - name: Load deployment group_vars
+      include_vars:
+        file: "{{ workspace }}/all.yaml"
+      no_log: True
+
+    - name: Load health-check group_vars
+      include_vars:
+        file: "{{ sf_ci }}/health-check/group_vars/all.yaml"
+      no_log: True
+
+- include: "../health-check/swiftlogs.yaml"
+
+- include: "../health-check/nodepool.yaml"
+  vars:
+    os_slave_net: "{{ hostvars.get('localhost', {}).get('slave_net', 'default') }}"
+
+- include: "../health-check/zuul.yaml"

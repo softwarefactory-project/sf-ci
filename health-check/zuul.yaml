@@ -3,13 +3,8 @@
 - name: "Create project"
   include: playbooks/managesf_project_create.yaml
 
-- name: "Check if jenkins job exists"
-  include: playbooks/jenkins_check_job.yaml job="{{ check[0] }}"
-  when: jobs_host == 'jenkins'
-
 - name: "Check if zuul-launcher job exists"
   include: playbooks/zuul_check_job.yaml job="{{ check[0] }}"
-  when: jobs_host == 'zuul'
 
 - name: "Check if zuul layout exists"
   include: playbooks/zuul_check_layout.yaml project_name="{{ project }}"
@@ -17,9 +12,10 @@
 # * Add jobs and zuul layout to config repo
 - name: "Reset config repos"
   include: playbooks/config_reset.yaml
-  when: hostvars[groups[jobs_host][0]]["job_created_" + jobs_host].rc != 0 or hostvars[groups["zuul"][0]]["zuul_created"].rc != 0
+  when: hostvars[groups["zuul-server"][0]]["job_created"].rc != 0
 
 - hosts: install-server
+  remote_user: root
   tasks:
     - block:
       - name: "Add config repo files"
@@ -28,24 +24,15 @@
           - { template: "health-jobs.yaml", dest: "jobs-zuul/health-check.yaml" }
           - { template: "project-layout.yaml", dest: "zuul/{{ project|replace('/', '_')}}.yaml" }
           - { template: "project-jobs.yaml", dest: "jobs-zuul/{{ project|replace('/', '_')}}.yaml" }
-        when: jobs_host == 'zuul'
-
-      - name: "Add config repo files"
-        template: src=templates/{{ item.template }}.j2 dest={{ config_path }}/{{ item.dest }}
-        with_items:
-          - { template: "health-jobs.yaml", dest: "jobs/health-check.yaml" }
-          - { template: "project-layout.yaml", dest: "zuul/{{ project|replace('/', '_')}}.yaml" }
-          - { template: "project-jobs.yaml", dest: "jobs/{{ project|replace('/', '_')}}.yaml" }
-        when: jobs_host == 'jenkins'
 
       - name: "Commit change"
         command: chdir={{ config_path }} bash -c "git add */*.yaml; exec git commit -a -m 'Add {{ project }} to config repo'"
-      when: hostvars[groups[jobs_host][0]]["job_created_" + jobs_host].rc != 0 or hostvars[groups["zuul"][0]]["zuul_created"].rc != 0
+      when: hostvars[groups["zuul-server"][0]]["job_created"].rc != 0
 
 
 - name: "Submit config repos"
   include: playbooks/config_submit_change.yaml
-  when: hostvars[groups[jobs_host][0]]["job_created_" + jobs_host].rc != 0 or hostvars[groups["zuul"][0]]["zuul_created"].rc != 0
+  when: hostvars[groups["zuul-server"][0]]["job_created"].rc != 0
 
 - hosts: install-server
   tasks:
@@ -56,16 +43,6 @@
       retries: 36
       delay: 5
       changed_when: false
-      when: jobs_host == 'zuul'
-
-    - name: "wait for new jobs to appear in jenkins"
-      command: curl --head --silent "http://jenkins:8081/jenkins/job/{{ check[0] }}/api/json"
-      register: newjob
-      until: newjob.stdout.find("200 OK") != -1
-      retries: 36
-      delay: 5
-      changed_when: false
-      when: jobs_host == 'jenkins'
 
     - name: "Wait for a slave to appears online in Jenkins"
       shell: for i in {1..100}; do sleep ${i}; curl -Ls https://{{ fqdn }}/jenkins/computer/api/json | python -c "import sys, json; d = json.loads(sys.stdin.read()); slaves = [s for s in d['computer'] if ('{{ node }}-default' in s['displayName'])]; any(s['offline'] == False for s in slaves) and sys.exit(0) or sys.exit(1)" && exit 0; done; exit 1
@@ -75,6 +52,7 @@
 # * Fix bad change and verify Jenkins CI +1
 # * Check if change got merged
 - hosts: install-server
+  remote_user: root
   tasks:
     - name: Commit bad change and check for test error
       command: chdir={{ project_path }} {{ item }}
@@ -103,6 +81,7 @@
 
 # * Check logs export
 - hosts: jenkins
+  remote_user: root
   tasks:
     - name: "Get artifact url from console.log"
       when: test_log_export == 'yes'
