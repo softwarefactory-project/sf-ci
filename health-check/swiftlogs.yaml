@@ -1,7 +1,12 @@
 ---
 # * Create swift container
 - hosts: install-server
+  remote_user: root
   tasks:
+    - name: Install swift client
+      yum:
+        name: python-swiftclient
+
     - name: Check Swift container exists
       command: swift stat "{{ os_container }}"
       register: swift_stat
