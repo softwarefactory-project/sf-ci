@@ -1,6 +1,7 @@
 ---
 # * Check if a jenkins jobs exists
 - hosts: jenkins
+  remote_user: root
   vars:
     job_name: "{{ job|default ('config-update') }}"
   tasks:

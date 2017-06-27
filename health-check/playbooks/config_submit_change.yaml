@@ -2,6 +2,7 @@
 # * Submit and wait config repo change
 # * Check for SUCCESS in config-update post job log
 - hosts: install-server
+  remote_user: root
   tasks:
     - name: Submit and approve config change
       command: chdir={{ config_path }} /usr/share/sf-config/scripts/submit_and_wait.py --approve
@@ -12,6 +13,7 @@
       register: commitsha
 
 - hosts: jenkins
+  remote_user: root
   tasks:
     - name: Check for config-update post job
       wait_for:

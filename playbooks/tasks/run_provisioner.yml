@@ -15,7 +15,7 @@
   become: yes
   become_user: root
   register: executed
-  when: st.stat.exists and sfversion.stdout.find("2.5.0") == 0
+  when: st.stat.exists and sfversion.stdout.find("2.5") == 0
 - name: Run data provisionner with SF_JENKINS_EXECUTOR=0
   command: python provisioner.py
   args:

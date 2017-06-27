@@ -52,7 +52,7 @@
       replace: "gitweb_theme:"
     become: yes
     become_user: root
-  when: "sf_version == '2.5.0'"
+  when: "sf_version == '2.5'"
 
 - name: Run sfconfig.py
   command: sfconfig.py
