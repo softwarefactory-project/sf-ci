@@ -1,0 +1,67 @@
+- name: "Update sfconfig.yaml"
+  become: yes
+  become_user: root
+  command: |
+    python -c 'import yaml
+    import sys
+    f = open("/etc/software-factory/sfconfig.yaml", "r")
+    conf = yaml.safe_load(f)
+    conf["fqdn"] = "{{ sf_domain }}"
+    conf["authentication"]["oauth2"]["github"]["disabled"] = False
+    conf["authentication"]["oauth2"]["github"]["client_id"] = "{{ github_app_id }}"
+    conf["authentication"]["oauth2"]["github"]["client_secret"] = "{{ github_app_secret }}"
+    conf["authentication"]["oauth2"]["google"]["disabled"] = False
+    conf["authentication"]["oauth2"]["google"]["client_id"] = "{{ google_app_id }}"
+    conf["authentication"]["oauth2"]["google"]["client_secret"] = "{{ google_app_secret }}"
+    conf["authentication"]["oauth2"]["bitbucket"]["disabled"] = False
+    conf["authentication"]["oauth2"]["bitbucket"]["client_id"] = "{{ bitbucket_app_id }}"
+    conf["authentication"]["oauth2"]["bitbucket"]["client_secret"] = "{{ bitbucket_app_secret }}"
+    conf["nodepool"]["providers"] = [{
+        "name": "default",
+        "auth_url": "{{ os_auth_url }}",
+        "username": "{{ os_username }}",
+        "password": "{{ os_password }}",
+        "project_name": "{{ os_project_name }}",
+    }]
+    f = open("/etc/software-factory/sfconfig.yaml", "w")
+    yaml.dump(conf, f, default_flow_style=False)
+    f.close()'
+
+- name: "Update arch.yaml to include nodepool-builder"
+  become: yes
+  become_user: root
+  command: |
+    python -c 'import yaml
+    arch = yaml.safe_load(open("/etc/software-factory/arch.yaml", "r"))
+    roles = arch["inventory"][0]["roles"]
+    roles.append("nodepool-builder") if "nodepool-builder" not in roles else None
+    # Fixed by: https://softwarefactory-project.io/r/8719
+    roles.remove("nodepool-launcher") if "nodepool-launcher" in roles else None
+    # Fixed by: https://softwarefactory-project.io/r/8711
+    roles.append("nodepool") if "nodepool" not in roles else None
+    yaml.dump(arch, open("/etc/software-factory/arch.yaml", "w"), default_flow_style=False)'
+
+- name: "Checkout SF DEV public key"
+  git:
+    repo: 'https://softwarefactory-project.io/r/SF_devs_public_keys'
+    dest: /tmp/SF_devs_public_keys
+
+- name: "Copy logo"
+  become: yes
+  become_user: root
+  copy:
+    src: files/logo.png
+    dest: "{{ item }}"
+  with_items:
+    - /etc/software-factory/logo-splash.png
+    - /etc/software-factory/logo-topmenu.png
+
+- name: "Add SF DEV public keys"
+  become: yes
+  become_user: root
+  shell: "cat /tmp/SF_devs_public_keys/authorized_keys >> /root/.ssh/authorized_keys"
+
+- name: "Remove SF DEV public key checkout"
+  file:
+    path: /tmp/SF_devs_public_keys
+    state: absent

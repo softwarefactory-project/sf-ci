@@ -35,10 +35,18 @@ function terminate {
 }
 
 if [ "${TEST_TYPE}" == "upgrade" ]; then
-    VERSION="2.5.0"
+    VERSION="${SF_VERSION:-2.5.0}"
 fi
 
 trap 'terminate' ERR
-ansible-playbook -e "sf_user=${USER} workspace=${WORKSPACE} local_repo_path=${LOCAL_REPO_PATH} sf_ci=$(pwd) sf_arch=${ARCH} sf_version=${VERSION} func_test_case=${FUNC_TEST_CASE}" playbooks/${TEST_TYPE}.yml
+ansible-playbook -M modules/                     \
+         -e sf_user=${USER}                      \
+         -e local_repo_path=${LOCAL_REPO_PATH}   \
+         -e workspace=${WORKSPACE}               \
+         -e sf_ci=$(pwd)                         \
+         -e sf_arch=${ARCH}                      \
+         -e sf_version=${VERSION}                \
+         -e func_test_case=${FUNC_TEST_CASE}     \
+         playbooks/${TEST_TYPE}.yml
 
 terminate 'END'
