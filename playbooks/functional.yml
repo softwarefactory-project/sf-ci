@@ -12,6 +12,7 @@
       - include: tasks/run_provisioner.yml
       - include: tasks/run_backup_create.yml
       - include: tasks/run_health-check.yml
+      - include: tasks/test_api_v2.yml
       - include: tasks/run_firehose_listener.yml
       - include: tasks/run_functional_tests.yml
       - include: tasks/check_firehose_events.yml

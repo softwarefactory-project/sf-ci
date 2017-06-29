@@ -1,0 +1,13 @@
+- include: update_bootstrap_mode.yml
+
+- name: Remove any sfmanager.log
+  file:
+    path: sfmanager.log
+    state: absent
+  become: yes
+  become_user: root
+
+- name: Start v2 functional tests
+  command: "{{ sf_ci }}/scripts/create_ns.sh HEALTHCHECK_PROJECT={{ project }} nosetests --with-timer --with-html --html-file=nose_results.html --logging-format '%(asctime)s: %(levelname)s - %(message)s' -sv {{ sf_ci }}/tests/apiv2/"
+  become: yes
+  become_user: root
