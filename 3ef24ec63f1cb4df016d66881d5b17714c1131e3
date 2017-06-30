@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9aa53dc9_5e0304b9",
+        "filename": "health-check/playbooks/config_submit_change.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 68
+      },
+      "writtenOn": "2017-06-30T10:09:30Z",
+      "side": 1,
+      "message": "\"api\" was dropped in latest review",
+      "revId": "3ef24ec63f1cb4df016d66881d5b17714c1131e3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
