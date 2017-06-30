@@ -445,27 +445,40 @@ class JenkinsUtils:
             return 0
 
     def get_last_console(self, job_name):
-        if os.environ.get("SF_JENKINS_EXECUTOR", "0") == "1":
-            console_url = "%s/job/%s/lastBuild/consoleText" % (
-                self.jenkins_url, job_name
-            )
-        else:
-            console_url = "%s/logs/results/%s/lastSuccessful" % (
-                config.GATEWAY_URL, job_name
-            )
         try:
-            return self.get(console_url).text
+            return self.get("%s/job/%s/lastBuild/consoleText" % (
+                self.jenkins_url, job_name)).text
         except:
             return ''
 
     def wait_for_config_update(self, revision):
-        job_text = "Updating configuration using %s" % revision
-        for retry in xrange(120):
-            time.sleep(1)
-            job_log = self.get_last_console("config-update")
-            if job_text in job_log and "Finished: " in job_log:
-                break
-        return job_log
+        if os.environ.get("SF_JENKINS_EXECUTOR", "0") == "1":
+            job_text = "Updating configuration using %s" % revision
+            # Legacy code
+            for retry in xrange(120):
+                job_log = self.get_last_console("config-update")
+                if job_text in job_log and "Finished: " in job_log:
+                    break
+                time.sleep(1)
+            return job_log
+        # Remove legacy code when 2.6 is released
+        job_url = "%sv2/builds/?job=config-update&ref=%s" % (
+                config.MANAGESF_API,
+                revision
+        )
+        r = None
+        try:
+            for retry in xrange(120):
+                r = requests.get(job_url)
+                for result in r.json()['results']:
+                    job_log = result["log_url"]
+                    return requests.get("%s/console.html" % job_log).text
+                time.sleep(1)
+        except:
+            logger.exception("Retry%d: Couldn't get %s" % (retry, job_url))
+            if r:
+                logger.error("Response was %s : %s" % (r, r.text))
+        return "FAILED"
 
     def get_job_logs(self, job_name, job_id):
         """Get timestamped logs
