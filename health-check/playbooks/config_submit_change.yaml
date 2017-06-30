@@ -12,16 +12,16 @@
     - command: chdir={{ config_path }} cat .git/refs/heads/master
       register: commitsha
 
-- hosts: jenkins
-  remote_user: root
-  tasks:
-    - name: Check for config-update post job
-      wait_for:
-        path: "{{ config_update_log }}"
-        search_regex: "{{ hostvars[groups['install-server'][0]]['commitsha'].stdout }}"
-        timeout: 120
+    - name: Wait config-update result
+      uri:
+        url: "http://localhost:20001/v2/builds/?job_name=config-update&ref={{ commitsha.stdout }}&in_progress=false"
+        return_content: yes
+        status_code: "200,404"
+      register: job
+      until: job.json.results
+      retries: 60
+      delay: 2
 
-    - name: Check for SUCCESS config-update post job
-      wait_for:
-        path: "{{ config_update_log }}"
-        search_regex: "SUCCESS"
+    - name: Abort if config-update job failed
+      fail: msg="Config-update job failed"
+      when: not job.json.results or job.json.results[0]["result"] != "SUCCESS"
