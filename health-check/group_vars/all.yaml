@@ -24,7 +24,6 @@ os_env:
   OS_PASSWORD: "{{ os_password|default(omit) }}"
 
 jobs_host: "zuul"
-config_update_log: "/var/www/logs/results/config-update/lastSuccessful"
 
 # Nodepool
 provider_name: default
