@@ -15,7 +15,6 @@ jobs: ["health-{name}-functional-tests", "health-{name}-unit-tests"]
 # Where projects are checkout on install-server
 project_path: "/var/lib/software-factory/health-check/{{ project }}"
 config_path: "/var/lib/software-factory/health-check/config"
-config_update_log: "/var/www/logs/results/config-update/lastSuccessful"
 
 # Nodepool
 provider_name: default
