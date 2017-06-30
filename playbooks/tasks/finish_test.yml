@@ -29,12 +29,6 @@
   become: yes
   become_user: root
 
-- name: Create an artifact tarball
-  command: "tar -czf {{ artifacts }}.tgz {{ artifacts }}/"
-
-- name: Move artifact tarball to artifacts directory
-  command: "mv {{ artifacts }}.tgz {{ artifacts }}/"
-
 - name: Check nose_results.html
   stat: path=nose_results.html
   register: nose_results
