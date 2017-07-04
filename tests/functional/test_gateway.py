@@ -128,8 +128,7 @@ class TestGateway(Base):
         m = ManageSfUtils(config.GATEWAY_URL)
         url = config.GATEWAY_URL + "/api/"
 
-        a = GerritUtils(url)
-        a.g.url = "%s/" % a.g.url.rstrip('a/')
+        a = GerritUtils(url, auth=HTTPBasicAuth("admin", "password"))
         self.assertRaises(HTTPError, a.get_account, config.USER_1)
 
         api_passwd = m.create_gerrit_api_password(config.USER_1)
@@ -141,8 +140,7 @@ class TestGateway(Base):
         a = GerritUtils(url, auth=auth)
         self.assertRaises(HTTPError, a.get_account, config.USER_1)
 
-        a = GerritUtils(url)
-        a.g.url = "%s/" % a.g.url.rstrip('a/')
+        a = GerritUtils(url, auth=HTTPBasicAuth("admin", "password"))
         self.assertRaises(HTTPError, a.get_account, 'john')
 
     def test_jenkins_accessible(self):
