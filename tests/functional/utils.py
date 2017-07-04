@@ -216,6 +216,11 @@ class ManageSfUtils(Tool):
         cmd = self.base_cmd % (user, passwd) + \
             "gerrit_api_htpasswd generate_password"
         output = self.exe(cmd)
+        try:
+            output = json.loads(output)["password"]
+        except ValueError:
+            # Legacy output
+            pass
         return output
 
     def delete_gerrit_api_password(self, user):
