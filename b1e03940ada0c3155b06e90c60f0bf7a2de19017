@@ -40,6 +40,41 @@
       "revId": "b1e03940ada0c3155b06e90c60f0bf7a2de19017",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9aa53dc9_77f26b9c",
+        "filename": "tests/functional/test_gateway.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-07-04T14:06:22Z",
+      "side": 1,
+      "message": "line 132 and 145 you can remove the line. If not you are trying to access the anonymous endpoint of Gerrit so It does not make sense to me. Line 137 \u0027a/\u0027 is not removed from the url.",
+      "parentUuid": "9aa53dc9_97cbaf72",
+      "revId": "b1e03940ada0c3155b06e90c60f0bf7a2de19017",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9aa53dc9_57ef67b0",
+        "filename": "tests/functional/test_gateway.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-07-04T14:06:22Z",
+      "side": 1,
+      "message": "An anonymous access test can be nice too:\na \u003d GerritUtils(url)  \nself.assertTrue(a.get_account(config.USER_1))",
+      "revId": "b1e03940ada0c3155b06e90c60f0bf7a2de19017",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
