@@ -128,7 +128,7 @@ class TestGateway(Base):
         m = ManageSfUtils(config.GATEWAY_URL)
         url = config.GATEWAY_URL + "/api/"
 
-        a = GerritUtils(url)
+        a = GerritUtils(url, auth=HTTPBasicAuth("admin", "password"))
         a.g.url = "%s/" % a.g.url.rstrip('a/')
         self.assertRaises(HTTPError, a.get_account, config.USER_1)
 
