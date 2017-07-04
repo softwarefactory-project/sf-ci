@@ -214,8 +214,13 @@ class ManageSfUtils(Tool):
     def create_gerrit_api_password(self, user):
         passwd = config.USERS[user]['password']
         cmd = self.base_cmd % (user, passwd) + \
-            "gerrit_api_htpasswd generate_password"
-        output = self.exe(cmd)
+            "--json gerrit_api_htpasswd generate_password"
+        output = json.loads(self.exe(cmd))
+        try:
+            output = output["password"]
+        except TypeError:
+            # Legacy output
+            pass
         return output
 
     def delete_gerrit_api_password(self, user):
