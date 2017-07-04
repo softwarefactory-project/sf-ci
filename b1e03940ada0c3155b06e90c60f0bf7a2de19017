@@ -22,6 +22,24 @@
       "revId": "b1e03940ada0c3155b06e90c60f0bf7a2de19017",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9aa53dc9_97cbaf72",
+        "filename": "tests/functional/test_gateway.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2017-07-04T10:17:57Z",
+      "side": 1,
+      "message": "The issue I\u0027m trying to fix, is enforcing gerrit-http-password on git-upload-pack for annon user. The change on the gateway make /api/ call works without http password, thus this assertion doesn\u0027t work.\n\nWhat do you mean by \"keep /a/\" ?",
+      "parentUuid": "9aa53dc9_17bf9fd1",
+      "revId": "b1e03940ada0c3155b06e90c60f0bf7a2de19017",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
