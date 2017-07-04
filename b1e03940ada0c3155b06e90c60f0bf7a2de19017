@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9aa53dc9_17bf9fd1",
+        "filename": "tests/functional/test_gateway.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-07-04T10:13:02Z",
+      "side": 1,
+      "message": "Here I think the case is to test a authenticated access so we should keep /a/.",
+      "range": {
+        "startLine": 132,
+        "startChar": 8,
+        "endLine": 132,
+        "endChar": 46
+      },
+      "revId": "b1e03940ada0c3155b06e90c60f0bf7a2de19017",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
