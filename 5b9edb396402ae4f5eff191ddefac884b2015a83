@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9aa53dc9_f759db8f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-07-04T15:39:27Z",
+      "side": 1,
+      "message": "Then we can remove the option from sfconfig/zuul.",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 71
+      },
+      "revId": "5b9edb396402ae4f5eff191ddefac884b2015a83",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9aa53dc9_77e5cba6",
+        "filename": "health-check/group_vars/all.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-07-04T15:39:27Z",
+      "side": 1,
+      "message": "Can be removed",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 18
+      },
+      "revId": "5b9edb396402ae4f5eff191ddefac884b2015a83",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9aa53dc9_57e2c7a0",
+        "filename": "health-check/playbooks/sfconfig_logs_setup.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-07-04T15:39:27Z",
+      "side": 1,
+      "message": "Can be removed",
+      "revId": "5b9edb396402ae4f5eff191ddefac884b2015a83",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9aa53dc9_97d84ff1",
+        "filename": "health-check/swiftlogs.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-07-04T15:39:27Z",
+      "side": 1,
+      "message": "Can be removed",
+      "revId": "5b9edb396402ae4f5eff191ddefac884b2015a83",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
