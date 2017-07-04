@@ -54,6 +54,9 @@
     become_user: root
   when: "sf_version == '2.5.0'"
 
+- name: Activate debug
+  command: /usr/share/sf-config/scripts/hieraedit.py --yaml /etc/software-factory/sfconfig.yaml --eval debug True
+
 - name: Run sfconfig.py
   command: sfconfig.py
   become: yes
