@@ -25,6 +25,24 @@
     },
     {
       "key": {
+        "uuid": "9aa53dc9_12520d14",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2017-07-05T03:42:33Z",
+      "side": 1,
+      "message": "Indeed, but it still works with jenkins.",
+      "parentUuid": "9aa53dc9_f759db8f",
+      "revId": "5b9edb396402ae4f5eff191ddefac884b2015a83",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9aa53dc9_77e5cba6",
         "filename": "health-check/group_vars/all.yaml",
         "patchSetId": 4
@@ -42,6 +60,24 @@
         "endLine": 19,
         "endChar": 18
       },
+      "revId": "5b9edb396402ae4f5eff191ddefac884b2015a83",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9aa53dc9_f2568905",
+        "filename": "health-check/group_vars/all.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2017-07-05T03:42:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9aa53dc9_77e5cba6",
       "revId": "5b9edb396402ae4f5eff191ddefac884b2015a83",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
