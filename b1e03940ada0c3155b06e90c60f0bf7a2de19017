@@ -61,6 +61,24 @@
     },
     {
       "key": {
+        "uuid": "9aa53dc9_f711db5e",
+        "filename": "tests/functional/test_gateway.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2017-07-05T02:03:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9aa53dc9_77f26b9c",
+      "revId": "b1e03940ada0c3155b06e90c60f0bf7a2de19017",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9aa53dc9_57ef67b0",
         "filename": "tests/functional/test_gateway.py",
         "patchSetId": 2
@@ -72,6 +90,24 @@
       "writtenOn": "2017-07-04T14:06:22Z",
       "side": 1,
       "message": "An anonymous access test can be nice too:\na \u003d GerritUtils(url)  \nself.assertTrue(a.get_account(config.USER_1))",
+      "revId": "b1e03940ada0c3155b06e90c60f0bf7a2de19017",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9aa53dc9_97096f34",
+        "filename": "tests/functional/test_gateway.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2017-07-05T02:03:33Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be a follow-up change ? I think the test won\u0027t work without the gateway change.",
+      "parentUuid": "9aa53dc9_57ef67b0",
       "revId": "b1e03940ada0c3155b06e90c60f0bf7a2de19017",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
