@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9aa53dc9_f20e89e4",
+        "filename": "tests/functional/utils.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 481,
+      "author": {
+        "id": 68
+      },
+      "writtenOn": "2017-07-05T10:10:12Z",
+      "side": 1,
+      "message": "(NIT) This should not be necessary anymore",
+      "revId": "0651a02744299714118849edeedbfb4c28dde3f9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
