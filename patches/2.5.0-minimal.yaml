@@ -13,7 +13,6 @@ inventory:
       - zuul
       - zuul-merger
       - nodepool
-      - jenkins
     mem: 8
     cpu: 4
     disk: 20
