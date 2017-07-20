@@ -2,7 +2,6 @@
   yum:
     name: '*'
     state: latest
-    exclude: jenkins
     update_cache: yes
   become: yes
   become_user: root
