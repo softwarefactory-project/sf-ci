@@ -54,7 +54,7 @@ class TestGateway(Base):
     def test_topmenu_links_shown(self):
         """ Test if all service links are shown in topmenu
         """
-        subpaths = ["/r/", "/jenkins/", "/zuul/", "/docs/"]
+        subpaths = ["/r/", "/zuul/", "/docs/"]
         if "etherpad" in services:
             subpaths.append("/etherpad/")
         if "lodgeit" in services:
@@ -115,8 +115,7 @@ class TestGateway(Base):
         """
         # Unauthenticated calls, unknown projects. Must return 404, not 30x
         urls = [config.GATEWAY_URL + "/r/dashboard",
-                config.GATEWAY_URL + "/r/grafana",
-                config.GATEWAY_URL + "/r/jenkinslogs"]
+                config.GATEWAY_URL + "/r/grafana"]
 
         for url in urls:
             resp = requests.get(url, allow_redirects=False)
@@ -142,45 +141,6 @@ class TestGateway(Base):
 
         a = GerritUtils(url, auth=HTTPBasicAuth("admin", "password"))
         self.assertRaises(HTTPError, a.get_account, 'john')
-
-    def test_jenkins_accessible(self):
-        """ Test if Jenkins is accessible on gateway host
-        """
-        url = config.GATEWAY_URL + "/jenkins/"
-
-        # Without SSO cookie. Note that auth is no longer enforced
-        resp = requests.get(url)
-        self.assertEqual(resp.status_code, 200)
-        self.assertTrue('<title>Dashboard [Jenkins]</title>' in resp.text)
-
-        # Ensure jenkins cli is disabled
-        resp = requests.get(url + "cli/")
-        self.assertEqual(resp.status_code, 403)
-
-        # With SSO cookie
-        resp = requests.get(
-            url, cookies=dict(
-                auth_pubtkt=config.USERS[config.USER_1]['auth_cookie']))
-        self.assertEqual(resp.status_code, 200)
-        self.assertTrue('<title>Dashboard [Jenkins]</title>' in resp.text)
-
-        # User1 (admin ) be known in Jenkins if logged in with SSO
-        self.assertTrue(config.USER_1 in resp.text)
-
-        # With SSO cookie as normal unpriviledge user
-        resp = requests.get(
-            url, cookies=dict(
-                auth_pubtkt=config.USERS[config.USER_2]['auth_cookie']))
-        self.assertEqual(resp.status_code, 200)
-        self.assertTrue('<title>Dashboard [Jenkins]</title>' in resp.text)
-        self.assertTrue(config.USER_2 not in resp.text)
-
-        # Ensure jenkins cli is disabled for SSO user
-        resp = requests.get(
-            url + "cli/",
-            cookies=dict(
-                auth_pubtkt=config.USERS[config.USER_1]['auth_cookie']))
-        self.assertEqual(resp.status_code, 403)
 
     @skipIfServiceMissing('kibana')
     def test_kibana_accessible(self):
@@ -267,30 +227,6 @@ class TestGateway(Base):
         resp = requests.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('<body ng-app="sfWelcome"' in resp.text)
-
-    def test_jenkinslogs_accessible(self):
-        """ Test if Jenkins logs are accessible on gateway host
-        """
-        url = "https://%s/jenkinslogs/127.0.0.1/sf/welcome.html" % (
-            config.GATEWAY_HOST)
-        resp = requests.get(url, allow_redirects=False)
-        self.assertEqual(resp.status_code, 307)
-
-        self._auth_required(url)
-
-        resp = requests.get(
-            url,
-            cookies=dict(
-                auth_pubtkt=config.USERS[config.USER_1]['auth_cookie']))
-        self.assertEqual(resp.status_code, 200)
-
-        url = "https://%s/jenkinslogs/127.0.0.2/dashboard/" % (
-            config.GATEWAY_HOST)
-        resp = requests.get(
-            url,
-            cookies=dict(
-                auth_pubtkt=config.USERS[config.USER_1]['auth_cookie']))
-        self.assertEqual(resp.status_code, 404)
 
     def test_default_redirect(self):
         """ Test if default redirect forwards user to Gerrit

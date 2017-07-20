@@ -81,7 +81,6 @@ class TestSoftwareFactoryDashboard(BaseGuiTest):
         driver.find_element_by_link_text("Paste")
         driver.find_element_by_link_text("Etherpad")
         driver.find_element_by_link_text("Zuul")
-        driver.find_element_by_link_text("Jenkins")
         driver.find_element_by_link_text("Gerrit")
         driver.find_element_by_link_text("Dashboard")
 

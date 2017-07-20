@@ -158,7 +158,6 @@
         - install-server
         - nodepool-launcher
         - nodepool-builder
-        - jenkins
         - zuul-server
 
 - hosts: install-server

@@ -53,17 +53,6 @@ class TestUserdata(Base):
                 'back': redirect}
         return requests.post(url, data=data)
 
-    def test_login_redirect_to_jenkins(self):
-        """ Verify the user creation and the login
-        """
-        self.logout()
-        url = config.GATEWAY_URL + "/jenkins/"
-        quoted_url = urllib2.quote(url, safe='')
-        response = self.login('user5', config.ADMIN_PASSWORD, quoted_url)
-
-        self.assertEqual(url, response.url)
-        self.verify_userdata_gerrit('user5')
-
     def test_invalid_user_login(self):
         """ Try to login with an invalid user
         """

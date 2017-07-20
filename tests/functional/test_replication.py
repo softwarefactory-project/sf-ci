@@ -24,7 +24,7 @@ from utils import Base
 from utils import set_private_key
 from utils import ResourcesUtils
 from utils import GerritGitUtils
-from utils import JenkinsUtils
+from utils import JobsUtils
 from utils import Tool
 from subprocess import Popen, PIPE, call
 
@@ -42,7 +42,7 @@ class TestProjectReplication(Base):
         super(TestProjectReplication, self).setUp()
         self.ru = ResourcesUtils()
         self.un = config.ADMIN_USER
-        self.ju = JenkinsUtils()
+        self.ju = JobsUtils()
         self.gu = GerritUtils(
             config.GATEWAY_URL,
             auth_cookie=config.USERS[self.un]['auth_cookie'])
