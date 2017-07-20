@@ -81,17 +81,6 @@
         timeout: 1200
 
 
-- hosts: jenkins
-  remote_user: root
-  tasks:
-    - name: "Wait for the first slave to appear in Jenkins"
-      shell: curl -Ls http://localhost:8082/jenkins/computer/api/json | python -c "import sys, json; d = json.loads(sys.stdin.read()); slaves = [s for s in d['computer'] if ('dib-centos-7' in s['displayName'])]; len(slaves) > 0 and sys.exit(0) or sys.exit(1)"
-      register: result
-      until: result|success
-      retries: 30
-      delay: 10
-
-
 - hosts: install-server
   remote_user: root
   tasks:

@@ -142,22 +142,6 @@ class SFchecker:
         for f, checksum in checksum_list.items():
             if f.startswith("content_"):
                 continue
-            # SF service user password is regenerated after sfconfig.py
-            # so the checksums will not match. Instead, make sure ids are
-            # still there.
-            if f.endswith("credentials.xml"):
-                old_file = checksum_list['content_' + f]
-                mismatch = self.check_credentials(self.read_file(f),
-                                                  old_file)
-                if not mismatch:
-                    print "Jenkins credentials file is OK."
-                else:
-                    print "Jenkins credentials mismatch:\n"
-                    print "New file is:"
-                    print "    %s" % self.read_file(f).replace("\n", "\n    ")
-                    print "Old file was:"
-                    print "    %s" % old_file.replace("\n", "\n    ")
-                continue
             c = self.compute_checksum(f)
             if c == checksum:
                 print "Expected checksum (%s) for %s is OK." % (
