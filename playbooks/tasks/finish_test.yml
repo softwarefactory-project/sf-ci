@@ -16,7 +16,7 @@
       become_user: root
 
     - name: Copy sf-logs
-      command: "rsync -a --no-links /root/sf-logs/ {{ artifacts }}/"
+      command: "rsync -a --chmod=Duog+rx,Fuog+r --no-links /root/sf-logs/ {{ artifacts }}/"
       become: yes
       become_user: root
   when: get_logs_playbook.stat.exists
