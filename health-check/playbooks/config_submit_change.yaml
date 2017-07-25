@@ -14,7 +14,7 @@
 
     - name: Wait config-update result
       uri:
-        url: "http://localhost:20001/v2/builds/?job_name=config-update&ref={{ commitsha.stdout }}&in_progress=false"
+        url: "http://localhost:20001/v2/builds/?job_name=config-update&ref={{ commitsha.stdout }}&in_progress_only=false"
         return_content: yes
         status_code: "200,404"
       register: job
