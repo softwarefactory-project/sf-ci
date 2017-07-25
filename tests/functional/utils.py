@@ -467,7 +467,7 @@ class JenkinsUtils:
                 time.sleep(1)
             return job_log
         # Remove above legacy code when 2.6 is released
-        job_url = "%sv2/builds/?job=config-update&ref=%s&in_progress=false" % (
+        job_url = "%sv2/builds/?job=config-update&ref=%s&in_progress_only=false" % (
             config.MANAGESF_API,
             revision
         )
