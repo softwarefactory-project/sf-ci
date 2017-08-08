@@ -6,14 +6,7 @@
   become: yes
   become_user: root
 
-- name: Clean previous /var/lib/software-factory/backup directory
-  file:
-    path: /var/lib/software-factory/backup
-    state: absent
-  become: yes
-  become_user: root
-
 - name: Run sfconfig --recover
-  command: sfconfig --recover ./sf_backup.tar.gz
+  command: sfconfig.py --recover /var/lib/software-factory/backup
   become: yes
   become_user: root
