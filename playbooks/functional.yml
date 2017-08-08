@@ -10,7 +10,6 @@
       - include: tasks/install_test_env.yml
       - include: tasks/run_serverspec.yml
       - include: tasks/run_provisioner.yml
-      - include: tasks/run_backup_create.yml
       - include: tasks/run_health-check.yml
       - include: tasks/run_firehose_listener.yml
       - include: tasks/run_functional_tests.yml

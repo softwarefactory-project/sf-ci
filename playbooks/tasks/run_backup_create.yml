@@ -1,6 +1,0 @@
-- include: update_bootstrap_mode.yml
-
-- name: Run sfmanager backup start
-  command: sfmanager system backup_start
-- name: Run sfmanager backup get
-  command: sfmanager system backup_get
