@@ -96,7 +96,7 @@ class TestRepoxplorer(Base):
         url = config.GATEWAY_URL + "/repoxplorer/"
         resp = requests.get(url)
         self.assertEqual(resp.status_code, 200)
-        self.assertTrue('[RepoXplorer] - Projects listing' in resp.text)
+        self.assertTrue('[RepoXplorer]' in resp.text)
 
     @skipIfServiceMissing('repoxplorer')
     def test_repoxplorer_data_indexed(self):
