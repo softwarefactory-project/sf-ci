@@ -13,6 +13,6 @@
   become_user: root
 
 - name: Run sfconfig --recover
-  command: sfconfig.py --recover ./sf_backup.tar.gz
+  command: sfconfig.py --recover /var/lib/managesf/sf_backup.tar.gz
   become: yes
   become_user: root
