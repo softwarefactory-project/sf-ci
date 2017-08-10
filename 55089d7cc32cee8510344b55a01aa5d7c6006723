@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3ab451fb_22c14a2f",
+        "filename": "playbooks/tasks/run_sfconfig_recover.yml",
+        "patchSetId": 5
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-08-10T08:10:40Z",
+      "side": 1,
+      "message": "Could you remove the archive creation at the end of sf_backup.yml playbook ? and here use instead \"sfconfig.py --revover /var/lib/software-factory/backup\"",
+      "range": {
+        "startLine": 16,
+        "startChar": 59,
+        "endLine": 16,
+        "endChar": 72
+      },
+      "revId": "55089d7cc32cee8510344b55a01aa5d7c6006723",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
