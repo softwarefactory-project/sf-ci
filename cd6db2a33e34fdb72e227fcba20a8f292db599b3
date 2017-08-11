@@ -1,0 +1,8 @@
+Code-Review+2: Tristan de Cacqueray <tdecacqu@redhat.com>
+Workflow+1: Tristan de Cacqueray <tdecacqu@redhat.com>
+Verified+2: Jenkins CI <jenkins@softwarefactory-project.io>
+Submitted-by: Jenkins CI <jenkins@softwarefactory-project.io>
+Submitted-at: Fri, 11 Aug 2017 10:52:38 +0000
+Reviewed-on: https://softwarefactory-project.io/r/9229
+Project: software-factory/sf-ci
+Branch: refs/heads/master
