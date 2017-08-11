@@ -3,5 +3,5 @@
   register: configured
 
 - name: "Run sfconfig"
-  command: sfconfig.py --skip-install
+  command: sfconfig --skip-install
   when: configured.stat.exists == False

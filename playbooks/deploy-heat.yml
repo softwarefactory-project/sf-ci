@@ -173,8 +173,8 @@
 
     - include: tasks/customize_latest.yml
 
-    - name: Run sfconfig.py --skip-install
-      command: sfconfig.py
+    - name: Run sfconfig
+      command: sfconfig
       become: yes
       become_user: root
       when: skip_sfconfig|default("no") == "no"

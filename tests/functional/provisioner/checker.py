@@ -142,7 +142,7 @@ class SFchecker:
         for f, checksum in checksum_list.items():
             if f.startswith("content_"):
                 continue
-            # SF service user password is regenerated after sfconfig.py
+            # SF service user password is regenerated after sfconfig
             # so the checksums will not match. Instead, make sure ids are
             # still there.
             if f.endswith("credentials.xml"):

@@ -14,7 +14,7 @@
           }"
 
     - name: Restart sfconfig
-      command: sfconfig.py --skip-install
+      command: sfconfig --skip-install
 
 - hosts: zuul-server
   remote_user: root

@@ -7,8 +7,8 @@
   become: yes
   become_user: root
 
-- name: "Run sfconfig.py --upgrade"
-  command: sfconfig.py --upgrade
+- name: "Run sfconfig --upgrade"
+  command: sfconfig --upgrade
 
 - name: "Collect package upgraded"
   shell: "rpm -qa | sort > package_upgraded"

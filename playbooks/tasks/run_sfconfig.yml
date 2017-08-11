@@ -54,8 +54,8 @@
     become_user: root
   when: "sf_version == '2.5'"
 
-- name: Run sfconfig.py
-  command: sfconfig.py
+- name: Run sfconfig
+  command: sfconfig
   become: yes
   become_user: root
 
