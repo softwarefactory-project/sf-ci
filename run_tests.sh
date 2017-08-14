@@ -2,6 +2,10 @@
 
 set -Ex
 
+# Remove ZUUL_* environment variables. We do not need them to be present
+# after that statement.
+while read var; do unset $var; done < <(env | egrep "^ZUUL_.*" | awk -F= '{ print $1}')
+
 TEST_TYPE="${1:-functional}"
 ARCH="${2:-minimal}"
 FUNC_TEST_CASE="${3:-tests/functional}"
