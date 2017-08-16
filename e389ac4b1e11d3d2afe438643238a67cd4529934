@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3ab451fb_90962493",
+        "filename": "run_tests.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2017-08-16T01:57:58Z",
+      "side": 1,
+      "message": "for var in $(env | awk -F\u003d \u0027/ZUUL_/ { print $1 }\u0027); do unset $var; done",
+      "revId": "e389ac4b1e11d3d2afe438643238a67cd4529934",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
