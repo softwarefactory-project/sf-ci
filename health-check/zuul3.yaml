@@ -1,0 +1,21 @@
+---
+- hosts: install-server
+  remote_user: root
+  tasks:
+    - name: Checkout tdpw/python-readerlib
+      git:
+        repo: https://{{ fqdn }}/r/tdpw/python-readerlib
+        dest: /var/lib/software-factory/health-check/python-readerlib
+
+    - name: Add python-readerlib to zuul3 main.yaml
+      copy:
+        content: "{{ zuul3_config|to_yaml }}"
+        dest: /etc/opt/rh/rh-python35/zuul/main.yaml
+
+- hosts: zuul3-scheduler
+  remote_user: root
+  tasks:
+    - name: Reload zuul3-scheduler
+      service:
+        name: rh-python35-zuul-scheduler
+        state: reloaded

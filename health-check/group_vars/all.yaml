@@ -25,3 +25,14 @@ image_name: sfcentos
 # Gerritbot
 bot_name: health-check-bot
 channel_name: "irc-channel-health-check{{ suffix }}"
+
+# Zuul3 config
+zuul3_config:
+  - tenant:
+      name: ''
+      source:
+        gerrit:
+          config-projects:
+            - zuul-jobs
+          untrusted-projects:
+            - tdpw/python-readerlib
