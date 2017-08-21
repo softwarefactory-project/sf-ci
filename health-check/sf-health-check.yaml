@@ -1,5 +1,14 @@
 - name: Run heatlh-check zuul
   include: zuul.yaml
+  when: '"zuul-launcher" in roles'
+
+- name: Run health-check nodepool3
+  include: nodepool3.yaml
+  when: '"nodepool3" in roles'
+
+- name: Run health-check zuul3
+  include: zuul3.yaml
+  when: '"zuul3" in roles'
 
 - include: gerritbot.yaml
   when: '"gerritbot" in roles'
