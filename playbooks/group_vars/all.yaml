@@ -1,5 +1,5 @@
 # Set until we get proper name
-koji_ip: 46.231.133.231
+koji_ip: 38.145.34.53
 # SF architecture file
 sf_arch: minimal
 # SF version
