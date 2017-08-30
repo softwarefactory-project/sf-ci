@@ -8,7 +8,6 @@
       - include: tasks/yum_update.yml
       - include: tasks/run_sfconfig.yml
       - include: tasks/install_test_env.yml
-      - include: tasks/run_serverspec.yml
       - include: tasks/run_provisioner.yml
       - include: tasks/run_backup_create.yml
       - include: tasks/run_health-check.yml
