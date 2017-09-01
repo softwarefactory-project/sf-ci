@@ -2,7 +2,9 @@
   yum:
     name: '*'
     state: latest
-    exclude: jenkins
+    exclude:
+      - jenkins
+      - ansible
     update_cache: yes
   become: yes
   become_user: root

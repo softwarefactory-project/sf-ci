@@ -2,6 +2,9 @@
 
 set -Ex
 
+# TODO: remove quick fix bellow
+sudo yum update -y ansible
+
 # Remove ZUUL_* environment variables. We do not need them to be present
 # after that statement.
 while read var; do unset $var; done < <(env | egrep "^ZUUL_.*" | awk -F= '{ print $1}')

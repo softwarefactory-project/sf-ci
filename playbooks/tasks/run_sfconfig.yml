@@ -1,6 +1,7 @@
 - name: Install sf-config package
   yum:
     name: sf-config
+    exclude: ansible
     state: latest
   become: yes
   become_user: root
