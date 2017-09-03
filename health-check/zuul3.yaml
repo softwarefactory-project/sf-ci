@@ -1,0 +1,103 @@
+---
+- name: "Reset config repos"
+  include: playbooks/config_reset.yaml
+
+- hosts: install-server
+  remote_user: root
+  tasks:
+    - name: Checkout tdpw/python-readerlib
+      git:
+        repo: https://{{ fqdn }}/r/tdpw/python-readerlib
+        dest: /var/lib/software-factory/health-check/python-readerlib
+        force: yes
+
+    - name: Add python-readerlib to zuul3 main.yaml
+      copy:
+        content: "{{ zuul3_config|to_yaml }}"
+        dest: "{{ config_path }}/zuulV3/health-check.yaml"
+      register: zuul3_conf
+
+    - name: Update change
+      when: zuul3_conf|changed
+      command: chdir={{ config_path }}  {{ item }}
+      with_items:
+          - 'git add -A'
+          - 'git commit -m "Add zuulV3 health-check configuration"'
+
+- name: "Submit config repos"
+  include: playbooks/config_submit_change.yaml
+  when: zuul3_conf|changed
+
+- hosts: zuul3-executor
+  tasks:
+    - name: "Set executor keep mode"
+      command: >
+        /opt/rh/rh-python35/root/bin/zuul-executor
+            -c /etc/opt/rh/rh-python35/zuul/zuul.conf keep
+
+- hosts: install-server
+  remote_user: root
+  vars:
+    # Glob fragment to get executor jobdir
+    id8: "[0-9a-z][0-9a-z][0-9a-z][0-9a-z][0-9a-z][0-9a-z][0-9a-z][0-9a-z]"
+  tasks:
+    - block:
+        - name: Add bad configuration
+          template:
+            src: "{{ item.src }}.j2"
+            dest: "/var/lib/software-factory/health-check/python-readerlib/{{ item.dst }}"
+          with_items:
+            - {src: zuul.yaml, dst: .zuul.yaml}
+            - {src: test-file-bad.yaml, dst: file.yaml}
+          register: bad_project_status
+
+        - name: Submit bad change and check for test error
+          command: "{{ item }}"
+          args:
+            chdir: /var/lib/software-factory/health-check/python-readerlib/
+          with_items:
+            - git add .zuul.yaml file.yaml
+            - git commit -m "Test project"
+            - /usr/share/sf-config/scripts/submit_and_wait.py --delay 1200 --failure
+          when: bad_project_status|changed
+
+        - name: Add good configuration
+          template:
+            src: "{{ item.src }}.j2"
+            dest: "/var/lib/software-factory/health-check/python-readerlib/{{ item.dst }}"
+          with_items:
+            - {src: test-file-good.yaml, dst: file.yaml}
+          register: good_project_status
+
+        - name: Update change and check for SUCCESS
+          command: "{{ item }}"
+          args:
+            chdir: /var/lib/software-factory/health-check/python-readerlib/
+          with_items:
+            - git commit -a --amend
+            - /usr/share/sf-config/scripts/submit_and_wait.py --delay 1200 --approve
+            - git fetch --all
+          environment: {'EDITOR':'test'}
+          when: good_project_status|changed
+
+        - name: "Check change was merged"
+          command: chdir=/var/lib/software-factory/health-check/python-readerlib/ git diff HEAD origin/master
+          register: diff
+          failed_when: diff.stdout != ''
+      always:
+        # This test only works when executor is running on the install-server
+        - name: "Unset executor keep mode"
+          command: >
+            /opt/rh/rh-python35/root/bin/zuul-executor
+                -c /etc/opt/rh/rh-python35/zuul/zuul.conf nokeep
+
+        - name: "List jobdir"
+          shell: "ls -d /tmp/systemd-private-*-rh-python35-zuul-executor.service-*/tmp/{{id8}}{{id8}}{{id8}}{{id8}}"
+          register: _jobdir
+
+        - name: "Fetch jobdir"
+          synchronize:
+            mode: pull
+            src: "{{ item }}"
+            dest: "/var/log/software-factory/executor-{{ item|basename }}"
+          with_items: "{{ _jobdir.stdout_lines }}"
