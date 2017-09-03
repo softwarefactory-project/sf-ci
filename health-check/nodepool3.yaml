@@ -1,0 +1,71 @@
+---
+- name: "Reset config repos"
+  include: playbooks/config_reset.yaml
+
+- hosts: install-server
+  remote_user: root
+  tasks:
+    - name: "Enable root ssh access to nodepool (convert install-server into a hypervisor)"
+      authorized_key:
+        user: root
+        key: "{{ nodepool_rsa_pub }}"
+
+    - name: "Enable zuul ssh access to zuul"
+      authorized_key:
+        user: zuul
+        key: "{{ zuul_rsa_pub }}"
+
+    - name: "Ensure /var/lib/zuul/src exists"
+      file:
+        path: /var/lib/zuul/src
+        owner: zuul
+        group: zuul
+        state: directory
+
+    - name: "Install hypervisor tools"
+      yum:
+        name: "{{ item }}"
+        state: present
+        disablerepo: "{{ yum_disable_repo|default(omit) }}"
+        enablerepo: "{{ yum_enable_repo|default(omit) }}"
+      with_items:
+        - runc
+        - yamllint
+        - bashate
+        - python-flake8
+
+    - name: "Add static and oci providers"
+      template:
+        src: nodepoolV3.yaml.j2
+        dest: "{{ config_path }}/nodepool/nodepoolV3.yaml"
+      register: nodepoolV3_conf
+
+    - name: Update change
+      when: nodepoolV3_conf|changed
+      command: chdir={{ config_path }}  {{ item }}
+      with_items:
+          - 'git commit -a -m "Add nodepoolV3 health-check configuration"'
+
+- name: "Submit config repos"
+  include: playbooks/config_submit_change.yaml
+  when: nodepoolV3_conf|changed
+
+- hosts: install-server
+  remote_user: root
+  vars:
+    # jmes filter to extract label of ready nodes
+    labels_ready_query: "[?state=='ready'].type"
+  tasks:
+    - name: "Wait for static node available"
+      uri:
+        url: "{{ nodepool3_internal_url }}/node-list.json"
+        return_content: yes
+      register: nodepool3_node_list
+      until: '"install-server" in nodepool3_node_list.json|json_query(labels_ready_query)'
+
+    - name: "Wait for oci node available"
+      uri:
+        url: "{{ nodepool3_internal_url }}/node-list.json"
+        return_content: yes
+      register: nodepool3_node_list
+      until: '"centos-oci" in nodepool3_node_list.json|json_query(labels_ready_query)'
