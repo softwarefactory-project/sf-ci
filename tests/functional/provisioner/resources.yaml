@@ -113,12 +113,8 @@ users:
  - name: user2
  - name: user3
 commands:
-  - cmd: /usr/share/sf-config/scripts/hieraedit.py --yaml /etc/software-factory/sfconfig.yaml safekey pc_test
   - cmd: echo "adev:OpPzvAQ.RbXb6" > /etc/httpd/managesf_htpasswd
 checksum:
-  - file: /etc/software-factory/sfconfig.yaml
-  - file: /var/lib/jenkins/credentials.xml
-  - file: /var/lib/jenkins/secret.key
   - file: /etc/httpd/managesf_htpasswd
   - file: /etc/gerrit/ssh_host_rsa_key.pub
   - file: /etc/gerrit/ssh_host_rsa_key
