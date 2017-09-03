@@ -1,0 +1,30 @@
+---
+diskimages: []
+
+labels:
+  - name: install-server
+    min-ready: 1
+  - name: centos-oci
+
+providers:
+  - name: static
+    driver: static
+    pools:
+      - name: main
+        nodes:
+          - name: {{ install_server }}
+            labels: install-server
+            host-key: ssh-ed25519 {{ ansible_ssh_host_key_ed25519_public }}
+            timeout: 13
+            ssh-port: 22
+            username: root
+            max-concurrency: 1
+
+  - name: oci
+    driver: oci
+    hypervisor: localhost
+    pools:
+      - name: main
+        max-servers: 10
+        labels:
+          - name: centos-oci
