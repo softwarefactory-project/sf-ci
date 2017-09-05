@@ -14,6 +14,6 @@
   become_user: root
 
 - name: Run sfconfig --recover
-  command: sfconfig --recover ./sf_backup.tar.gz
+  command: sfconfig --recover "{{ workspace }}/sf_backup.tar.gz"
   become: yes
   become_user: root
