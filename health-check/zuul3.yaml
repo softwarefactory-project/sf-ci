@@ -92,7 +92,7 @@
                 -c /etc/opt/rh/rh-python35/zuul/zuul.conf nokeep
 
         - name: "List jobdir"
-          shell: "ls -d /tmp/{{id8}}{{id8}}{{id8}}{{id8}}"
+          shell: "ls -d /tmp/systemd-private-*-rh-python35-zuul-executor.service-*/tmp/{{id8}}{{id8}}{{id8}}{{id8}}"
           register: _jobdir
 
         - name: "Fetch jobdir"
