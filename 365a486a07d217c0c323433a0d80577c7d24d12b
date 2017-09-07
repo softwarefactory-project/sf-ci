@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dac4157f_f31690a6",
+        "filename": "health-check/group_vars/all.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-09-07T08:27:22Z",
+      "side": 1,
+      "message": "Could you put a name ?",
+      "revId": "365a486a07d217c0c323433a0d80577c7d24d12b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dac4157f_d3594c90",
+        "filename": "health-check/zuul3.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-09-07T08:27:22Z",
+      "side": 1,
+      "message": "YAML file (because configuration is ok I mean .zuul.yaml)",
+      "range": {
+        "startLine": 45,
+        "startChar": 24,
+        "endLine": 45,
+        "endChar": 37
+      },
+      "revId": "365a486a07d217c0c323433a0d80577c7d24d12b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dac4157f_b35ed874",
+        "filename": "health-check/zuul3.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-09-07T08:27:22Z",
+      "side": 1,
+      "message": "YAML file",
+      "range": {
+        "startLine": 64,
+        "startChar": 25,
+        "endLine": 64,
+        "endChar": 38
+      },
+      "revId": "365a486a07d217c0c323433a0d80577c7d24d12b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
