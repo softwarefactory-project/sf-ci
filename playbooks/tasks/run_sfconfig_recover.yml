@@ -6,6 +6,14 @@
   become: yes
   become_user: root
 
+- name: Reinstall allinone arch.yaml
+  become: yes
+  become_user: root
+  copy:
+    remote_src: true
+    src: /var/lib/software-factory/backup/install-server/etc/software-factory/arch.yaml
+    dest: /etc/software-factory/arch.yaml
+
 - name: Run sfconfig --recover
   command: sfconfig --recover /var/lib/software-factory/backup
   become: yes
