@@ -18,6 +18,9 @@
       become: yes
   when: get_logs_playbook.stat.exists
 
+- name: Dump process list
+  shell: "ps -Zaxf > {{ artifacts }}/ps.txt"
+
 - name: Ensure artifacts are owned by user
   file:
     path: "{{ artifacts }}"

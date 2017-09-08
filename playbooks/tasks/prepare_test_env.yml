@@ -4,6 +4,9 @@
   command: "sed -i '/^jenkins/ s#:[^:]*$#:/sbin/nologin#' /etc/passwd"
   become: yes
 
+- name: Remove previous avc errors
+  shell: "rm -f /var/log/audit/audit.[0-9]*; echo -n > /var/log/audit/audit.log"
+
 - name: "Create artifact directory"
   file:
     path: "{{ artifacts }}"
