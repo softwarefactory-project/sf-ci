@@ -1,0 +1,5 @@
+---
+- name: Look for avc error
+  command: ausearch -m avc --raw
+  register: _ausearch
+  failed_when: _ausearch.stdout != ""
