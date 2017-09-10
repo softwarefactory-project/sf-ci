@@ -62,6 +62,8 @@
         return_content: yes
       register: nodepool3_node_list
       until: '"install-server" in nodepool3_node_list.json|json_query(labels_ready_query)'
+      retries: 6
+      delay: 5
 
     - name: "Wait for oci node available"
       uri:
@@ -69,3 +71,5 @@
         return_content: yes
       register: nodepool3_node_list
       until: '"centos-oci" in nodepool3_node_list.json|json_query(labels_ready_query)'
+      retries: 6
+      delay: 5
