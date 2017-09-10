@@ -2,7 +2,9 @@
   yum:
     name: sf-config
     state: latest
-    exclude: ansible
+    exclude:
+      - ansible
+      - sf-release
   become: yes
   become_user: root
 
