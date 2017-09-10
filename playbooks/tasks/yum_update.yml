@@ -5,6 +5,7 @@
     exclude:
       - jenkins
       - ansible
+      - sf-release
     update_cache: yes
   become: yes
   become_user: root
