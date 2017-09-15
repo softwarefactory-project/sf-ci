@@ -25,6 +25,7 @@ rm -Rf ~/.ara/ ${ARTIFACTS}/
 sudo sed -i 's/^jinja2.*//' /usr/lib/python2.7/site-packages/ansible*.egg-info/requires.txt
 sudo sed -i 's/^MarkupSafe.*//' /usr/lib/python2.7/site-packages/Jinja2-*.egg-info/requires.txt
 
+export ARA_LOG_FILE=
 export ara_location=$(python -c "import os,ara; print(os.path.dirname(ara.__file__))")
 export ANSIBLE_CALLBACK_PLUGINS=$ara_location/plugins/callbacks
 export ANSIBLE_ACTION_PLUGINS=$ara_location/plugins/actions
