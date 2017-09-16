@@ -23,6 +23,18 @@
   become: yes
   become_user: root
 
+- name: Exclude sf-release package from zuul-built repo
+  ini_file:
+    path: /etc/yum.repos.d/sf-release.repo
+    section: "{{ item }}"
+    option: exclude
+    value: sf-release
+  with_items:
+    - sfmaster
+    - sftesting
+  become: yes
+  become_user: root
+
 - name: Replace koji hostname by its IP
   replace:
     dest: /etc/yum.repos.d/sf-release.repo
