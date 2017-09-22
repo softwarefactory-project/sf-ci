@@ -2,9 +2,19 @@
   include: zuul.yaml
   when: '"zuul-launcher" in roles'
 
+# Remove this when Iaa20c3b68e6e6c9c63bcbf92cb94e85f30295446 merged
+- hosts: install-server
+  tasks:
+    - name: Check for new nodepool3 configuration
+      file:
+        path: /root/config/nodepoolV3
+      register: _new_nodepool_config
+
 - name: Run health-check nodepool3
   include: nodepool3.yaml
-  when: '"nodepool3" in roles'
+  when:
+    - _new_nodepool_config.stat.exists
+    - '"nodepool3" in roles'
 
 - name: Run health-check zuul3
   include: zuul3.yaml

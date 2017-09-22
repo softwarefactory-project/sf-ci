@@ -37,14 +37,15 @@
     - name: "Add static and oci providers"
       template:
         src: nodepoolV3.yaml.j2
-        dest: "{{ config_path }}/nodepool/nodepoolV3.yaml"
+        dest: "{{ config_path }}/nodepoolV3/_health-check.yaml"
       register: nodepoolV3_conf
 
     - name: Update change
       when: nodepoolV3_conf|changed
       command: chdir={{ config_path }}  {{ item }}
       with_items:
-          - 'git commit -a -m "Add nodepoolV3 health-check configuration"'
+          - 'git add nodepoolV3/_health-check.yaml'
+          - 'git commit -m "Add nodepoolV3 health-check configuration"'
 
 - name: "Submit config repos"
   include: playbooks/config_submit_change.yaml
