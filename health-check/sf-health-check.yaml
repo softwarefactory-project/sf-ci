@@ -2,14 +2,13 @@
   include: zuul.yaml
   when: '"zuul-launcher" in roles'
 
-# Uncomment when Iaa20c3b68e6e6c9c63bcbf92cb94e85f30295446 is merged
-#- name: Run health-check nodepool3
-#  include: nodepool3.yaml
-#  when: '"nodepool3" in roles'
+- name: Run health-check nodepool3
+  include: nodepool3.yaml
+  when: '"nodepool3" in roles'
 
-#- name: Run health-check zuul3
-#  include: zuul3.yaml
-#  when: '"zuul3" in roles'
+- name: Run health-check zuul3
+  include: zuul3.yaml
+  when: '"zuul3" in roles'
 
 - include: gerritbot.yaml
   when: '"gerritbot" in roles'
