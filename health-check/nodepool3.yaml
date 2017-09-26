@@ -57,15 +57,6 @@
     # jmes filter to extract label of ready nodes
     labels_ready_query: "[?state=='ready'].type"
   tasks:
-    - name: "Wait for static node available"
-      uri:
-        url: "{{ nodepool3_internal_url }}/node-list.json"
-        return_content: yes
-      register: nodepool3_node_list
-      until: '"install-server" in nodepool3_node_list.json|json_query(labels_ready_query)'
-      retries: 6
-      delay: 5
-
     - name: "Wait for oci node available"
       uri:
         url: "{{ nodepool3_internal_url }}/node-list.json"
