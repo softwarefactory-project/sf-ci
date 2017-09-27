@@ -12,16 +12,34 @@
     - command: chdir={{ config_path }} cat .git/refs/heads/master
       register: commitsha
 
-    - name: Wait config-update result
-      uri:
-        url: "http://localhost:20001/v2/builds/?job_name=config-update&ref={{ commitsha.stdout }}&in_progress=false"
-        return_content: yes
-        status_code: "200,404"
-      register: job
-      until: job.json.results
-      retries: 60
-      delay: 2
+    - block:
+        - name: Wait config-update result using managesf API
+          when: sf_zuul_executor == '0'
+          uri:
+            url: "http://localhost:20001/v2/builds/?job_name=config-update&ref={{ commitsha.stdout }}&in_progress=false"
+            return_content: yes
+            status_code: "200,404"
+          register: job
+          until: job.json.results
+          retries: 120
+          delay: 2
+        - name: Abort if config-update job failed
+          fail: msg="Config-update job failed"
+          when: not job.json.results or job.json.results[0]["result"] != "SUCCESS"
+      when: sf_zuul_executor == '0'
 
-    - name: Abort if config-update job failed
-      fail: msg="Config-update job failed"
-      when: not job.json.results or job.json.results[0]["result"] != "SUCCESS"
+    - block:
+        - name: Wait config-update result using zuul-web API
+          uri:
+            url: "https://sftests.com/zuul3/local/builds.json?job_name=config-update&newrev={{ commitsha.stdout }}"
+            return_content: yes
+            status_code: "200,404"
+          register: job
+          until: "'json' in job and job.json"
+          retries: 120
+          delay: 2
+        - debug: "msg={{ job }}"
+        - name: Abort if config-update job failed
+          fail: msg="Config-update job failed"
+          when: job.json[0]["result"] != "SUCCESS"
+      when: sf_zuul_executor == '1'

@@ -20,6 +20,8 @@ import config
 from utils import Base
 from utils import JenkinsUtils
 from utils import get_cookie
+from utils import skipIfServiceMissing
+from utils import services
 
 
 def rand_suffix():
@@ -70,6 +72,7 @@ class TestJenkinsBasic(Base):
         super(TestJenkinsBasic, self).setUp()
         self.ju = JenkinsUtils()
 
+    @skipIfServiceMissing('jenkins')
     def test_sf_service_user_credentials(self):
         """Test if SF_SERVICE_USER's credentials are correctly added
         to the credentials store"""
@@ -85,6 +88,8 @@ class TestJobsAPI(Base):
 
     @classmethod
     def setUpClass(cls):
+        if "jenkins" not in services:
+            return
         cookie = get_cookie(config.ADMIN_USER, config.ADMIN_PASSWORD)
         cls.cookie = {"auth_pubtkt": cookie}
         cls.ju = JenkinsUtils()
@@ -95,6 +100,7 @@ class TestJobsAPI(Base):
         cls.ju.wait_till_job_completes(cls.test_job, 1, 'lastBuild')
         cls.base_url = config.GATEWAY_URL + "/manage/jobs/"
 
+    @skipIfServiceMissing('jenkins')
     def test_get_one(self):
         """Get info about one job"""
         job = requests.get(self.base_url + "%s/id/1/" % self.test_job,
@@ -104,6 +110,7 @@ class TestJobsAPI(Base):
         self.assertEqual(self.test_job,
                          job["jenkins"][0]["job_name"])
 
+    @skipIfServiceMissing('jenkins')
     def test_get_parameters(self):
         """fetch the parameters used to run one job"""
         u = self.base_url + "%s/id/1/parameters" % self.test_job
@@ -119,6 +126,7 @@ class TestJobsAPI(Base):
                          job["jenkins"]["parameters"][0]['name'],
                          job)
 
+    @skipIfServiceMissing('jenkins')
     def test_get_logs(self):
         """fetch the logs of a job and check their contents"""
         job = requests.get(self.base_url + "%s/id/1/logs" % self.test_job,
@@ -132,6 +140,7 @@ class TestJobsAPI(Base):
         self.assertTrue("Hi, I am a lazy test." in r,
                         r)
 
+    @skipIfServiceMissing('jenkins')
     def test_run(self):
         """Test running a parameterized job manually"""
         last_build = self.ju.get_last_build_number(self.test_job,
@@ -144,6 +153,7 @@ class TestJobsAPI(Base):
                          int(r["jenkins"]["job_id"]),
                          r)
 
+    @skipIfServiceMissing('jenkins')
     def test_stop(self):
         """test stopping a running job"""
         last_build = self.ju.get_last_build_number(self.test_job,

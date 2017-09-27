@@ -93,7 +93,8 @@ class TestResourcesWorkflow(Base):
             config_clone_dir,
             "Add new resources for functional tests")
         config_update_log = self.ju.wait_for_config_update(change_sha)
-        self.assertIn("SUCCESS", config_update_log)
+        self.assertEqual(
+            len(re.findall('managesf\..*failed=0', config_update_log)), 1)
 
     def propose_resources_change_check_ci(
             self, fpath, resources=None,
@@ -116,7 +117,8 @@ class TestResourcesWorkflow(Base):
                 config_clone_dir, msg, publish=True)
 
         change_nr = self.gu.get_change_number(change_sha)
-        note = self.gu.wait_for_verify(change_nr)
+        note = self.gu.wait_for_verify(
+            change_nr, ['jenkins', 'zuul'], timeout=180)
         self.assertEqual(note, expected_note)
 
     def get_resources(self):
@@ -565,7 +567,9 @@ class TestResourcesWorkflow(Base):
         for r in json.loads(r.content[4:]):
             if r['_number'] > lastid:
                 lastid = r['_number']
-        self.assertEqual(self.gu.wait_for_verify(lastid), 1)
+        self.assertEqual(
+            self.gu.wait_for_verify(
+                lastid, ['jenkins', 'zuul'], timeout=180), 1)
         # Check flag "sf-resources: skip-apply" in the commit msg
         change = self.gu.g.get(
             'changes/?q=%s&o=CURRENT_REVISION&o=CURRENT_COMMIT' % lastid)[0]
@@ -587,7 +591,8 @@ class TestResourcesWorkflow(Base):
         # If not True then we cannot concider config-update succeed
         config_update_log = self.ju.wait_for_config_update(revision)
         self.assertIn("Skip resources apply.", config_update_log)
-        self.assertIn("SUCCESS", config_update_log)
+        self.assertEqual(
+            len(re.findall('managesf\..*failed=0', config_update_log)), 1)
         # Checking again missing resources  must return nothing
         ret = requests.get("%s/manage/resources/?get_missing_"
                            "resources=true" % config.GATEWAY_URL,

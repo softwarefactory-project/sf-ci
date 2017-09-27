@@ -54,7 +54,13 @@ class TestGateway(Base):
     def test_topmenu_links_shown(self):
         """ Test if all service links are shown in topmenu
         """
-        subpaths = ["/r/", "/jenkins/", "/zuul/", "/docs/"]
+        subpaths = ["/r/", "/docs/"]
+        if "jenkins" in services:
+            subpaths.append("/jenkins/")
+        if "zuul" in services:
+            subpaths.append("/zuul/")
+        if "zuul3" in services:
+            subpaths.append("/zuul3/local/status.html")
         if "etherpad" in services:
             subpaths.append("/etherpad/")
         if "lodgeit" in services:
@@ -143,6 +149,7 @@ class TestGateway(Base):
         a = GerritUtils(url, auth=HTTPBasicAuth("admin", "password"))
         self.assertRaises(HTTPError, a.get_account, 'john')
 
+    @skipIfServiceMissing('jenkins')
     def test_jenkins_accessible(self):
         """ Test if Jenkins is accessible on gateway host
         """
@@ -194,10 +201,23 @@ class TestGateway(Base):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('<title>Kibana</title>' in resp.text)
 
+    @skipIfServiceMissing('zuul')
     def test_zuul_accessible(self):
         """ Test if Zuul is accessible on gateway host
         """
         url = config.GATEWAY_URL + "/zuul/"
+        resp = requests.get(
+            url,
+            cookies=dict(
+                auth_pubtkt=config.USERS[config.USER_1]['auth_cookie']))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue('<title>Zuul Status</title>' in resp.text)
+
+    @skipIfServiceMissing('zuul3')
+    def test_zuul_accessible(self):
+        """ Test if Zuul3 is accessible on gateway host
+        """
+        url = config.GATEWAY_URL + "/zuul3/local/status.html"
         resp = requests.get(
             url,
             cookies=dict(
@@ -268,6 +288,7 @@ class TestGateway(Base):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('<body ng-app="sfWelcome"' in resp.text)
 
+    @skipIfServiceMissing('jenkins')
     def test_jenkinslogs_accessible(self):
         """ Test if Jenkins logs are accessible on gateway host
         """
