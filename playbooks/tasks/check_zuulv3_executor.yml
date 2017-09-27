@@ -1,0 +1,17 @@
+---
+- name: Check for zuulv3 config update
+  command: grep -q -r config-update /root/zuul-jobs/
+  register: _config_update_zuulv3
+  failed_when: _config_update_zuulv3.rc not in [0, 1, 2]
+  become: yes
+  become_user: root
+
+- name: Set SF_ZUUL_EXECUTOR=0
+  set_fact:
+    sf_zuul_executor: 0
+  when: _config_update_zuulv3.rc in [1, 2]
+
+- name: Set SF_ZUUL_EXECUTOR=1
+  set_fact:
+    sf_zuul_executor: 1
+  when: _config_update_zuulv3.rc == 0
