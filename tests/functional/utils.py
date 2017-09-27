@@ -457,29 +457,41 @@ class JenkinsUtils:
             return ''
 
     def wait_for_config_update(self, revision):
-        if os.environ.get("SF_JENKINS_EXECUTOR", "0") == "1":
-            job_text = "Updating configuration using %s" % revision
-            # Legacy code
-            for retry in xrange(120):
-                job_log = self.get_last_console("config-update")
-                if job_text in job_log and "Finished: " in job_log:
-                    break
-                time.sleep(1)
-            return job_log
-        # Remove above legacy code when 2.6 is released
-        job_url = "%sv2/builds/?job=config-update&ref=%s&in_progress=false" % (
-            config.MANAGESF_API,
-            revision
-        )
+        zuul3 = os.environ.get("SF_ZUUL_EXECUTOR", "1") != "0"
+        if zuul3:
+            job_url = ("%s/zuul3/local/builds.json?job_name=config-update&"
+                       "newrev=%s") % (
+                           config.GATEWAY_URL,
+                           revision)
+        else:
+            job_url = ("%sv2/builds/?job=config-update&ref=%s&"
+                       "in_progress=false") % (
+                           config.MANAGESF_API,
+                           revision)
+        logger.debug("Waiting for config-update using %s" % job_url)
         r = None
         try:
-            for retry in xrange(120):
+            for retry in range(120):
                 r = requests.get(job_url)
-                for result in r.json()['results']:
-                    return requests.get("%s/console.html" % result["log_url"]).text
+                if r.ok:
+                    j = r.json()
+                    logger.debug("Got build results: %s" % j)
+                    job_log_url = None
+                    if zuul3:
+                        if len(j):
+                            job_log_url = "%s/job-output.txt.gz" % (
+                                j[0]['log_url'])
+                    else:
+                        for result in j['results']:
+                            job_log_url = "%s/console.html" % (
+                                result["log_url"])
+                            break
+                    if job_log_url:
+                        return requests.get(job_log_url).text
                 time.sleep(1)
         except:
-            logger.exception("Retry%d: Couldn't get %s: %s" % (retry, job_url, r.text))
+            logger.exception("Retry%d: Couldn't get %s: %s" % (
+                retry, job_url, r.text))
             if not r.ok:
                 logger.error("Response was %s : %s" % (r, r.text))
         return "FAILED"
