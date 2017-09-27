@@ -9,6 +9,7 @@
       - include: tasks/install_test_env.yml
       - include: tasks/restore_ci_repo.yml
       - include: tasks/install_sf_ci_repo.yml
+      - include: tasks/check_zuulv3_executor.yml
       - include: tasks/run_provisioner.yml
       - include: tasks/run_sfconfig_upgrade.yml
       - include: tasks/run_checker.yml
