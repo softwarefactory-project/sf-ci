@@ -29,7 +29,7 @@ channel_name: "irc-channel-health-check{{ suffix }}"
 # Zuul3 config
 zuul3_config:
   - tenant:
-      name: ''
+      name: 'local'
       source:
         gerrit:
           untrusted-projects:
