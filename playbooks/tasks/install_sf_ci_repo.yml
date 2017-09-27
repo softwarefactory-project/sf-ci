@@ -1,6 +1,12 @@
+- name: Setup /etc/sf-release file
+  copy:
+    content: "{{ sf_version }}"
+    dest: /etc/sf-release
+
 - name: Check for zuul-built.repo
   stat: path=/etc/yum.repos.d/zuul-built.repo
   register: zuul_built_repo
+
 
 - name: Check for sf-release.repo
   stat: path=/etc/yum.repos.d/sf-release.repo
