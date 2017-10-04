@@ -30,7 +30,7 @@
     option: exclude
     value: sf-release
   with_items:
-    - sfmaster
+    - sfrelease-master
   become: yes
   become_user: root
 
