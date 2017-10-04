@@ -23,14 +23,16 @@
   become: yes
   become_user: root
 
+- name: Get section name on sf-release.repo
+  shell: head -n 1 /etc/yum.repos.d/sf-release.repo | sed -e 's/\[//' -e 's/\]//'
+  register: sf_release_name
+
 - name: Exclude sf-release package from zuul-built repo
   ini_file:
     path: /etc/yum.repos.d/sf-release.repo
-    section: "{{ item }}"
+    section: "{{ sf_release_name.stdout }}"
     option: exclude
     value: sf-release
-  with_items:
-    - sfmaster
   become: yes
   become_user: root
 
