@@ -6,6 +6,13 @@
   become: yes
   become_user: root
 
+- name: Restore the arch.yaml file from the backup
+  copy:
+    src: /var/lib/software-factory/backup/install-server/etc/software-factory/arch.yaml
+    dest: /etc/software-factory/arch.yaml
+  become: yes
+  become_user: root
+
 - name: Run sfconfig --recover
   command: sfconfig --recover /var/lib/software-factory/backup
   become: yes
