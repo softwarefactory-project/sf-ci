@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abe1de1_eceb45af",
+        "filename": "playbooks/tasks/install_sf_ci_repo.yml",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-10-09T12:26:01Z",
+      "side": 1,
+      "message": "This is fixed in the master of sf-ci. \u0027sfmaster\u0027 target name is used by sfinfo/zuul_rpm_setup.py to setup the temporary rpm repo from the logserver. So the fix was: https://softwarefactory-project.io/r/gitweb?p\u003dsoftware-factory/sf-ci.git;a\u003dblob;f\u003dplaybooks/tasks/install_sf_ci_repo.yml;h\u003d0553d06912c066469a9cd42e15f2ad2828840088;hb\u003dHEAD#l33",
+      "revId": "c7c3619598ecb8f96363eb9c79dbed75670b6823",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
