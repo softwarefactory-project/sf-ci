@@ -3,4 +3,3 @@
 - name: Create backup
   command: ansible-playbook /var/lib/software-factory/ansible/sf_backup.yml
   become: yes
-  become_user: root

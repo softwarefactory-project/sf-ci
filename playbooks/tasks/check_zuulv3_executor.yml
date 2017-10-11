@@ -4,7 +4,6 @@
   register: _config_update_zuulv3
   failed_when: _config_update_zuulv3.rc not in [0, 1, 2]
   become: yes
-  become_user: root
 
 - name: Set SF_ZUUL_EXECUTOR=0
   set_fact:

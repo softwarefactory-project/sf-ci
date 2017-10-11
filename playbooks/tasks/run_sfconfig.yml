@@ -4,21 +4,18 @@
     exclude: ansible
     state: latest
   become: yes
-  become_user: root
 
 - name: Install SF architecture file {{ sf_arch }}.yaml
   copy:
     src: "/usr/share/sf-config/refarch/{{ sf_arch }}.yaml"
     dest: /etc/software-factory/arch.yaml
   become: yes
-  become_user: root
 
 - name: Install extra custom-vars for mirrors
   copy:
     src: "{{ sf_ci }}/patches/custom-vars.yaml"
     dest: /etc/software-factory/custom-vars.yaml
   become: yes
-  become_user: root
 
 # Special fix for 2.5.0
 - block:
@@ -30,14 +27,12 @@
       - /root/.ssh
       - /etc/serverspec
     become: yes
-    become_user: root
 
   - name: Fix arch
     copy:
       src: "{{ sf_ci }}/patches/2.5.0-minimal.yaml"
       dest: /etc/software-factory/arch.yaml
     become: yes
-    become_user: root
 
   - name: Fix gitweb install
     replace:
@@ -45,19 +40,16 @@
       regexp: " theme "
       replace: " gitweb_theme "
     become: yes
-    become_user: root
   - name: Fix gitweb default
     replace:
       dest: "/usr/share/sf-config/ansible/roles/sf-gitweb/defaults/main.yml"
       regexp: "^theme:"
       replace: "gitweb_theme:"
     become: yes
-    become_user: root
   when: "sf_version == '2.5'"
 
 - name: Run sfconfig
   command: sfconfig
   become: yes
-  become_user: root
 
 - include: update_bootstrap_mode.yml

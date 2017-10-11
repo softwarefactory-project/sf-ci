@@ -2,6 +2,7 @@
   copy:
     content: "{{ sf_version }}"
     dest: /etc/sf-release
+  become: yes
 
 - name: Check for zuul-built.repo
   stat: path=/etc/yum.repos.d/zuul-built.repo
@@ -21,13 +22,11 @@
     name: "https://softwarefactory-project.io/repos/sf-release-master.rpm"
   when: not zuul_built_repo.stat.exists and not sf_release_repo.stat.exists
   become: yes
-  become_user: root
 
 - name: Install zuul-built.repo in place of sf-release
   command: mv /etc/yum.repos.d/zuul-built.repo /etc/yum.repos.d/sf-release.repo
   when: zuul_built_repo.stat.exists
   become: yes
-  become_user: root
 
 - name: Exclude sf-release package from zuul-built repo
   when: zuul_built_repo.stat.exists
@@ -39,7 +38,6 @@
   with_items:
     - sfmaster
   become: yes
-  become_user: root
 
 - name: Replace koji hostname by its IP
   replace:
@@ -47,7 +45,6 @@
     regexp: 'koji.softwarefactory-project.io'
     replace: "{{ koji_ip }}"
   become: yes
-  become_user: root
 
 - name: Check for locally built packages
   stat:
@@ -60,7 +57,6 @@
     state: absent
   when: not local_build.stat.exists
   become: yes
-  become_user: root
 
 - name: Add local_built repo
   yum_repository:
@@ -70,7 +66,6 @@
     gpgcheck: "0"
   when: local_build.stat.exists
   become: yes
-  become_user: root
 
 - name: Exclude older package from scl
   ini_file:
@@ -79,4 +74,3 @@
     option: exclude
     value: rh-python35-python-jinja2
   become: yes
-  become_user: root

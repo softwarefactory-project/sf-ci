@@ -6,4 +6,3 @@
   environment:
     SF_ZUUL_EXECUTOR: "{{ sf_zuul_executor }}"
   become: yes
-  become_user: root

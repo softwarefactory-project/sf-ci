@@ -7,4 +7,3 @@
       - ansible
     update_cache: yes
   become: yes
-  become_user: root

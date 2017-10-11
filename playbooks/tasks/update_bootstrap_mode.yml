@@ -7,4 +7,3 @@
     - /var/lib/software-factory/
     - /etc/software-factory/
   become: yes
-  become_user: root

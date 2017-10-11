@@ -169,14 +169,12 @@
     - name: Allow root access
       command: sed -i 's/^.*rather than the user ..root.* ssh-rsa/ssh-rsa/' /root/.ssh/authorized_keys
       become: yes
-      become_user: root
 
     - include: tasks/customize_latest.yml
 
     - name: Run sfconfig
       command: sfconfig
       become: yes
-      become_user: root
       when: skip_sfconfig|default("no") == "no"
 
     # Specifying a destination path
@@ -186,7 +184,6 @@
         dest: "{{ workspace }}/all.yaml"
         flat: yes
       become: yes
-      become_user: root
 
     - name: Load deployment group_vars
       include_vars:

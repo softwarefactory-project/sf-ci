@@ -1,4 +1,3 @@
 - name: "Run sf_erase playbook"
   command: ansible-playbook /var/lib/software-factory/ansible/sf_erase.yml -e "sfconfig_batch=true"
   become: yes
-  become_user: root

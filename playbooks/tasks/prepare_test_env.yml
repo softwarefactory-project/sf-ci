@@ -3,7 +3,6 @@
 - name: "Fix jenkins user shell"
   command: "sed -i '/^jenkins/ s#:[^:]*$#:/sbin/nologin#' /etc/passwd"
   become: yes
-  become_user: root
 
 - name: "Create artifact directory"
   file:

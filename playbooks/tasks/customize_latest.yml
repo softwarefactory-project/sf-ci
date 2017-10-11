@@ -1,6 +1,5 @@
 - name: "Update sfconfig.yaml"
   become: yes
-  become_user: root
   command: |
     python -c 'import yaml
     import sys
@@ -29,7 +28,6 @@
 
 - name: "Update arch.yaml to include nodepool-builder"
   become: yes
-  become_user: root
   command: |
     python -c 'import yaml
     arch = yaml.safe_load(open("/etc/software-factory/arch.yaml", "r"))
@@ -48,7 +46,6 @@
 
 - name: "Copy logo"
   become: yes
-  become_user: root
   copy:
     src: files/logo.png
     dest: "{{ item }}"
@@ -58,7 +55,6 @@
 
 - name: "Add SF DEV public keys"
   become: yes
-  become_user: root
   shell: "cat /tmp/SF_devs_public_keys/authorized_keys >> /root/.ssh/authorized_keys"
 
 - name: "Remove SF DEV public key checkout"

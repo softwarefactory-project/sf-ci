@@ -2,13 +2,11 @@
   command: mv /root/zuul-built.repo /etc/yum.repos.d/
   when: zuul_built_repo.stat.exists
   become: yes
-  become_user: root
 
 - name: Restore local-built.repo
   command: mv /root/local-built.repo /etc/yum.repos.d/
   when: local_built_repo.stat.exists
   become: yes
-  become_user: root
 
 # TODO: this need to be dynamic if we want to test N-2 upgrade to N-1
 # Right now, upgrade job only run for master branch and it test N-1 to master
@@ -17,4 +15,3 @@
     content: "master"
     dest: /etc/sf-release
   become: yes
-  become_user: root

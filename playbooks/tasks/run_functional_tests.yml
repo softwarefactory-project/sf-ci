@@ -5,11 +5,9 @@
     path: sfmanager.log
     state: absent
   become: yes
-  become_user: root
 
 - name: Start functional tests
   command: "{{ sf_ci }}/scripts/create_ns.sh nosetests --with-timer --with-html --html-file=nose_results.html --logging-format '%(asctime)s: %(levelname)s - %(message)s' -sv {{ sf_ci }}/{{ func_test_case }}"
   environment:
     SF_ZUUL_EXECUTOR: "{{ sf_zuul_executor }}"
   become: yes
-  become_user: root

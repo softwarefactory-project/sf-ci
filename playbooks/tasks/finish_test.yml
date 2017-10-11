@@ -1,24 +1,20 @@
 - name: Restore jenkins shell
   command: "sed -i '/^jenkins/ s#:[^:]*$#:/bin/bash#' /etc/passwd"
   become: yes
-  become_user: root
 
 - name: Check for get_logs playbook
   stat: path=/var/lib/software-factory/ansible/get_logs.yml
   register: get_logs_playbook
   become: yes
-  become_user: root
 
 - block:
     - name: Run get-logs playbook
       command: ansible-playbook /var/lib/software-factory/ansible/get_logs.yml
       become: yes
-      become_user: root
 
     - name: Copy sf-logs
       command: "rsync -a --chmod=Duog+rx,Fuog+r --no-links /root/sf-logs/ {{ artifacts }}/"
       become: yes
-      become_user: root
   when: get_logs_playbook.stat.exists
 
 - name: Ensure artifacts are owned by user
@@ -27,7 +23,6 @@
     owner: "{{ sf_user }}"
     recurse: yes
   become: yes
-  become_user: root
 
 - name: Check nose_results.html
   stat: path=nose_results.html

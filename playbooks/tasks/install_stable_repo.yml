@@ -10,17 +10,14 @@
   command: mv /etc/yum.repos.d/zuul-built.repo /root/
   when: zuul_built_repo.stat.exists
   become: yes
-  become_user: root
 
 - name: Save local-built.repo
   command: mv /etc/yum.repos.d/local-built.repo /root
   when: local_built_repo.stat.exists
   become: yes
-  become_user: root
 
 - name: Install stable repo
   yum:
     name: https://softwarefactory-project.io/repos/sf-release-{{ sf_version }}.rpm
     state: present
   become: yes
-  become_user: root

@@ -6,7 +6,6 @@
     - python-nose-timer
     - python-nose-htmloutput
   become: yes
-  become_user: root
 
 # Remove sfmanager.log as it might be created before and owned by root
 - name: Remove previous sfmanager.log
