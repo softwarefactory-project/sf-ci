@@ -8,3 +8,11 @@
   file:
     path: "{{ artifacts }}"
     state: directory
+
+# /etc/nodepool is created during the slave creation
+# remove this directory to allow symlink creation for
+# nodepool3 setup playbook
+- name: Remove /etc/nodepool directory
+  file:
+    path: /etc/nodepool
+    state: absent
