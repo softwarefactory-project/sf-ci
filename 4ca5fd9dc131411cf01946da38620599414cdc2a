@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abe1de1_18e22fd6",
+        "filename": "playbooks/tasks/prepare_test_env.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-10-16T10:28:41Z",
+      "side": 1,
+      "message": "Could you handle that in the nodepool3 playbook instead ?",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 17
+      },
+      "revId": "4ca5fd9dc131411cf01946da38620599414cdc2a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
