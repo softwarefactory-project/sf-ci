@@ -39,11 +39,6 @@
     roles.append("nodepool") if "nodepool" not in roles else None
     yaml.dump(arch, open("/etc/software-factory/arch.yaml", "w"), default_flow_style=False)'
 
-- name: "Checkout SF DEV public key"
-  git:
-    repo: 'https://softwarefactory-project.io/r/SF_devs_public_keys'
-    dest: /tmp/SF_devs_public_keys
-
 - name: "Copy logo"
   become: yes
   copy:
@@ -53,11 +48,3 @@
     - /etc/software-factory/logo-splash.png
     - /etc/software-factory/logo-topmenu.png
 
-- name: "Add SF DEV public keys"
-  become: yes
-  shell: "cat /tmp/SF_devs_public_keys/authorized_keys >> /root/.ssh/authorized_keys"
-
-- name: "Remove SF DEV public key checkout"
-  file:
-    path: /tmp/SF_devs_public_keys
-    state: absent
