@@ -33,6 +33,7 @@ export ANSIBLE_LIBRARY=$ara_location/plugins/modules
 
 function terminate {
     if which ara &> /dev/null; then
+        mkdir -p ${ARTIFACTS} 
         pushd ${ARTIFACTS}
             rm -Rf ara-report
             ara generate html ara-report
