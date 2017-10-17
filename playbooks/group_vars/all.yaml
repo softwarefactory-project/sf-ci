@@ -16,19 +16,22 @@ home: "{{ lookup('env', 'HOME') }}"
 
 # sfconfig.yaml customization
 sf_domain: "{{ lookup('env', 'SF_DOMAIN')|default('sftests.com', true) }}"
+# set sf_zuul_executor until zuulv2 will be remove from the arch
+sf_zuul_executor: "{{ lookup('env', 'SF_ZUUL_EXECUTOR')| default(1, true) }}"
 
 # deploy-heat params
 os_auth_url: "{{ lookup('env', 'OS_AUTH_URL') }}"
 os_username: "{{ lookup('env', 'OS_USERNAME') }}"
 os_password: "{{ lookup('env', 'OS_PASSWORD') }}"
-os_project_name: "{{ lookup('env', 'OS_PROJECT_NAME') }}"
+os_tenant_name: "{{ lookup('env', 'OS_TENANT_NAME') }}"
 
 floatingip_id: "{{ lookup('env', 'OS_FLOATING_IP_ID') }}"
 floatingip: "{{ lookup('env', 'OS_FLOATING_IP') }}"
+external_network: "{{ lookup('env', 'OS_EXTERNAL_NET_ID') }}"
 
-swift_url: "http://46.231.132.68:8080/v1/AUTH_b50e80d3969f441a8b7b1fe831003e0a/sf-images"
-stack_url: "{{ swift_url }}/sf-{{ sf_version }}-{{ sf_arch }}{% if floatingip_id %}-fixed-ip{% endif %}.hot"
-image_url: "{{ swift_url }}/sf-{{ sf_version }}.qcow2"
+sf_url: "https://softwarefactory-project.io/releases"
+stack_url: "{{ sf_url }}/sf-{{ sf_version }}/sf-{{ sf_version }}-{{ sf_arch }}{% if floatingip_id %}-fixed-ip{% endif %}.hot"
+image_url: "{{ sf_url }}/sf-{{ sf_version }}/sf-{{ sf_version }}.qcow2"
 
 # tuning default values
 github_app_id: "{{ lookup('env', 'GITHUB_APP_ID' )}}"
