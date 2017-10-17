@@ -30,9 +30,11 @@ export ara_location=$(python -c "import os,ara; print(os.path.dirname(ara.__file
 export ANSIBLE_CALLBACK_PLUGINS=$ara_location/plugins/callbacks
 export ANSIBLE_ACTION_PLUGINS=$ara_location/plugins/actions
 export ANSIBLE_LIBRARY=$ara_location/plugins/modules
+export ANSIBLE_HOST_KEY_CHECKING=False
 
 function terminate {
     if which ara &> /dev/null; then
+        mkdir -p ${ARTIFACTS}
         pushd ${ARTIFACTS}
             rm -Rf ara-report
             ara generate html ara-report
