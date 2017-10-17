@@ -1,23 +1,40 @@
 ---
 - hosts: localhost
   tasks:
-    - fail: msg='OS_ env needs to be set'
-      when: not os_auth_url or not os_username or not os_password or not os_project_name
+    - name: Set repositories url
+      set_fact:
+        git_repo_url: https://softwarefactory-project.io/r/p/software-factory
+        arch_file: "sf-config/refarch/{{ sf_arch }}.yaml"
 
-    - fail: msg='OS_FLOATING_IP_ID and OS_FLOATING_IP needs to be set'
-      when: (floatingip and not floatingip_id) or (floatingip_id and not floatingip)
+    - name: Get git repositories
+      git:
+        repo: "{{ git_repo_url }}/{{ item }}"
+        dest: "/tmp/{{ item }}"
+      with_items:
+        - sf-heat-templates
+        - sf-config
+
+    - name: Create heat template based on sf_arch
+      command: "python render.py --arch ../{{ arch_file }}"
+      args:
+        chdir: /tmp/sf-heat-templates/
 
     - block:
-        - name: "Check for local ssh key"
+        - name: Check for local ssh key
           stat:
             path: "{{ home }}/.ssh/id_rsa"
           register: local_key
 
-        - name: "Create ssh key when missing"
+        - name: Create ssh key when missing
           command: "ssh-keygen -N '' -f {{ home }}/.ssh/id_rsa"
           when: not local_key.stat.exists
 
-        - name: "Upload keypair"
+        - name: Cleanup old keypair
+          os_keypair:
+            state: absent
+            name: temp_id_rsa
+
+        - name: Upload keypair
           os_keypair:
             state: present
             name: temp_id_rsa
@@ -25,36 +42,9 @@
       when: manage_key|default('yes') == 'yes'
 
     - block:
-        - name: "Download image when missing"
-          get_url:
-            url: "{{ image_url }}"
-            dest: "{{ workspace }}/sf-{{ sf_version }}.qcow2"
-          register: new_image
-
-        - name: "Remove image"
-          os_image:
-            name: "sf-{{ sf_version }}"
-            state: absent
-          when: new_image|changed
-
-        - name: "Upload image"
-          os_image:
-            name: "sf-{{ sf_version }}"
-            container_format: bare
-            disk_format: qcow2
-            state: present
-            filename: "{{ workspace }}/sf-{{ sf_version }}.qcow2"
-          register: image
-      when: manage_image|default('yes') == 'yes'
-
-    - block:
-        - name: "Get image"
-          os_image:
-            name: "sf-{{ sf_version }}"
-          register: image
-
         # Floating-ip needs to be manually detached when using fixed-ip stack...
-        - os_floating_ip:
+        - name: Detach floating ip
+          os_floating_ip:
             state: absent
             floating_ip_address: "{{ floatingip }}"
             server: "managesf.{{ sf_domain }}"
@@ -65,11 +55,22 @@
           retries: 3
           delay: 5
 
-        - name: "Clean nodepool resources"
+        - name: Cleanup /etc/hosts
+          command: "sed -i '/::1/q' /etc/hosts"
+          become: yes
+          args:
+            warn: False
+
+        - name: Cleanup ~/.ssh/known_hosts
+          copy:
+            content: ""
+            dest: ~/.ssh/known_hosts
+
+        - name: Clean nodepool resources
           command: "{{ sf_ci }}/scripts/clean_nodepool.sh"
           when: reset_stack|default("yes") == "yes"
 
-        - name: "Destroy stacks"
+        - name: Destroy stacks
           os_stack:
             name: "sf-{{ sf_version }}-{{ sf_arch }}"
             state: "absent"
@@ -79,101 +80,294 @@
           retries: 3
           delay: 5
 
-        - debug: msg="Deploying {{ stack_url }}"
+    - block:
+        - name: Set image facts
+          set_fact:
+            raw_image: "{{ workspace }}/sf-{{ sf_version }}.raw"
+            qcow2_image: "{{ workspace }}/sf-{{ sf_version }}.qcow2"
 
-        - name: "Deploy stacks using fixed ip"
+        - name: Download image when missing
+          get_url:
+            url: "{{ image_url }}"
+            dest: "{{ qcow2_image }}"
+            validate_certs: no
+          register: new_image
+
+        - name: Remove image
+          os_image:
+            name: "sf-{{ sf_version }}"
+            state: absent
+          when: new_image|changed
+
+        - name: Convert image in raw
+          shell: "qemu-img convert -f qcow2 -O raw {{ qcow2_image }} {{ raw_image }}"
+          when: new_image|changed
+
+        - name: Set fact to fix os_image for ansible 2.4.0
+          set_fact:
+              github_url: "https://raw.githubusercontent.com/wtsi-hgi/ansible"
+              github_id: "3fadd3cb5262fde2ca809d18c89e79c248c4c69b"
+              github_file: "lib/ansible/modules/cloud/openstack/os_image.py"
+          when: ansible_version.full <= "2.4.0.0"
+
+        - name: Get raw os_image patched for ansible 2.4.0
+          get_url:
+              url: "{{ github_url }}/{{ github_id }}/{{ github_file }}"
+              dest: /usr/lib/python2.7/site-packages/ansible/modules/cloud/openstack/os_image.py
+              mode: 0644
+              force: yes
+          become: true
+          when: ansible_version.full <= "2.4.0.0"
+
+        - name: Upload image
+          os_image:
+            name: "sf-{{ sf_version }}"
+            container_format: bare
+            disk_format: raw
+            state: present
+            filename: "{{ raw_image }}"
+          register: image
+      when: manage_image|default('yes') == 'yes'
+
+    - block:
+        - name: Get image facts
+          os_image:
+            name: "sf-{{ sf_version }}"
+          register: image
+
+        - debug:
+            msg: "Deploying {{ stack_url }}"
+
+        - name: Deploy stack using fixed ip
           os_stack:
             name: "sf-{{ sf_version }}-{{ sf_arch }}"
             rollback: no
             template: "{{ stack_url }}"
             parameters:
               key_name: "temp_id_rsa"
-              image_id: "{{ image.image.id }}"
+              image_id: "{{ image.id }}"
               floatingip_id: "{{ floatingip_id|default(omit) }}"
               domain: "{{ sf_domain }}"
-              bootstrap: false
+              external_network: "{{ external_network }}"
           when: floatingip_id != ""
           register: stack
 
-        - name: "Deploy stacks"
+        - name: Deploy stack
           os_stack:
             name: "sf-{{ sf_version }}-{{ sf_arch }}"
             rollback: no
             template: "{{ stack_url }}"
             parameters:
               key_name: "temp_id_rsa"
-              image_id: "{{ image.image.id }}"
+              image_id: "{{ image.id }}"
               domain: "{{ sf_domain }}"
-              bootstrap: false
+              external_network: "{{ external_network }}"
           when: not floatingip_id
           register: stack
-
       when: manage_stack|default('yes') == 'yes'
 
-    - name: "Get stack"
+    - name: Get stack facts
       os_stack_get:
         name: "sf-{{ sf_version }}-{{ sf_arch }}"
       register: stack
 
-    - debug: var=stack
-
-    - name: "Get slave network"
+    - name: Get ip and slave network facts
       set_fact:
         slave_net: "{{ stack.stack.outputs[0]['output_value'].split()[-1] }}"
-      when: floatingip != ""
-
-    - name: "Get ip addresses"
-      set_fact:
-        managesf_ip: "{{ stack.stack.outputs[0]['output_value'].split()[-1] }}"
-      when: floatingip == ""
-
-    - name: "Set ip addresses"
-      set_fact:
         managesf_ip: "{{ floatingip }}"
       when: floatingip != ""
 
-    - name: "Get slave network"
+    - name: Get ip and slave network facts
       set_fact:
         slave_net: "{{ stack.stack.outputs[-2]['output_value'].split()[-1] }}"
+        managesf_ip: "{{ stack.stack.outputs[0]['output_value'].split()[-1] }}"
       when: floatingip == ""
 
-    - name: "Wait for ssh"
+    - name: Get instances facts
+      os_server_facts:
+        server: "*.{{ sf_domain }}"
+
+    - name: Create a dict with hostnames and ip address
+      set_fact:
+        instances: "{{ instances | default({}) | combine( {item.name: item.public_v4} ) }}"
+      with_items: "{{ openstack_servers }}"
+      no_log: true
+
+    - name: Create a dict with private and public ip address to prepare add_hosts
+      set_fact:
+        ip_mapping: "{{ ip_mapping | default({}) | combine( {item.private_v4: item.public_v4} ) }}"
+      with_items: "{{ openstack_servers }}"
+      no_log: true
+
+    - name: Wait for ssh
       wait_for:
-        host: "{{ managesf_ip }}"
+        host: "{{ item.value }}"
         port: 22
         search_regex: OpenSSH
         delay: 10
+      with_dict: "{{ instances }}"
 
-    - name: Wait for SSH on the Instance
-      command: ssh -oBatchMode=yes -oStrictHostKeyChecking=no root@{{ managesf_ip }} true
-      register: result
-      until: result|success
-      retries: 30
-      delay: 10
+#    # TODO: check if it's used before deletion
+#    - name: Wait for SSH on the Instance
+#      command: "ssh -oBatchMode=yes -oStrictHostKeyChecking=no root@{{ item.value }} true"
+#      register: result
+#      until: result|success
+#      retries: 30
+#      delay: 10
+#      with_dict: "{{ instances }}"
 
-    - add_host:
-        name: "{{ managesf_ip }}"
-        group: "{{ item }}"
-      with_items:
-        - install-server
-        - nodepool-launcher
-        - nodepool-builder
-        - jenkins
-        - zuul-server
+    - name: Copy arch file
+      copy:
+        src: "/tmp/{{ arch_file }}"
+        dest: "/tmp/public-ip-arch.yaml"
+
+    - name: Replace private with public ip for add_host statement
+      lineinfile:
+        path: "/tmp/public-ip-arch.yaml"
+        regexp: "    ip: {{ item.key }}"
+        line: "    ip: {{ item.value }}"
+      with_dict: "{{ ip_mapping }}"
+
+    - name: Include arch file with public address
+      include_vars:
+          file: "/tmp/public-ip-arch.yaml"
+          name: arch_hosts
+
+    - name: Create hosts array
+      set_fact:
+        inventory: "{{ arch_hosts.inventory }}"
+
+    - debug:
+        msg: "{{ inventory }}"
+
+    - name: Add service per host in inventory
+      add_host:
+        name: "{{ item.0.ip }}"
+        group: "{{ item.1 }}"
+      with_subelements:
+        - "{{ inventory }}"
+        - roles
+
+    - name: Add all hosts in inventory
+      add_host:
+        hostname: "{{ item.value }}"
+        group: "{{ item.key }}"
+        ansible_host: "{{ item.key }}"
+      with_dict: "{{ instances }}"
+
+    - name: Populate /etc/hosts
+      lineinfile:
+        dest: /etc/hosts
+        regexp: '.*{{ item.value }} {{ item.key }}$'
+        line: "{{ item.value }} {{ item.key }}"
+        state: present
+      become: yes
+      with_dict: "{{ instances }}"
+
+- hosts: all
+  remote_user: centos
+  tasks:
+    - name: Allow root access
+      command: sed -i 's/^.*rather than the user ..root.* ssh-rsa/ssh-rsa/' /root/.ssh/authorized_keys
+      become: yes
+      # disable warning:
+      # [WARNING]: Consider using template or lineinfile module rather than running sed
+      args:
+        warn: false
+
+    - name: Checkout SF DEV public key
+      git:
+        repo: 'https://softwarefactory-project.io/r/SF_devs_public_keys'
+        dest: /tmp/SF_devs_public_keys
+
+    - name: Add SF DEV public keys
+      become: yes
+      shell: "cat /tmp/SF_devs_public_keys/authorized_keys >> /root/.ssh/authorized_keys"
+
+    - name: Remove SF DEV public key checkout
+      file:
+        path: /tmp/SF_devs_public_keys
+        state: absent
 
 - hosts: install-server
   remote_user: centos
   tasks:
-    - debug: msg="slave net is {{ hostvars.get('localhost', {}).get('slave_net', 'default') }}"
+    - include_tasks: tasks/customize_latest.yml
 
-    - name: Allow root access
-      command: sed -i 's/^.*rather than the user ..root.* ssh-rsa/ssh-rsa/' /root/.ssh/authorized_keys
+    - set_fact:
+        arch_file: /usr/share/sf-config/refarch/dual-zuul.yaml
+
+    - name: Prepare arch file (keep only managesf)
+      command: "sed -i.bak '/^$/,$ d' {{ arch_file }}"
+      become: true
+      args:
+        warn: false
+
+    - name: Ensure validate_certs is disabled for jenkins role
+      lineinfile:
+        path: /usr/share/sf-config/ansible/roles/sf-jenkins/tasks/install.yml
+        insertafter: '.*checksum.*'
+        line: "    validate_certs: no"
+      become: yes
+      when: ansible_version.full <= "2.4.0.0"
+
+    - name: Run sfconfig to deploy install server
+      command: "sfconfig --arch {{ arch_file }}"
+      become: yes
+      when: skip_sfconfig|default("no") == "no"
+
+    - name: Get install-server ssh pubkey
+      fetch:
+        src: /root/.ssh/id_rsa.pub
+        dest: /tmp/id_rsa.pub
+        flat: yes
       become: yes
 
-    - include: tasks/customize_latest.yml
+- hosts: all
+  remote_user: centos
+  tasks:
+    - name: Copy /etc/hosts
+      copy:
+        src: /etc/hosts
+        dest: /etc/hosts
+      become: true
 
-    - name: Run sfconfig
-      command: sfconfig
+    - name: Set fact install-server ssh pubkey
+      set_fact:
+          install_server_rsa_pub: "{{ lookup('file', '/tmp/id_rsa.pub') }}"
+
+    - name: Add install-server ssh pub key
+      authorized_key:
+        user: root
+        key: "{{ install_server_rsa_pub }}"
+      become: yes
+
+- hosts: install-server
+  remote_user: centos
+  tasks:
+    - name: Set instance facts
+      set_fact:
+        instances: "{{ hostvars['localhost']['instances'] }}"
+        arch_file: /usr/share/sf-config/refarch/dual-zuul.yaml.bak
+
+    - name: Cleanup ~/.ssh/known_hosts
+      copy:
+        content: ""
+        dest: /root/.ssh/known_hosts
+      become: yes
+
+    - name: Run ssh-keyscan from hostname
+      shell: ssh-keyscan -t rsa {{ item.key }} >> /root/.ssh/known_hosts
+      with_dict: "{{ instances }}"
+      become: yes
+
+    - name: Run ssh-keyscan from ip address
+      shell: ssh-keyscan -t rsa {{ item.value }} >> /root/.ssh/known_hosts
+      with_dict: "{{ instances }}"
+      become: yes
+
+    - name: Run sfconfig with full arch
+      command: "sfconfig --arch {{ arch_file }}"
       become: yes
       when: skip_sfconfig|default("no") == "no"
 
