@@ -31,7 +31,7 @@
     - block:
         - name: Wait config-update result using zuul-web API
           uri:
-            url: "https://sftests.com/zuul3/local/builds.json?job_name=config-update&newrev={{ commitsha.stdout }}"
+            url: "https://{{ sf_domain | default('sftests.com') }}/zuul3/local/builds.json?job_name=config-update&newrev={{ commitsha.stdout }}"
             return_content: yes
             status_code: "200,404"
             validate_certs: no
