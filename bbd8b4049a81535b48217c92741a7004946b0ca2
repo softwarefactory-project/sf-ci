@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abe1de1_123a0b37",
+        "filename": "health-check/nodepool3.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 68
+      },
+      "writtenOn": "2017-10-19T15:17:33Z",
+      "side": 1,
+      "message": "Be mindful that as of now, this playbook requires zuul2 to be activated. The last step uses the managesf builds endpoint which only works with zuul2 builds atm.",
+      "revId": "bbd8b4049a81535b48217c92741a7004946b0ca2",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_b2491fd3",
+        "filename": "health-check/nodepool3.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 68
+      },
+      "writtenOn": "2017-10-19T15:17:33Z",
+      "side": 1,
+      "message": "Yep, I predict a lot of broken stuff on this API due to changes in nodepool3 CLI output...",
+      "revId": "bbd8b4049a81535b48217c92741a7004946b0ca2",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
