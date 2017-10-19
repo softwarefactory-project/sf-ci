@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9abe1de1_3244ef72",
+        "filename": "health-check/nodepool3.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-10-19T20:30:21Z",
+      "side": 1,
+      "message": "No in config_submit_change there is both cases supported and this conditioned by the var sf_zuul_executor.",
+      "parentUuid": "9abe1de1_123a0b37",
+      "revId": "bbd8b4049a81535b48217c92741a7004946b0ca2",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abe1de1_b2491fd3",
         "filename": "health-check/nodepool3.yaml",
         "patchSetId": 1
