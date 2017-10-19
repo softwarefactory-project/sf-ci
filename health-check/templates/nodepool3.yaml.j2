@@ -1,0 +1,32 @@
+---
+diskimages:
+  - name: np3-dib-centos-7
+    formats:
+      - raw
+    elements:
+      - centos-minimal
+      - nodepool3-minimal
+      - sf-zuul3-worker
+
+labels:
+  - name: np3-dib-centos-7
+    min-ready: 1
+
+providers:
+  - name: np3
+    cloud: {{ provider_name }}
+    clean-floating-ips: true
+    image-name-format: '{image_name}-{timestamp}'
+    boot-timeout: 120
+    rate: 10.0
+    diskimages:
+      - name: np3-dib-centos-7
+    pools:
+      - name: main
+        max-servers: 1
+        networks:
+           - {{ os_slave_net }}
+        labels:
+          - name: np3-dib-centos-7
+            min-ram: 1024
+            diskimage: np3-dib-centos-7
