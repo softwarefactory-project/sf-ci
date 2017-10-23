@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abe1de1_f5cae14e",
+        "filename": "playbooks/deploy-heat.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-10-23T09:49:51Z",
+      "side": 1,
+      "message": "This is not needed.",
+      "range": {
+        "startLine": 162,
+        "startChar": 0,
+        "endLine": 165,
+        "endChar": 21
+      },
+      "revId": "d704fe1d34cd8f7d1cf3b8e15d508ae26e4721b1",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_15b555cc",
+        "filename": "playbooks/deploy-heat.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-10-23T09:49:51Z",
+      "side": 1,
+      "message": "Trailing char.",
+      "range": {
+        "startLine": 177,
+        "startChar": 87,
+        "endLine": 177,
+        "endChar": 88
+      },
+      "revId": "d704fe1d34cd8f7d1cf3b8e15d508ae26e4721b1",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_d5c7dd43",
+        "filename": "playbooks/group_vars/all.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-10-23T09:49:51Z",
+      "side": 1,
+      "message": "Should it be {{ sf_version }} ?",
+      "range": {
+        "startLine": 32,
+        "startChar": 48,
+        "endLine": 32,
+        "endChar": 54
+      },
+      "revId": "d704fe1d34cd8f7d1cf3b8e15d508ae26e4721b1",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_b5c46940",
+        "filename": "run_tests.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-10-23T09:49:51Z",
+      "side": 1,
+      "message": "Trailing char.",
+      "range": {
+        "startLine": 36,
+        "startChar": 29,
+        "endLine": 36,
+        "endChar": 30
+      },
+      "revId": "d704fe1d34cd8f7d1cf3b8e15d508ae26e4721b1",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
