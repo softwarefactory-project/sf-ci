@@ -17,6 +17,9 @@
     dest: /etc/software-factory/custom-vars.yaml
   become: yes
 
+- name: Include custom vars
+  include_vars:  /etc/software-factory/custom-vars.yaml
+
 # Special fix for 2.5.0
 - block:
   - file:
