@@ -4,6 +4,9 @@ set -Ex
 
 # TODO: remove quick fix bellow
 sudo yum update -y ansible
+# TODO: To be removed when are bump merged and images rebuilt
+sudo yum install -y https://softwarefactory-project.io/logs/97/9997/1/check/sf-rpm-build/Zc3a7e638f27642cd853e6c94ce133f41/zuul-rpm-build/ara-0.14.4-1.el7.noarch.rpm
+sudo yum update -y ara
 
 # Remove ZUUL_* environment variables. We do not need them to be present
 # after that statement.
@@ -44,6 +47,7 @@ function terminate {
 
 trap 'terminate' ERR
 ansible-playbook -M modules/                     \
+         -e @playbooks/group_vars/all.yaml       \
          -e sf_user=${USER}                      \
          -e workspace=${WORKSPACE}               \
          -e local_repo_path=${LOCAL_REPO_PATH}   \

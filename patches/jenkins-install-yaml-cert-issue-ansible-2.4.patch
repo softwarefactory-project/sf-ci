@@ -1,0 +1,17 @@
+--- install.yml	2017-10-26 12:55:01.951212369 +0000
++++ install.yml.new	2017-10-26 12:56:09.819280791 +0000
+@@ -39,6 +39,7 @@
+     url: "{{ jenkins_cache_url }}/{{ item.name }}.hpi"
+     dest: "/var/lib/jenkins/plugins/{{ item.name }}.hpi"
+     checksum: "{{ item.checksum }}"
++    validate_certs: no
+   with_items: "{{ jenkins_plugins }}"
+   when: jenkins_cache_url != ""
+ 
+@@ -47,5 +48,6 @@
+     url: "{{ jenkins_plugins_url }}/{{ item.name }}/{{ item.version }}/{{ item.name }}.hpi"
+     dest: "/var/lib/jenkins/plugins/{{ item.name }}.hpi"
+     checksum: "{{ item.checksum }}"
++    validate_certs: no
+   with_items: "{{ jenkins_plugins }}"
+   when: jenkins_cache_url == ""
