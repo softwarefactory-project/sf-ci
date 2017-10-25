@@ -5,6 +5,11 @@
     exclude: ansible
   become: yes
 
+- name: "Patch sfconfig jenkins install.yaml for ansible 2.4"
+  shell: "patch /usr/share/sf-config/ansible/roles/sf-jenkins/tasks/install.yml < {{ sf_ci }}/patches/jenkins-install-yaml-cert-issue-ansible-2.4.patch"
+  become: yes
+  ignore_errors: yes
+
 - name: Restore the arch.yaml file from the backup
   copy:
     src: /var/lib/software-factory/backup/install-server/etc/software-factory/arch.yaml
