@@ -10,16 +10,6 @@
 - name: "Run sfconfig --upgrade"
   command: sfconfig --upgrade
 
-# Special temporary fixes for ansible 2.4
-- name: "Patch zuul2 ansiblelauncher for ansible 2.4"
-  shell: "patch /usr/lib/python2.7/site-packages/zuul/launcher/ansiblelaunchserver.py < {{ sf_ci }}/patches/ansiblelauncher-ansible-2.4.patch"
-  become: yes
-- name: Force restart of zuul2 launcher after patch applied
-  service:
-    name: zuul-launcher
-    state: restarted
-  ignore_errors: yes
-
 - name: "Collect package upgraded"
   shell: "rpm -qa | sort > package_upgraded"
 
