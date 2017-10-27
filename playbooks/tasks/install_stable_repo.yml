@@ -20,4 +20,5 @@
   yum:
     name: https://softwarefactory-project.io/repos/sf-release-{{ sf_version }}.rpm
     state: present
+    validate_certs: no
   become: yes
