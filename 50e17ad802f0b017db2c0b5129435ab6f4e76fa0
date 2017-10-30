@@ -1,0 +1,101 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9abe1de1_817487fd",
+        "filename": "playbooks/deploy-heat.yml",
+        "patchSetId": 11
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-10-30T14:15:58Z",
+      "side": 1,
+      "message": "to be removed",
+      "revId": "50e17ad802f0b017db2c0b5129435ab6f4e76fa0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_61605336",
+        "filename": "playbooks/deploy-heat.yml",
+        "patchSetId": 11
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-10-30T14:15:58Z",
+      "side": 1,
+      "message": "to be removed",
+      "revId": "50e17ad802f0b017db2c0b5129435ab6f4e76fa0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_015f5773",
+        "filename": "playbooks/deploy-heat.yml",
+        "patchSetId": 11
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-10-30T14:15:58Z",
+      "side": 1,
+      "message": "to be removed",
+      "range": {
+        "startLine": 307,
+        "startChar": 0,
+        "endLine": 312,
+        "endChar": 45
+      },
+      "revId": "50e17ad802f0b017db2c0b5129435ab6f4e76fa0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_c16a7f1a",
+        "filename": "playbooks/group_vars/all.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-10-30T14:15:58Z",
+      "side": 1,
+      "message": "{{ sf_version }} ?",
+      "range": {
+        "startLine": 32,
+        "startChar": 48,
+        "endLine": 32,
+        "endChar": 54
+      },
+      "revId": "50e17ad802f0b017db2c0b5129435ab6f4e76fa0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_e16d8333",
+        "filename": "run_tests.sh",
+        "patchSetId": 11
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2017-10-30T14:15:58Z",
+      "side": 1,
+      "message": "Is it really necessarily ?",
+      "revId": "50e17ad802f0b017db2c0b5129435ab6f4e76fa0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
