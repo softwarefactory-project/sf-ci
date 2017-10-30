@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9abe1de1_814b67b0",
+        "filename": "playbooks/deploy-heat.yml",
+        "patchSetId": 11
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2017-10-30T14:43:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9abe1de1_817487fd",
+      "revId": "50e17ad802f0b017db2c0b5129435ab6f4e76fa0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abe1de1_61605336",
         "filename": "playbooks/deploy-heat.yml",
         "patchSetId": 11
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "9abe1de1_61c73313",
+        "filename": "playbooks/deploy-heat.yml",
+        "patchSetId": 11
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2017-10-30T14:43:40Z",
+      "side": 1,
+      "message": "I removed the \u0027-i.bak\u0027, the rest of the code keep only managesf on the arch file",
+      "parentUuid": "9abe1de1_61605336",
+      "revId": "50e17ad802f0b017db2c0b5129435ab6f4e76fa0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abe1de1_015f5773",
         "filename": "playbooks/deploy-heat.yml",
         "patchSetId": 11
@@ -47,6 +83,30 @@
       "writtenOn": "2017-10-30T14:15:58Z",
       "side": 1,
       "message": "to be removed",
+      "range": {
+        "startLine": 307,
+        "startChar": 0,
+        "endLine": 312,
+        "endChar": 45
+      },
+      "revId": "50e17ad802f0b017db2c0b5129435ab6f4e76fa0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_41cc2f35",
+        "filename": "playbooks/deploy-heat.yml",
+        "patchSetId": 11
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2017-10-30T14:43:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9abe1de1_015f5773",
       "range": {
         "startLine": 307,
         "startChar": 0,
@@ -82,6 +142,30 @@
     },
     {
       "key": {
+        "uuid": "9abe1de1_21d13bce",
+        "filename": "playbooks/group_vars/all.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2017-10-30T14:43:40Z",
+      "side": 1,
+      "message": "I deleted line 32 to keep only line 31 with the correct values",
+      "parentUuid": "9abe1de1_c16a7f1a",
+      "range": {
+        "startLine": 32,
+        "startChar": 48,
+        "endLine": 32,
+        "endChar": 54
+      },
+      "revId": "50e17ad802f0b017db2c0b5129435ab6f4e76fa0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9abe1de1_e16d8333",
         "filename": "run_tests.sh",
         "patchSetId": 11
@@ -93,6 +177,24 @@
       "writtenOn": "2017-10-30T14:15:58Z",
       "side": 1,
       "message": "Is it really necessarily ?",
+      "revId": "50e17ad802f0b017db2c0b5129435ab6f4e76fa0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9abe1de1_01d637c5",
+        "filename": "run_tests.sh",
+        "patchSetId": 11
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2017-10-30T14:43:40Z",
+      "side": 1,
+      "message": "Removed",
+      "parentUuid": "9abe1de1_e16d8333",
       "revId": "50e17ad802f0b017db2c0b5129435ab6f4e76fa0",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
