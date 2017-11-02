@@ -11,7 +11,7 @@
       when: nodepool_service.stdout.lower().find("fail") != -1
 
 - name: "Reset config repos"
-  include: playbooks/config_reset.yaml
+  include_tasks: playbooks/config_reset.yaml
 
 # * Add image and node label to config-repo
 - hosts: install-server
@@ -36,7 +36,7 @@
       environment: {'EDITOR':'test'}
 
 - name: "Submit config repos"
-  include: playbooks/config_submit_change.yaml
+  include_tasks: playbooks/config_submit_change.yaml
   when: sfconfiged.rc
 
 - hosts: nodepool-builder

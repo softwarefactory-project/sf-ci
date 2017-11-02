@@ -170,7 +170,7 @@
       command: sed -i 's/^.*rather than the user ..root.* ssh-rsa/ssh-rsa/' /root/.ssh/authorized_keys
       become: yes
 
-    - include: tasks/customize_latest.yml
+    - include_tasks: tasks/customize_latest.yml
 
     - name: Run sfconfig
       command: sfconfig
@@ -195,8 +195,8 @@
         file: "{{ sf_ci }}/health-check/group_vars/all.yaml"
       no_log: True
 
-- include: "../health-check/nodepool.yaml"
+- include_tasks: "../health-check/nodepool.yaml"
   vars:
     os_slave_net: "{{ hostvars.get('localhost', {}).get('slave_net', 'default') }}"
 
-- include: "../health-check/zuul.yaml"
+- include_tasks: "../health-check/zuul.yaml"

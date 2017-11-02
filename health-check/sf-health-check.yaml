@@ -1,10 +1,10 @@
 - name: Run heatlh-check zuul
-  include: zuul.yaml
+  include_tasks: zuul.yaml
   when: '"zuul-launcher" in roles'
 
 - name: Run health-check zuul3
-  include: zuul3.yaml
+  include_tasks: zuul3.yaml
   when: '"zuul3" in roles'
 
-- include: gerritbot.yaml
+- include_tasks: gerritbot.yaml
   when: '"gerritbot" in roles'

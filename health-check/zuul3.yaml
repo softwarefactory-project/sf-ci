@@ -1,6 +1,6 @@
 ---
 - name: "Reset config repos"
-  include: playbooks/config_reset.yaml
+  include_tasks: playbooks/config_reset.yaml
 
 - hosts: install-server
   remote_user: root
@@ -25,7 +25,7 @@
           - 'git commit -m "Add zuulV3 health-check configuration"'
 
 - name: "Submit config repos"
-  include: playbooks/config_submit_change.yaml
+  include_tasks: playbooks/config_submit_change.yaml
   when: zuul3_conf|changed
 
 - hosts: zuul3-executor

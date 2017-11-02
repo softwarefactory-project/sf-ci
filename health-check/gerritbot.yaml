@@ -26,7 +26,7 @@
       wait_for: path=/var/log/gerritbot/gerritbot.log search_regex="INFO gerritbot{{':'}} Identified with IRC server."
 
 - name: "Reset config repos"
-  include: playbooks/config_reset.yaml
+  include_tasks: playbooks/config_reset.yaml
 
 - hosts: install-server
   tasks:
@@ -41,7 +41,7 @@
 
 # * Check gerritbot send irc message
 - name: "Check for 'created' notification"
-  include: playbooks/gerritbot_fakeircd_check.yaml ircd_logs_pattern="PRIVMSG .irc-channel-health-check .* created config.* Test gerritbot notif .*http"
+  include_tasks: playbooks/gerritbot_fakeircd_check.yaml ircd_logs_pattern="PRIVMSG .irc-channel-health-check .* created config.* Test gerritbot notif .*http"
 
 # * Test gerritbot config-update
 - hosts: install-server
@@ -59,10 +59,10 @@
         - git commit -m "Change gerritbot channel" -a
 
 - name: "Submit config repos"
-  include: playbooks/config_submit_change.yaml
+  include_tasks: playbooks/config_submit_change.yaml
 
 - name: "Check for 'merged' notification"
-  include: playbooks/gerritbot_fakeircd_check.yaml ircd_logs_pattern="PRIVMSG .irc-channel-health-check .Merged config.* Change gerritbot channel  http..."
+  include_tasks: playbooks/gerritbot_fakeircd_check.yaml ircd_logs_pattern="PRIVMSG .irc-channel-health-check .Merged config.* Change gerritbot channel  http..."
 
 - hosts: install-server
   tasks:
@@ -77,7 +77,7 @@
 
 # * Check gerritbot send irc message to correct channel
 - name: "Check for 'created' notification on new channel"
-  include: playbooks/gerritbot_fakeircd_check.yaml ircd_logs_pattern="PRIVMSG .{{ channel_name }} .* created config.* Create new fake config change .*http"
+  include_tasks: playbooks/gerritbot_fakeircd_check.yaml ircd_logs_pattern="PRIVMSG .{{ channel_name }} .* created config.* Create new fake config change .*http"
 
 - hosts: gerritbot
   tasks:

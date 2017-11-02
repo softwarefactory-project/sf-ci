@@ -27,4 +27,4 @@
 
 # * Setup logexport with sfconfig
 - name: "Check logexport configuration"
-  include: playbooks/sfconfig_logs_setup.yaml
+  include_tasks: playbooks/sfconfig_logs_setup.yaml

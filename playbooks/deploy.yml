@@ -3,10 +3,10 @@
   become_method: sudo
   tasks:
     - block:
-      - include: tasks/prepare_test_env.yml
-      - include: tasks/install_sf_ci_repo.yml
-      - include: tasks/yum_update.yml
-      - include: tasks/run_sfconfig.yml
-      - include: tasks/install_test_env.yml
+      - include_tasks: tasks/prepare_test_env.yml
+      - include_tasks: tasks/install_sf_ci_repo.yml
+      - include_tasks: tasks/yum_update.yml
+      - include_tasks: tasks/run_sfconfig.yml
+      - include_tasks: tasks/install_test_env.yml
       always:
-      - include: tasks/finish_test.yml
+      - include_tasks: tasks/finish_test.yml

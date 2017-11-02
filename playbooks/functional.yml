@@ -3,20 +3,20 @@
   become_method: sudo
   tasks:
     - block:
-      - include: tasks/prepare_test_env.yml
-      - include: tasks/install_sf_ci_repo.yml
-      - include: tasks/yum_update.yml
-      - include: tasks/run_sfconfig.yml
-      - include: tasks/install_test_env.yml
-      - include: tasks/check_zuulv3_executor.yml
-      - include: tasks/run_provisioner.yml
-      - include: tasks/run_backup_create.yml
-      - include: tasks/run_health-check.yml
-      - include: tasks/run_firehose_listener.yml
-      - include: tasks/run_functional_tests.yml
-      - include: tasks/check_firehose_events.yml
-      - include: tasks/run_erase.yml
-      - include: tasks/run_sfconfig_recover.yml
-      - include: tasks/run_checker.yml
+      - include_tasks: tasks/prepare_test_env.yml
+      - include_tasks: tasks/install_sf_ci_repo.yml
+      - include_tasks: tasks/yum_update.yml
+      - include_tasks: tasks/run_sfconfig.yml
+      - include_tasks: tasks/install_test_env.yml
+      - include_tasks: tasks/check_zuulv3_executor.yml
+      - include_tasks: tasks/run_provisioner.yml
+      - include_tasks: tasks/run_backup_create.yml
+      - include_tasks: tasks/run_health-check.yml
+      - include_tasks: tasks/run_firehose_listener.yml
+      - include_tasks: tasks/run_functional_tests.yml
+      - include_tasks: tasks/check_firehose_events.yml
+      - include_tasks: tasks/run_erase.yml
+      - include_tasks: tasks/run_sfconfig_recover.yml
+      - include_tasks: tasks/run_checker.yml
       always:
-      - include: tasks/finish_test.yml
+      - include_tasks: tasks/finish_test.yml

@@ -65,7 +65,7 @@
         data['network']['static_hostnames'] = ['{{ groups['downstream'][0] }} downstream.com']
         yaml.dump(data, open('/etc/software-factory/sfconfig.yaml', 'w'), default_flow_style=False)"
 
-    - include: tasks/sfconfig.yaml
+    - include_tasks: tasks/sfconfig.yaml
 
     - name: "Get localCA.pem"
       command: cat /etc/pki/ca-trust/source/anchors/localCA.pem
@@ -94,7 +94,7 @@
         content: "{{ hostvars[groups['upstream'][0]]['localCA'].stdout }}"
         dest: /etc/pki/ca-trust/source/anchors/upstreamCA.pem
 
-    - include: tasks/sfconfig.yaml
+    - include_tasks: tasks/sfconfig.yaml
 
 # Configure zuul downstream user in upstream gerrit
     - name: "Get zuul public key"
@@ -140,7 +140,7 @@
         - rm -Rf /root/sandbox
       when: reset_project|default(None) == "yes"
 
-    - include: tasks/create_project.yaml hostname=upstream.com
+    - include_tasks: tasks/create_project.yaml hostname=upstream.com
 
 - hosts: downstream
   gather_facts: no
@@ -153,7 +153,7 @@
         - rm -Rf /root/sandbox /var/lib/zuul/git/test /var/lib/zuul/git/upstream.com /var/lib/zuul/git/downstream.com
       when: reset_project|default(None) == "yes"
 
-    - include: tasks/create_project.yaml hostname=downstream.com
+    - include_tasks: tasks/create_project.yaml hostname=downstream.com
 
 # Configure downstream config repo
     - name: "Copy sandbox config"

@@ -1,17 +1,17 @@
 ---
 # * Create a new project
 - name: "Create project"
-  include: playbooks/managesf_project_create.yaml
+  include_tasks: playbooks/managesf_project_create.yaml
 
 - name: "Check if zuul-launcher job exists"
-  include: playbooks/zuul_check_job.yaml job="{{ check[0] }}"
+  include_tasks: playbooks/zuul_check_job.yaml job="{{ check[0] }}"
 
 - name: "Check if zuul layout exists"
-  include: playbooks/zuul_check_layout.yaml project_name="{{ project }}"
+  include_tasks: playbooks/zuul_check_layout.yaml project_name="{{ project }}"
 
 # * Add jobs and zuul layout to config repo
 - name: "Reset config repos"
-  include: playbooks/config_reset.yaml
+  include_tasks: playbooks/config_reset.yaml
   when: hostvars[groups["zuul-server"][0]]["job_created"].rc != 0
 
 - hosts: install-server
@@ -31,7 +31,7 @@
 
 
 - name: "Submit config repos"
-  include: playbooks/config_submit_change.yaml
+  include_tasks: playbooks/config_submit_change.yaml
   when: hostvars[groups["zuul-server"][0]]["job_created"].rc != 0
 
 - hosts: install-server
