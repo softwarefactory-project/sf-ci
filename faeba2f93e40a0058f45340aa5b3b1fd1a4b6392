@@ -1,0 +1,8 @@
+Code-Review+2: Nicolas HICHER <nhicher@redhat.com>
+Workflow+1: Nicolas HICHER <nhicher@redhat.com>
+Verified+2: Jenkins CI <jenkins@softwarefactory-project.io>
+Submitted-by: Jenkins CI <jenkins@softwarefactory-project.io>
+Submitted-at: Fri, 03 Nov 2017 21:05:40 +0000
+Reviewed-on: https://softwarefactory-project.io/r/9932
+Project: software-factory/sf-ci
+Branch: refs/heads/master
