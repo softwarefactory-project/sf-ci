@@ -210,7 +210,7 @@
 
     - name: Copy arch file
       copy:
-        src: "/tmp/{{ arch_file }}"
+        src: "{{ arch_file }}"
         dest: "/tmp/public-ip-arch.yaml"
 
     - name: Replace private with public ip for add_host statement
