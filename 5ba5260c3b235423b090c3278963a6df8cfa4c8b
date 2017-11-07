@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7ad32947_96b86ce7",
+        "filename": "health-check/nodepool3.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2017-11-07T07:27:54Z",
+      "side": 1,
+      "message": "where does this \"toto\" comes from ? :)",
+      "revId": "5ba5260c3b235423b090c3278963a6df8cfa4c8b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
