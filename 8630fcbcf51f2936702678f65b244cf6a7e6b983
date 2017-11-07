@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7ad32947_f6d20034",
+        "filename": "scripts/clean_nodepool.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2017-11-07T07:19:24Z",
+      "side": 0,
+      "message": "I think the logic here was to not release the preprod floating ip, only the slaves... But perhaps this was a flawed logic and we shouldn\u0027t expect the latest deployment will have a dns name?",
+      "revId": "8630fcbcf51f2936702678f65b244cf6a7e6b983",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
