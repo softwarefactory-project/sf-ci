@@ -9,4 +9,6 @@
       command: grep "config-update" /var/lib/software-factory/mosquitto_sub.log
     - name: Check whether /var/lib/software-factory/mosquitto_sub.log contains "PIPELINE"
       command: grep "PIPELINE" /var/lib/software-factory/mosquitto_sub.log
+    - name: Check whether /var/lib/software-factory/mosquitto_sub.log contains "log_url"
+      command: grep "log_url" /var/lib/software-factory/mosquitto_sub.log
   when: '"firehose" in inventory[0]["roles"]'
