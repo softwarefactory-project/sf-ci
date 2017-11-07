@@ -18,3 +18,7 @@ jenkins_repo_desc: "Mirrored jenkins repo"
 # Set zuulv3 debug mode until it stabilize
 zuul3_loglevel: DEBUG
 nodepool_loglevel: DEBUG
+
+
+# Enable using hypervisor-oci on the install-server
+enable_insecure_slaves: true
