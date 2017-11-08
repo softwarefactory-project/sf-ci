@@ -103,23 +103,6 @@
           shell: "qemu-img convert -f qcow2 -O raw {{ qcow2_image }} {{ raw_image }}"
           when: new_image|changed
 
-        - name: Set fact to fix os_image for ansible 2.4.0
-          set_fact:
-              github_url: "https://raw.githubusercontent.com/wtsi-hgi/ansible"
-              github_id: "3fadd3cb5262fde2ca809d18c89e79c248c4c69b"
-              github_file: "lib/ansible/modules/cloud/openstack/os_image.py"
-          when: ansible_version.major == 2 and ansible_version.minor == 4 and ansible_version.revision == 0
-
-        - name: Get raw os_image patched for ansible 2.4.0
-          get_url:
-              url: "{{ github_url }}/{{ github_id }}/{{ github_file }}"
-              dest: /usr/lib/python2.7/site-packages/ansible/modules/cloud/openstack/os_image.py
-              mode: 0644
-              force: yes
-              checksum: "sha256:8b5c129841a37463846c30996bcc5454a956ae7463e771d127c920fa260b0126"
-          become: true
-          when: ansible_version.major == 2 and ansible_version.minor == 4 and ansible_version.revision == 0
-
         - name: Upload image
           os_image:
             name: "sf-{{ sf_version }}"
@@ -251,6 +234,10 @@
         line: "{{ item.value }} {{ item.key }}"
         state: present
       become: yes
+      with_dict: "{{ instances }}"
+
+    - name: Run ssh-keyscan from hostname
+      shell: ssh-keyscan -t rsa {{ item.key }} >> ~/.ssh/known_hosts
       with_dict: "{{ instances }}"
 
 - hosts: all
