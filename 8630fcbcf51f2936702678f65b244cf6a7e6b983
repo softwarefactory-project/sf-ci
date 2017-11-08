@@ -16,6 +16,24 @@
       "revId": "8630fcbcf51f2936702678f65b244cf6a7e6b983",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ad32947_b96d9bce",
+        "filename": "scripts/clean_nodepool.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2017-11-08T15:04:22Z",
+      "side": 0,
+      "message": "Only the slave floating are deleted, I don\u0027t understand your point.",
+      "parentUuid": "7ad32947_f6d20034",
+      "revId": "8630fcbcf51f2936702678f65b244cf6a7e6b983",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
