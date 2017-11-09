@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7ad32947_9f9d1f5c",
+        "filename": "playbooks/tasks/run_sfconfig.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2017-11-09T18:49:14Z",
+      "side": 1,
+      "message": "It will be better to use native ansible lineinfile statement\n\n- lineinfile:                                                                                                                       \n    path: /etc/software-factory/arch.yaml                                                                                           \n    insertafter: \u0027      - nodepool3-launcher\u0027                                                                                       \n    line: \u0027      - hypervisor-oci\u0027",
+      "range": {
+        "startLine": 22,
+        "startChar": 2,
+        "endLine": 22,
+        "endChar": 7
+      },
+      "revId": "65f7418acd4b4e92278a7cd861f108acc79cf087",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
