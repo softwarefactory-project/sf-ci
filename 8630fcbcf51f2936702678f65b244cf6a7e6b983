@@ -34,6 +34,24 @@
       "revId": "8630fcbcf51f2936702678f65b244cf6a7e6b983",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ad32947_dc93a54e",
+        "filename": "scripts/clean_nodepool.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2017-11-09T00:21:51Z",
+      "side": 0,
+      "message": "You removed the filter \"/$SLAVE_TEMPLATE/\" that prevent releasing the floating-ip of the install-server when slaves are running within a single tenant along-side the rest of the instances.",
+      "parentUuid": "7ad32947_b96d9bce",
+      "revId": "8630fcbcf51f2936702678f65b244cf6a7e6b983",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
