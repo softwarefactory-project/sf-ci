@@ -17,6 +17,14 @@
     dest: /etc/software-factory/custom-vars.yaml
   become: yes
 
+# Since 2.7 the hypervisor-oci role must be activated in the CI
+- name: Activate hypervisor-oci role in the arch.yaml file
+  lineinfile:
+    path: /etc/software-factory/arch.yaml
+    insertafter: '      - nodepool3-launcher'
+    line: '      - hypervisor-oci'
+  when: "sf_version != '2.6'"
+
 # Special fix for 2.5.0
 - block:
   - file:
