@@ -1,0 +1,9 @@
+Code-Review+1: Nicolas HICHER <nhicher@redhat.com>
+Code-Review+2: Tristan de Cacqueray <tdecacqu@redhat.com>
+Workflow+1: Tristan de Cacqueray <tdecacqu@redhat.com>
+Verified+2: Jenkins CI <jenkins@softwarefactory-project.io>
+Submitted-by: Jenkins CI <jenkins@softwarefactory-project.io>
+Submitted-at: Thu, 09 Nov 2017 03:30:22 +0000
+Reviewed-on: https://softwarefactory-project.io/r/10097
+Project: software-factory/sf-ci
+Branch: refs/heads/master
