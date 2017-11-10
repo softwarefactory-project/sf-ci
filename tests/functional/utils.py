@@ -25,6 +25,7 @@ import string
 import random
 import requests
 import time
+import uuid
 import yaml
 
 import logging
@@ -107,8 +108,7 @@ def get_module_version(module):
 
 
 def create_random_str():
-    value = "".join([random.choice(string.ascii_lowercase) for _ in range(6)])
-    return value
+    return str(uuid.uuid4())
 
 
 def set_private_key(priv_key):
