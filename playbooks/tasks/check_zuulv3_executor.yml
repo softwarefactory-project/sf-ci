@@ -1,6 +1,6 @@
 ---
 - name: Check for zuulv3 config update
-  command: grep -q -r config-update /root/zuul-jobs/
+  command: grep -q -r config-update /root/zuul-jobs/ /root/config/zuul.d/
   register: _config_update_zuulv3
   failed_when: _config_update_zuulv3.rc not in [0, 1, 2]
   become: yes
