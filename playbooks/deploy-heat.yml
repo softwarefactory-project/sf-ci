@@ -10,145 +10,25 @@
       git:
         repo: "{{ git_repo_url }}/{{ item }}"
         dest: "/tmp/{{ item }}"
+        force: yes
       with_items:
-        #- sf-heat-templates
+        - sf-heat-templates
         - sf-config
 
-#    - name: Create heat template based on sf_arch
-#      command: "python render.py --arch ../{{ arch_file }}"
-#      args:
-#        chdir: /tmp/sf-heat-templates/
+    - name: Use rdo flavor
+      replace:
+        path: '{{ arch_file }}'
+        regexp: '(\s+flavor:) (m1\.*)'
+        replace: '\1 rdo.\2'
 
-    - block:
-        - name: Check for local ssh key
-          stat:
-            path: "{{ home }}/.ssh/id_rsa"
-          register: local_key
+    - name: Create heat template based on sf_arch
+      command: "python render.py --arch {{ arch_file }}"
+      args:
+        chdir: /tmp/sf-heat-templates/
 
-        - name: Create ssh key when missing
-          command: "ssh-keygen -N '' -f {{ home }}/.ssh/id_rsa"
-          when: not local_key.stat.exists
+    - include_tasks: tasks/deploy-heat/destroy_stack.yml
 
-        - name: Cleanup old keypair
-          os_keypair:
-            state: absent
-            name: temp_id_rsa
-
-        - name: Upload keypair
-          os_keypair:
-            state: present
-            name: temp_id_rsa
-            public_key_file: "{{ home }}/.ssh/id_rsa.pub"
-      when: manage_key|default('yes') == 'yes'
-
-    - block:
-        # Floating-ip needs to be manually detached when using fixed-ip stack...
-        - name: Detach floating ip
-          os_floating_ip:
-            state: absent
-            floating_ip_address: "{{ floatingip }}"
-            server: "managesf.{{ sf_domain }}"
-          when: reset_stack|default("yes") == "yes" and floatingip != ""
-          ignore_errors: yes
-          register: os_floating_ip_result
-          until: os_floating_ip_result|success
-          retries: 3
-          delay: 5
-
-        - name: Cleanup /etc/hosts
-          command: "sed -i '/::1/q' /etc/hosts"
-          become: yes
-          args:
-            warn: False
-
-        - name: Cleanup ~/.ssh/known_hosts
-          copy:
-            content: ""
-            dest: ~/.ssh/known_hosts
-
-        - name: Clean nodepool resources
-          command: "{{ sf_ci }}/scripts/clean_nodepool.sh"
-          when: reset_stack|default("yes") == "yes"
-
-        - name: Destroy stacks
-          os_stack:
-            name: "sf-{{ sf_version }}-{{ sf_arch }}"
-            state: "absent"
-          when: reset_stack|default("yes") == "yes"
-          register: os_stack_result
-          until: os_stack_result|success
-          retries: 3
-          delay: 5
-
-    - block:
-        - name: Set image facts
-          set_fact:
-            raw_image: "{{ workspace }}/sf-{{ sf_version }}.raw"
-            qcow2_image: "{{ workspace }}/sf-{{ sf_version }}.qcow2"
-
-        - name: Download image when missing
-          get_url:
-            url: "{{ image_url }}"
-            dest: "{{ qcow2_image }}"
-            validate_certs: no
-          register: new_image
-
-        - name: Remove image
-          os_image:
-            name: "sf-{{ sf_version }}"
-            state: absent
-          when: new_image|changed
-
-        - name: Convert image in raw
-          shell: "qemu-img convert -f qcow2 -O raw {{ qcow2_image }} {{ raw_image }}"
-          when: new_image|changed
-
-        - name: Upload image
-          os_image:
-            name: "sf-{{ sf_version }}"
-            container_format: bare
-            disk_format: raw
-            state: present
-            filename: "{{ raw_image }}"
-          register: image
-      when: manage_image|default('yes') == 'yes'
-
-    - block:
-        - name: Get image facts
-          os_image:
-            name: "sf-{{ sf_version }}"
-          register: image
-
-        - debug:
-            msg: "Deploying {{ stack_url }}"
-
-        - name: Deploy stack using fixed ip
-          os_stack:
-            name: "sf-{{ sf_version }}-{{ sf_arch }}"
-            rollback: no
-            template: "{{ stack_url }}"
-            parameters:
-              key_name: "temp_id_rsa"
-              image_id: "{{ image.id }}"
-              floatingip_id: "{{ floatingip_id|default(omit) }}"
-              domain: "{{ sf_domain }}"
-              external_network: "{{ external_network }}"
-          when: floatingip_id != ""
-          register: stack
-
-        - name: Deploy stack
-          os_stack:
-            name: "sf-{{ sf_version }}-{{ sf_arch }}"
-            rollback: no
-            template: "{{ stack_url }}"
-            parameters:
-              key_name: "temp_id_rsa"
-              image_id: "{{ image.id }}"
-              domain: "{{ sf_domain }}"
-              external_network: "{{ external_network }}"
-          when: not floatingip_id
-          register: stack
-      when: manage_stack|default('yes') == 'yes'
+    - include_tasks: tasks/deploy-heat/create_stack.yml
 
     - name: Get stack facts
       os_stack_get:
@@ -167,78 +47,65 @@
         managesf_ip: "{{ stack.stack.outputs[0]['output_value'].split()[-1] }}"
       when: floatingip == ""
 
-    - name: Get instances facts
-      os_server_facts:
-        server: "*.{{ sf_domain }}"
-
-    - name: Create a dict with hostnames and ip address
-      set_fact:
-        instances: "{{ instances | default({}) | combine( {item.name: item.public_v4} ) }}"
-      with_items: "{{ openstack_servers }}"
-      no_log: true
-
-    - name: Create a dict with private and public ip address to prepare add_hosts
-      set_fact:
-        ip_mapping: "{{ ip_mapping | default({}) | combine( {item.private_v4: item.public_v4} ) }}"
-      with_items: "{{ openstack_servers }}"
-      no_log: true
-
-    - name: Wait for ssh
-      wait_for:
-        host: "{{ item.value }}"
-        port: 22
-        search_regex: OpenSSH
-        delay: 10
-      with_dict: "{{ instances }}"
-
     - name: Copy arch file
       copy:
         src: "{{ arch_file }}"
-        dest: "/tmp/public-ip-arch.yaml"
+        dest: /tmp/arch.yaml
 
     - name: Replace private with public ip for add_host statement
       lineinfile:
-        path: "/tmp/public-ip-arch.yaml"
-        regexp: "    ip: {{ item.key }}"
-        line: "    ip: {{ item.value }}"
-      with_dict: "{{ ip_mapping }}"
+        path: /tmp/arch.yaml
+        regexp: "    ip: 192.168.0.10"
+        line: "    ip: {{ managesf_ip }}"
 
-    - name: Include arch file with public address
+    - name: Include arch file
       include_vars:
-          file: "/tmp/public-ip-arch.yaml"
+          file: /tmp/arch.yaml
           name: arch_hosts
 
-    - name: Create hosts array
+    - name: Create ~/.ssh/config file
+      template:
+        src: ssh_config.j2
+        dest: ~/.ssh/config
+        mode: 0600
+
+    - name: Wait for ssh
+      wait_for:
+        host: "{{ managesf_ip }}"
+        port: 22
+        delay: 10
+        search_regex: OpenSSH
+
+    - name: Run ssh-keyscan from hostname
+      shell: 'ssh-keyscan -t rsa {{ item.name }} >> ~/.ssh/known_hosts'
+      with_items: '{{ arch_hosts.inventory }}'
+
+    - name: Add host inventory
       set_fact:
         inventory: "{{ arch_hosts.inventory }}"
+
+    - name: Add all hosts in inventory
+      add_host:
+        hostname: "{{ item.ip }}"
+        ansible_host: "{{ item.name }}"
+      with_items: "{{ arch_hosts.inventory }}"
 
     - name: Add service per host in inventory
       add_host:
         name: "{{ item.0.ip }}"
         group: "{{ item.1 }}"
       with_subelements:
-        - "{{ inventory }}"
+        - "{{ arch_hosts.inventory }}"
         - roles
-
-    - name: Add all hosts in inventory
-      add_host:
-        hostname: "{{ item.value }}"
-        group: "{{ item.key }}"
-        ansible_host: "{{ item.key }}"
-      with_dict: "{{ instances }}"
 
     - name: Populate /etc/hosts
       lineinfile:
         dest: /etc/hosts
-        regexp: '.*{{ item.value }} {{ item.key }}$'
-        line: "{{ item.value }} {{ item.key }}"
+        regexp: '.*{{ item.ip }} {{ item.name }}$'
+        line: "{{ item.ip }} {{ item.name }}"
         state: present
       become: yes
-      with_dict: "{{ instances }}"
-
-    - name: Run ssh-keyscan from hostname
-      shell: ssh-keyscan -t rsa {{ item.key }} >> ~/.ssh/known_hosts
-      with_dict: "{{ instances }}"
+      with_items: "{{ arch_hosts.inventory }}"
 
 - hosts: all
   remote_user: centos

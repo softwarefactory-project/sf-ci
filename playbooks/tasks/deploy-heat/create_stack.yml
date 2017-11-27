@@ -1,0 +1,91 @@
+- block:
+    - name: Check for local ssh key
+      stat:
+        path: "{{ home }}/.ssh/id_rsa"
+      register: local_key
+
+    - name: Create ssh key when missing
+      command: "ssh-keygen -N '' -f {{ home }}/.ssh/id_rsa"
+      when: not local_key.stat.exists
+
+    - name: Cleanup old keypair
+      os_keypair:
+        state: absent
+        name: temp_id_rsa
+
+    - name: Upload keypair
+      os_keypair:
+        state: present
+        name: temp_id_rsa
+        public_key_file: "{{ home }}/.ssh/id_rsa.pub"
+  when: manage_key|default('yes') == 'yes'
+
+- block:
+    - name: Set image facts
+      set_fact:
+        raw_image: "{{ workspace }}/sf-{{ sf_version }}.raw"
+        qcow2_image: "{{ workspace }}/sf-{{ sf_version }}.qcow2"
+
+    - name: Download image when missing
+      get_url:
+        url: "{{ image_url }}"
+        dest: "{{ qcow2_image }}"
+        validate_certs: no
+      register: new_image
+
+    - name: Remove image
+      os_image:
+        name: "sf-{{ sf_version }}"
+        state: absent
+      when: new_image|changed
+
+    - name: Convert image in raw
+      shell: "qemu-img convert -f qcow2 -O raw {{ qcow2_image }} {{ raw_image }}"
+      when: new_image|changed
+
+    - name: Upload image
+      os_image:
+        name: "sf-{{ sf_version }}"
+        container_format: bare
+        disk_format: raw
+        state: present
+        filename: "{{ raw_image }}"
+      register: image
+  when: manage_image|default('yes') == 'yes'
+
+- block:
+    - name: Get image facts
+      os_image:
+        name: "sf-{{ sf_version }}"
+      register: image
+
+    - debug:
+        msg: "Deploying {{ stack_url }}"
+
+    - name: Deploy stack using fixed ip
+      os_stack:
+        name: "sf-{{ sf_version }}-{{ sf_arch }}"
+        rollback: no
+        template: "{{ stack_url }}"
+        parameters:
+          key_name: "temp_id_rsa"
+          image_id: "{{ image.id }}"
+          floatingip_id: "{{ floatingip_id|default(omit) }}"
+          domain: "{{ sf_domain }}"
+          external_network: "{{ external_network }}"
+      when: floatingip_id != ""
+      register: stack
+
+    - name: Deploy stack
+      os_stack:
+        name: "sf-{{ sf_version }}-{{ sf_arch }}"
+        rollback: no
+        template: "{{ stack_url }}"
+        parameters:
+          key_name: "temp_id_rsa"
+          image_id: "{{ image.id }}"
+          domain: "{{ sf_domain }}"
+          external_network: "{{ external_network }}"
+      when: not floatingip_id
+      register: stack
+  when: manage_stack|default('yes') == 'yes'
