@@ -325,13 +325,18 @@
         key: "{{ install_server_rsa_pub }}"
       become: yes
 
+    - name: Update all packages
+      yum:
+        name: "*"
+        state: latest
+      become: yes
+
 - hosts: install-server
   remote_user: centos
   tasks:
     - name: Set instance facts
       set_fact:
         instances: "{{ hostvars['localhost']['instances'] }}"
-        arch_file: /usr/share/sf-config/refarch/dual-zuul.yaml
 
     - name: Run ssh-keyscan from hostname
       shell: ssh-keyscan -t rsa {{ item.key }} >> /root/.ssh/known_hosts
@@ -343,8 +348,24 @@
       with_dict: "{{ instances }}"
       become: yes
 
+    - name: Copy arch file
+      copy:
+        src: "/usr/share/sf-config/refarch/{{ sf_arch }}.yaml"
+        dest: /etc/software-factory/arch.yaml
+        remote_src: True
+      become: yes
+
+    # Since 2.7 the hypervisor-oci role must be activated in the CI
+    - name: Activate hypervisor-oci role in the arch.yaml file
+      lineinfile:
+        path: /etc/software-factory/arch.yaml
+        insertafter: '      - nodepool3-launcher'
+        line: '      - hypervisor-oci'
+      when: "sf_version != '2.6'"
+      become: yes
+
     - name: Run sfconfig
-      command: "sfconfig --arch {{ arch_file }}"
+      command: "sfconfig  --enable-insecure-slaves"
       become: yes
       when: skip_sfconfig|default("no") == "no"
 
