@@ -19,5 +19,6 @@
 - name: Install stable repo
   yum:
     name: https://softwarefactory-project.io/repos/sf-release-{{ sf_version }}.rpm
+    validate_certs: no
     state: present
   become: yes

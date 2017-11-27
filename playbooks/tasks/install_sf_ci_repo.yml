@@ -20,6 +20,7 @@
 - name: Install sf-release master when no zuul-built
   yum:
     name: "https://softwarefactory-project.io/repos/sf-release-master.rpm"
+    validate_certs: no
   when: not zuul_built_repo.stat.exists and not sf_release_repo.stat.exists
   become: yes
 
