@@ -1,0 +1,38 @@
+- block:
+    # Floating-ip needs to be manually detached when using fixed-ip stack...
+    - name: Detach floating ip
+      os_floating_ip:
+        state: absent
+        floating_ip_address: "{{ floatingip }}"
+        server: "managesf.{{ sf_domain }}"
+      when: reset_stack|default("yes") == "yes" and floatingip != ""
+      ignore_errors: yes
+      register: os_floating_ip_result
+      until: os_floating_ip_result|success
+      retries: 3
+      delay: 5
+
+    - name: Cleanup /etc/hosts
+      command: "sed -i '/::1/q' /etc/hosts"
+      become: yes
+      args:
+        warn: False
+
+    - name: Cleanup ~/.ssh/known_hosts
+      copy:
+        content: ""
+        dest: ~/.ssh/known_hosts
+
+    - name: Clean nodepool resources
+      command: "{{ sf_ci }}/scripts/clean_nodepool.sh"
+      when: reset_stack|default("yes") == "yes"
+
+    - name: Destroy stacks
+      os_stack:
+        name: "sf-{{ sf_version }}-{{ sf_arch }}"
+        state: "absent"
+      when: reset_stack|default("yes") == "yes"
+      register: os_stack_result
+      until: os_stack_result|success
+      retries: 3
+      delay: 5
