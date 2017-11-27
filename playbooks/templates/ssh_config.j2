@@ -1,0 +1,22 @@
+# managed by ansible
+Host {{ managesf_ip }}
+    Hostname {{ managesf_ip }}
+    UserKnownHostsFile /dev/null
+    StrictHostKeyChecking no
+    LogLevel Error
+    User centos
+
+{% for host in arch_hosts["inventory"] %}
+Host {{ host.name }}
+{% if "install-server" in host["roles"]%}
+    Hostname {{ managesf_ip }}
+{% else %}
+    Hostname {{ host.ip }}
+    ProxyCommand ssh -W %h:%p {{ managesf_ip }}
+{% endif %}
+    UserKnownHostsFile /dev/null
+    StrictHostKeyChecking no
+    LogLevel Error
+    User centos
+
+{% endfor %}
