@@ -92,9 +92,9 @@ class TestResourcesWorkflow(Base):
         change_sha = self.commit_direct_push_as_admin(
             config_clone_dir,
             "Add new resources for functional tests")
-        config_update_log = self.ju.wait_for_config_update(change_sha)
-        self.assertEqual(
-            len(re.findall('managesf\..*failed=0', config_update_log)), 1)
+        config_update_result = self.ju.wait_for_config_update(
+            change_sha, return_result=True)
+        self.assertEqual(config_update_result, 'SUCCESS')
 
     def propose_resources_change_check_ci(
             self, fpath, resources=None,

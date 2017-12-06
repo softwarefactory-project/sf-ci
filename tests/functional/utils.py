@@ -457,7 +457,7 @@ class JenkinsUtils:
         except:
             return ''
 
-    def wait_for_config_update(self, revision):
+    def wait_for_config_update(self, revision, return_result=False):
         zuul3 = os.environ.get("SF_ZUUL_EXECUTOR", "1") != "0"
         if zuul3:
             job_url = ("%s/zuul3/local/builds.json?job_name=config-update&"
@@ -482,11 +482,15 @@ class JenkinsUtils:
                         if len(j):
                             job_log_url = "%s/job-output.txt.gz" % (
                                 j[0]['log_url'])
+                            result = j[0]['result']
                     else:
                         for result in j['results']:
                             job_log_url = "%s/console.html" % (
                                 result["log_url"])
+                            result = result['result']
                             break
+                    if return_result:
+                        return result
                     if job_log_url:
                         return requests.get(job_log_url).text
                 time.sleep(1)

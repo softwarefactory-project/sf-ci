@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import re
 import os
 import shutil
 import config
@@ -74,8 +75,9 @@ class TestRepoxplorer(Base):
         change_sha = self.commit_direct_push_as_admin(
             config_clone_dir,
             "Add new resources for functional tests")
-        config_update_log = self.ju.wait_for_config_update(change_sha)
-        self.assertIn("SUCCESS", config_update_log)
+        config_update_result = self.ju.wait_for_config_update(
+            change_sha, return_result=True)
+        self.assertEqual(config_update_result, 'SUCCESS')
 
     def get_projects(self):
         url = config.GATEWAY_URL + "/repoxplorer/projects.json/"
