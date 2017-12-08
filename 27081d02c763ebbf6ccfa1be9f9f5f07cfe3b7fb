@@ -16,6 +16,24 @@
       "revId": "27081d02c763ebbf6ccfa1be9f9f5f07cfe3b7fb",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3ae2911b_8f86f911",
+        "filename": "playbooks/tasks/check_firehose_events.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2017-12-08T17:33:12Z",
+      "side": 1,
+      "message": "Ok, I will clean this one to, thanks for the review",
+      "parentUuid": "3ae2911b_2f9f0561",
+      "revId": "27081d02c763ebbf6ccfa1be9f9f5f07cfe3b7fb",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
