@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3ae2911b_2f9f0561",
+        "filename": "playbooks/tasks/check_firehose_events.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 68
+      },
+      "writtenOn": "2017-12-08T16:34:50Z",
+      "side": 1,
+      "message": "This one might fail as well and need to be removed, let\u0027s see the result",
+      "revId": "27081d02c763ebbf6ccfa1be9f9f5f07cfe3b7fb",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
