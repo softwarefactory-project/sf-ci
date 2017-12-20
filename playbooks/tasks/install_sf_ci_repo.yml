@@ -8,15 +8,6 @@
   stat: path=/etc/yum.repos.d/zuul-built.repo
   register: zuul_built_repo
 
-# TODO: remove this temporary fix when new packages requirements are merged
-# see https://softwarefactory-project.io/r/#/q/topic:extras-paramiko
-- name: Exclude python-paramiko from extras
-  ini_file:
-    path: /etc/yum.repos.d/CentOS-Base.repo
-    section: "extras"
-    option: exclude
-    value: python-paramiko
-  become: yes
 
 - name: Check for sf-release.repo
   stat: path=/etc/yum.repos.d/sf-release.repo
