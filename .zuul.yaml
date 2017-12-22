@@ -1,0 +1,57 @@
+---
+- job:
+    name: sf-ci
+    description: The sf ci tests
+    post-run: playbooks/get-logs.yaml
+    timeout: 7200
+    required-projects:
+      - software-factory/sf-ci
+      - software-factory/sfinfo
+    nodeset:
+      nodes:
+        - name: install-server
+          label: dib-centos-7
+    vars:
+      sf_version: master
+
+- job:
+    name: sf-ci-functional-minimal
+    parent: sf-ci
+    run: playbooks/functionalv3.yaml
+    vars:
+      sf_arch: minimal
+
+- job:
+    name: sf-ci-functional-allinone
+    parent: sf-ci
+    run: playbooks/functionalv3.yaml
+    vars:
+      sf_arch: allinone
+
+- job:
+    name: sf-ci-upgrade-upgrade
+    parent: sf-ci
+    run: playbooks/upgradev3.yaml
+    vars:
+      sf_arch: minimal
+      sf_version: 2.6
+
+- job:
+    name: sf-ci-upgrade-allinone
+    parent: sf-ci
+    run: playbooks/upgradev3.yaml
+    vars:
+      sf_arch: allinone
+
+- project:
+    name: software-factory/sf-ci
+    check:
+      jobs:
+        - linters
+        - sf-rpm-build
+        - sf-ci-functional-minimal:
+            dependencies:
+              - sf-rpm-build
+        - sf-ci-upgrade-minimal:
+            dependencies:
+              - sf-rpm-build
