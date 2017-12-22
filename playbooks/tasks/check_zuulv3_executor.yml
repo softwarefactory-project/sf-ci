@@ -3,6 +3,7 @@
   file:
     path: /root/config/zuul.d
     state: directory
+  become: yes
 
 - name: Check for zuulv3 config update
   command: grep -q -r config-update /root/zuul-jobs/ /root/config/zuul.d/

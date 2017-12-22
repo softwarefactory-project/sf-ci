@@ -6,6 +6,8 @@ sf_arch: minimal
 sf_version: master
 # Local repository path
 local_repo_path: ""
+# Default test case
+func_test_case: "tests/functional"
 
 # workspace (use default(, true) to set default when env lookup return '')
 workspace: "{{ lookup('env','WORKSPACE')|default(lookup('env', 'PWD'), true) }}"
