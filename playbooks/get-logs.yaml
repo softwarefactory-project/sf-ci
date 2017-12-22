@@ -1,0 +1,12 @@
+---
+- hosts: install-server
+  vars:
+    sf_user: "zuul-worker"
+  tasks:
+    - include: tasks/set_environment_facts.yml
+    - include: tasks/finish_test.yml
+    - name: Fetch artifacts
+      synchronize:
+        src: "{{ artifacts }}/"
+        dest: "{{ zuul.executor.log_root }}/artifacts/"
+        mode: pull

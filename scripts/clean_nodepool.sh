@@ -8,7 +8,8 @@ SLAVE_TEMPLATE=${SLAVE_TEMPLATE:-dib-centos-7}
 SLAVES=$(openstack server list --name $SLAVE_TEMPLATE -f value -c ID)
 for slave in $SLAVES; do
     echo "Removing slave $slave ..."
-    FLOATING_IPS=$(openstack server show $slave -f value -c addresses | awk '{print $2}')
+    FLOATING_IPS=$(openstack server show $slave -f value -c addresses | \
+                            awk '{print $2}')
     for floating_ip in $FLOATING_IPS; do
         echo "Releasing floating IP $floating_ip ..."
         openstack server remove floating ip $slave $floating_ip
