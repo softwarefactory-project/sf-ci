@@ -1,0 +1,18 @@
+---
+- hosts: install-server
+  vars:
+    artifacts: "{{ ansible_env.HOME }}/artifacts"
+    sf_user: "zuul-worker"
+  tasks:
+    - name: Ensure artifacts directory exists
+      file:
+        path: "{{ artifacts }}"
+        state: directory
+
+    - include: tasks/finish_test.yml
+
+    - name: Fetch artifacts
+      synchronize:
+        src: "{{ artifacts }}/"
+        dest: "{{ zuul.executor.log_root }}/artifacts/"
+        mode: pull
