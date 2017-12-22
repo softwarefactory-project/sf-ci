@@ -1,7 +1,4 @@
-- name: Include arch file vars
-  include_vars:
-    file: /etc/software-factory/arch.yaml
-
 - name: Check whether /var/lib/software-factory/mosquitto_sub.log contains "review"
   command: grep "review" /var/lib/software-factory/mosquitto_sub.log
-  when: '"firehose" in inventory[0]["roles"]'
+  when: sf_firehose_enabled
+  become: yes

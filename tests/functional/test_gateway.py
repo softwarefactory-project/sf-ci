@@ -12,7 +12,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import os
 import shlex
 
 import config
@@ -214,7 +213,7 @@ class TestGateway(Base):
         self.assertTrue('<title>Zuul Status</title>' in resp.text)
 
     @skipIfServiceMissing('zuul3')
-    def test_zuul_accessible(self):
+    def test_zuul3_accessible(self):
         """ Test if Zuul3 is accessible on gateway host
         """
         url = config.GATEWAY_URL + "/zuul3/local/status.html"

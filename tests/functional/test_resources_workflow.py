@@ -14,7 +14,6 @@
 
 import os
 import re
-import time
 import json
 import config
 import shutil

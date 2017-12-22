@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
-from time import sleep
 from distutils.version import StrictVersion
 try:
     import shade
@@ -33,7 +32,7 @@ description:
 options:
     name:
       description:
-        - Name of the stack that should be created, name could be char and digit, no space
+        - Name of the stack that should be created
       required: true
 requirements:
     - "python >= 2.6"
@@ -57,20 +56,22 @@ id:
 stack: {}
 '''
 
-def main():
 
-    argument_spec = openstack_full_argument_spec(
+def main():
+    argument_spec = openstack_full_argument_spec(  # noqa
         name=dict(required=True),
     )
 
-    module_kwargs = openstack_module_kwargs()
-    module = AnsibleModule(argument_spec,
+    module_kwargs = openstack_module_kwargs()  # noqa
+    module = AnsibleModule(argument_spec,  # noqa
                            supports_check_mode=True,
                            **module_kwargs)
 
     # stack API introduced in 1.8.0
-    if not HAS_SHADE or (StrictVersion(shade.__version__) < StrictVersion('1.8.0')):
-        module.fail_json(msg='shade 1.8.0 or higher is required for this module')
+    if not HAS_SHADE or \
+       (StrictVersion(shade.__version__) < StrictVersion('1.8.0')):
+        module.fail_json(
+            msg='shade 1.8.0 or higher is required for this module')
 
     name = module.params['name']
     try:
@@ -80,7 +81,7 @@ def main():
     except shade.OpenStackCloudException as e:
         module.fail_json(msg=str(e))
 
-from ansible.module_utils.basic import *
-from ansible.module_utils.openstack import *
+from ansible.module_utils.basic import *  # noqa
+from ansible.module_utils.openstack import *  # noqa
 if __name__ == '__main__':
     main()
