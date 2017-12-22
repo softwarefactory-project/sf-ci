@@ -1,6 +1,7 @@
 - name: Include arch file vars
   include_vars:
     file: /etc/software-factory/arch.yaml
+  become: yes
 
 - block:
     - name: Install mosquitto_sub service
