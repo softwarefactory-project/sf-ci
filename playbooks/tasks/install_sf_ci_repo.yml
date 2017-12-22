@@ -8,7 +8,6 @@
   stat: path=/etc/yum.repos.d/zuul-built.repo
   register: zuul_built_repo
 
-
 - name: Check for sf-release.repo
   stat: path=/etc/yum.repos.d/sf-release.repo
   register: sf_release_repo
@@ -21,7 +20,9 @@
   yum:
     name: "https://softwarefactory-project.io/repos/sf-release-master.rpm"
     validate_certs: no
-  when: not zuul_built_repo.stat.exists and not sf_release_repo.stat.exists
+  when:
+    - not zuul_built_repo.stat.exists
+    - not sf_release_repo.stat.exists
   become: yes
 
 - name: Install zuul-built.repo in place of sf-release
@@ -38,13 +39,6 @@
     value: sf-release
   with_items:
     - sfmaster
-  become: yes
-
-- name: Replace koji hostname by its IP
-  replace:
-    dest: /etc/yum.repos.d/sf-release.repo
-    regexp: 'koji.softwarefactory-project.io'
-    replace: "{{ koji_ip }}"
   become: yes
 
 - name: Check for locally built packages
