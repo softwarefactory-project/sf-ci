@@ -2,12 +2,6 @@
 
 set -Ex
 
-# TODO: remove quick fix bellow
-sudo yum update -y ansible
-# TODO: To be removed when are bump merged and images rebuilt
-sudo yum install -y https://softwarefactory-project.io/logs/97/9997/1/check/sf-rpm-build/Zc3a7e638f27642cd853e6c94ce133f41/zuul-rpm-build/ara-0.14.4-1.el7.noarch.rpm
-sudo yum update -y ara
-
 # Remove ZUUL_* environment variables. We do not need them to be present
 # after that statement.
 while read var; do unset $var; done < <(env | egrep "^ZUUL_.*" | awk -F= '{ print $1}')

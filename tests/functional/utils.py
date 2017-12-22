@@ -21,8 +21,6 @@ import shlex
 import shutil
 import stat
 import tempfile
-import string
-import random
 import requests
 import time
 import uuid
