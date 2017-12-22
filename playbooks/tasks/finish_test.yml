@@ -1,3 +1,4 @@
+# TODO: remove this task
 - name: Restore jenkins shell
   command: "sed -i '/^jenkins/ s#:[^:]*$#:/bin/bash#' /etc/passwd"
   become: yes

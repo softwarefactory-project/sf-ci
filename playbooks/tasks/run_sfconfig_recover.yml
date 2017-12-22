@@ -9,6 +9,7 @@
   copy:
     src: /var/lib/software-factory/backup/install-server/etc/software-factory/arch.yaml
     dest: /etc/software-factory/arch.yaml
+    remote_src: true
   become: yes
 
 - name: Run sfconfig --recover

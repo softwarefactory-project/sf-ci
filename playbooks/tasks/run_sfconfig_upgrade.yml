@@ -9,6 +9,7 @@
 
 - name: "Run sfconfig --upgrade"
   command: sfconfig --upgrade
+  become: yes
 
 - name: "Collect package upgraded"
   shell: "rpm -qa | sort > package_upgraded"
@@ -16,4 +17,5 @@
 - name: "Package diff"
   shell: "diff /var/lib/software-factory/package_installed package_upgraded  | tee {{ artifacts }}/package_upgrade.txt"
   register: package_diff
-  failed_when: package_diff.rc != 0 and package_diff.rc != 1
+  failed_when: package_diff.rc not in [0, 1]
+  become: yes
