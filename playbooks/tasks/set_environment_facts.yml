@@ -1,0 +1,39 @@
+---
+# Define if zuul-executor is running config-update
+- name: Ensure /root/config/zuul.d exists
+  file:
+    path: /root/config/zuul.d
+    state: directory
+  become: yes
+
+- name: Check for zuulv3 config update
+  command: grep -q -r config-update /root/zuul-jobs/ /root/config/zuul.d/
+  register: _config_update_zuulv3
+  failed_when: false
+  become: yes
+
+- name: Set sf_zuul_executor fact
+  set_fact:
+    sf_zuul_executor: "{% if _config_update_zuulv3.rc == 0 %}1{% else %}0{% endif %}"
+
+# Define if firehose is enabled
+- name: Check for firehose role
+  command: grep -q firehose /etc/software-factory/arch.yaml
+  failed_when: false
+  register: _firehose_in_arch
+
+- name: Set sf_firehose_enabled
+  set_fact:
+    sf_firehose_enabled: "{{ _firehose_in_arch.rc == 0 }}"
+
+# Prepare artifacts directory
+- name: Set artifacts
+  set_fact:
+    artifacts: "{{ ansible_env.HOME }}/artifacts"
+
+- name: Ensure artifacts directory exists
+  file:
+    path: "{{ artifacts }}"
+    state: directory
+    owner: "{{ sf_user }}"
+  become: yes

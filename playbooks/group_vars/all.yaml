@@ -1,40 +1,40 @@
-# Set until we get proper name
-koji_ip: 38.145.34.53
 # SF architecture file
 sf_arch: minimal
 # SF version
 sf_version: master
 # Local repository path
 local_repo_path: ""
+# Default test case
+func_test_case: "tests/functional"
 
 # workspace (use default(, true) to set default when env lookup return '')
-workspace: "{{ lookup('env','WORKSPACE')|default(lookup('env', 'PWD'), true) }}"
+workspace: "./"
 sf_ci: "{{ workspace }}"
-sf_user: "{{ lookup('env', 'USER') }}"
+sf_user: "centos"
 artifacts: "{{ workspace }}/artifacts"
-home: "{{ lookup('env', 'HOME') }}"
+home: "/home/centos"
 
 # sfconfig.yaml customization
-sf_domain: "{{ lookup('env', 'SF_DOMAIN')|default('sftests.com', true) }}"
+sf_domain: "sftests.com"
 
 # deploy-heat params
-os_auth_url: "{{ lookup('env', 'OS_AUTH_URL') }}"
-os_username: "{{ lookup('env', 'OS_USERNAME') }}"
-os_password: "{{ lookup('env', 'OS_PASSWORD') }}"
-os_tenant_name: "{{ lookup('env', 'OS_TENANT_NAME') }}"
+# os_auth_url: "{{ lookup('env', 'OS_AUTH_URL') }}"
+# os_username: "{{ lookup('env', 'OS_USERNAME') }}"
+# os_password: "{{ lookup('env', 'OS_PASSWORD') }}"
+# os_tenant_name: "{{ lookup('env', 'OS_TENANT_NAME') }}"
 
-floatingip_id: "{{ lookup('env', 'OS_FLOATING_IP_ID') }}"
-floatingip: "{{ lookup('env', 'OS_FLOATING_IP') }}"
-external_network: "{{ lookup('env', 'OS_EXTERNAL_NET_ID') }}"
+# floatingip_id: "{{ lookup('env', 'OS_FLOATING_IP_ID') }}"
+# floatingip: "{{ lookup('env', 'OS_FLOATING_IP') }}"
+# external_network: "{{ lookup('env', 'OS_EXTERNAL_NET_ID') }}"
 
 sf_url: "https://softwarefactory-project.io/releases"
 stack_url: "{{ sf_url }}/sf-{{ sf_version }}/sf-{{ sf_version }}-{{ sf_arch }}{% if floatingip_id %}-fixed-ip{% endif %}.hot"
 image_url: "{{ sf_url }}/sf-{{ sf_version }}/sf-{{ sf_version }}.qcow2"
 
 # tuning default values
-github_app_id: "{{ lookup('env', 'GITHUB_APP_ID' )}}"
-github_app_secret: "{{ lookup('env', 'GITHUB_APP_SECRET' )}}"
-google_app_id: "{{ lookup('env', 'GOOGLE_APP_ID' )}}"
-google_app_secret: "{{ lookup('env', 'GOOGLE_APP_SECRET' )}}"
-bitbucket_app_id: "{{ lookup('env', 'BITBUCKET_APP_ID' )}}"
-bitbucket_app_secret: "{{ lookup('env', 'BITBUCKET_APP_SECRET' )}}"
+# github_app_id: "{{ lookup('env', 'GITHUB_APP_ID' )}}"
+# github_app_secret: "{{ lookup('env', 'GITHUB_APP_SECRET' )}}"
+# google_app_id: "{{ lookup('env', 'GOOGLE_APP_ID' )}}"
+# google_app_secret: "{{ lookup('env', 'GOOGLE_APP_SECRET' )}}"
+# bitbucket_app_id: "{{ lookup('env', 'BITBUCKET_APP_ID' )}}"
+# bitbucket_app_secret: "{{ lookup('env', 'BITBUCKET_APP_SECRET' )}}"
