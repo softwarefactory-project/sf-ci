@@ -1,0 +1,29 @@
+---
+- job:
+    name: sf-ci
+    description: The sf ci tests
+    post-run: playbooks/get-logs.yaml
+    required-projects:
+      - software-factory/sf-ci
+      - software-factory/sfinfo
+    nodeset:
+      nodes:
+        - name: install-server
+          label: dib-centos-7
+    vars:
+      sf_version: master
+      sf_arch: allinone
+
+- job:
+    name: sf-ci-allinone-functional
+    parent: sf-ci
+    run: playbooks/functionalv3.yaml
+
+- project:
+    name: software-factory/sf-ci
+    check:
+      jobs:
+        - sf-rpm-build
+        - sf-ci-functional-minimal:
+            dependencies:
+              - sf-rpm-build

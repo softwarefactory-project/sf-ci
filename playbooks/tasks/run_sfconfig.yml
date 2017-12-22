@@ -25,37 +25,6 @@
     line: '      - hypervisor-oci'
   when: "sf_version != '2.6'"
 
-# Special fix for 2.5.0
-- block:
-  - file:
-      path: "{{ item }}"
-      mode: 0700
-      state: directory
-    with_items:
-      - /root/.ssh
-      - /etc/serverspec
-    become: yes
-
-  - name: Fix arch
-    copy:
-      src: "{{ sf_ci }}/patches/2.5.0-minimal.yaml"
-      dest: /etc/software-factory/arch.yaml
-    become: yes
-
-  - name: Fix gitweb install
-    replace:
-      dest: "/usr/share/sf-config/ansible/roles/sf-gitweb/tasks/install.yml"
-      regexp: " theme "
-      replace: " gitweb_theme "
-    become: yes
-  - name: Fix gitweb default
-    replace:
-      dest: "/usr/share/sf-config/ansible/roles/sf-gitweb/defaults/main.yml"
-      regexp: "^theme:"
-      replace: "gitweb_theme:"
-    become: yes
-  when: "sf_version == '2.5'"
-
 # Special fixes for ansible 2.4
 - name: "Patch zuul2 ansiblelauncher for ansible 2.4"
   shell: "patch /usr/lib/python2.7/site-packages/zuul/launcher/ansiblelaunchserver.py < {{ sf_ci }}/patches/ansiblelauncher-ansible-2.4.patch"
