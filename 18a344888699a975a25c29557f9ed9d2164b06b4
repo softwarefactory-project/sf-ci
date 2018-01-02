@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "da1255d7_ac578bc9",
+        "filename": "playbooks/tasks/deploy-heat/destroy_stack.yml",
+        "patchSetId": 7
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2018-01-02T14:47:45Z",
+      "side": 1,
+      "message": "It really useful only when you run playbook few time on the same host. I will check how to improve the cleaning",
+      "parentUuid": "da1255d7_0c5217de",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 32
+      },
+      "revId": "18a344888699a975a25c29557f9ed9d2164b06b4",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da1255d7_ec5d83ed",
         "filename": "playbooks/templates/ssh_config.j2",
         "patchSetId": 7
