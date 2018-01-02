@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da1255d7_0c5217de",
+        "filename": "playbooks/tasks/deploy-heat/destroy_stack.yml",
+        "patchSetId": 7
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-01-02T14:36:52Z",
+      "side": 1,
+      "message": "Is there a way to mitigate the impact on the host node ? What if we run ansible with the StrictHostKeyChecking at no ?",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 32
+      },
+      "revId": "18a344888699a975a25c29557f9ed9d2164b06b4",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da1255d7_ec5d83ed",
+        "filename": "playbooks/templates/ssh_config.j2",
+        "patchSetId": 7
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-01-02T14:36:52Z",
+      "side": 1,
+      "message": "Smart !",
+      "range": {
+        "startLine": 15,
+        "startChar": 4,
+        "endLine": 15,
+        "endChar": 47
+      },
+      "revId": "18a344888699a975a25c29557f9ed9d2164b06b4",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
