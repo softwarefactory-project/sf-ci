@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba076199_a86c1b09",
+        "filename": "tests/functional/test_pages.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2018-01-08T01:16:45Z",
+      "side": 1,
+      "message": "If/when a better variable name is choosen, update it here too.",
+      "revId": "8c5332601a5b493aebba24f1a8aa83a7a3dddf87",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
