@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from copy import deepcopy
 import json
 import os
 import re
@@ -136,14 +137,16 @@ def get_cookie(username, password):
     return resp.cookies.get('auth_pubtkt', '')
 
 
-def ssh_run_cmd(sshkey_priv_path, user, host, subcmd):
+def ssh_run_cmd(sshkey_priv_path, user, host, subcmd, verbose=False):
     host = '%s@%s' % (user, host)
     sshcmd = ['ssh', '-o', 'LogLevel=ERROR',
               '-o', 'StrictHostKeyChecking=no',
               '-o', 'UserKnownHostsFile=/dev/null', '-i',
               sshkey_priv_path, host]
+    if verbose:
+        sshcmd += ['-v', ]
     cmd = sshcmd + subcmd
-
+    logger.info('Running remote command: %s' % ' '.join(cmd))
     p = Popen(cmd, stdout=PIPE)
     return p.communicate()
 
@@ -384,8 +387,9 @@ class GerritGitUtils(Tool):
         return out.split()
 
 
-class JenkinsUtils:
+class JenkinsUtils(Tool):
     def __init__(self):
+        Tool.__init__(self)
         self.jenkins_user = 'jenkins'
         self.jenkins_password = config.groupvars.get('jenkins_password')
         self.jenkins_url = config.GATEWAY_URL + "/jenkins/"
@@ -458,15 +462,39 @@ class JenkinsUtils:
     def wait_for_config_update(self, revision, return_result=False):
         zuul3 = os.environ.get("SF_ZUUL_EXECUTOR", "1") != "0"
         if zuul3:
-            job_url = ("%s/zuul3/local/builds.json?job_name=config-update&"
-                       "newrev=%s") % (
-                           config.GATEWAY_URL,
-                           revision)
+            return self.wait_for_config_update_zuul3(revision, return_result)
         else:
-            job_url = ("%sv2/builds/?job=config-update&ref=%s&"
-                       "in_progress=false") % (
-                           config.MANAGESF_API,
-                           revision)
+            return self.wait_for_config_update_zuul2(revision, return_result)
+
+    def wait_for_config_update_zuul2(self, revision, return_result=False):
+        params = deepcopy(config.ZUUL_MYSQL)
+        params['revision'] = revision
+        out = None
+        cmd = ["/usr/bin/mysql", "--host=%(host)s" % params,
+               "--user=%(user)s" % params, "--password=%(password)s" % params,
+               "zuul", "-N", "-B",
+               """--execute="select result from zuul_build where """
+               """buildset_id in (select id from zuul_buildset where """
+               """ref = '%(revision)s') and """
+               """job_name = 'config-update'" """]
+        try:
+            for retry in range(240):
+                out, err = ssh_run_cmd(config.SERVICE_PRIV_KEY_PATH,
+                                       "root", config.GATEWAY_HOST,
+                                       cmd, verbose=True)
+                if out == "SUCCESS":
+                    return out
+                else:
+                    logger.info(out)
+                time.sleep(1)
+        except Exception as e:
+            logger.exception('Retry%d: command "%s": resulted in error %s' % (
+                retry, cmd % params, e))
+        return "FAILED"
+
+    def wait_for_config_update_zuul3(self, revision, return_result=False):
+        job_url = ("%s/zuul3/local/builds.json?job_name=config-update&"
+                   "newrev=%s") % (config.GATEWAY_URL, revision)
         logger.debug("Waiting for config-update using %s" % job_url)
         r = None
         try:
@@ -477,17 +505,10 @@ class JenkinsUtils:
                     logger.debug("Got build results: %s" % j)
                     job_log_url = None
                     result = None
-                    if zuul3:
-                        if len(j):
-                            job_log_url = "%s/job-output.txt.gz" % (
-                                j[0]['log_url'])
-                            result = j[0]['result']
-                    else:
-                        for result in j['results']:
-                            job_log_url = "%s/console.html" % (
-                                result["log_url"])
-                            result = result['result']
-                            break
+                    if len(j):
+                        job_log_url = "%s/job-output.txt.gz" % (
+                            j[0]['log_url'])
+                        result = j[0]['result']
                     if return_result and result:
                         return result
                     if job_log_url:
