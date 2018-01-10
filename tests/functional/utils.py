@@ -458,9 +458,9 @@ class JenkinsUtils:
     def wait_for_config_update(self, revision, return_result=False):
         zuul3 = os.environ.get("SF_ZUUL_EXECUTOR", "1") != "0"
         if zuul3:
-            job_url = ("%s/zuul3/local/builds.json?job_name=config-update&"
+            job_url = ("%sv2/zuul/local/builds.json?job_name=config-update&"
                        "newrev=%s") % (
-                           config.GATEWAY_URL,
+                           config.MANAGESF_API,
                            revision)
         else:
             job_url = ("%sv2/builds/?job=config-update&ref=%s&"
