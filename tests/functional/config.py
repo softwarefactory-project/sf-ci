@@ -214,3 +214,13 @@ USERS = {
 
 # List of potential issue tracker plugins supported by managesf
 ISSUE_TRACKERS = []
+
+zuul2 = os.environ.get("SF_ZUUL_EXECUTOR", "1") == "0"
+
+if zuul2:
+    ZUUL_MYSQL = {'host': groupvars['zuul_mysql_host'],
+                  'password': groupvars['zuul_mysql_password'],
+                  'user': 'zuul'}
+
+else:
+    ZUUL_MYSQL = {}

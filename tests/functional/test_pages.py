@@ -101,7 +101,8 @@ class TestPages(Base):
             config_dir, "Set website job")
         config_update_result = self.ju.wait_for_config_update(
             change_sha, return_result=True)
-        self.assertEqual(config_update_result, 'SUCCESS')
+        self.assertTrue('SUCCESS' in config_update_result,
+                        config_update_result)
 
         # Add raw content and define .zuul.yaml
         clone_dir = self.clone_as_admin(pname)
