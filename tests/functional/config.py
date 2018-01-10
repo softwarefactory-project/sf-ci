@@ -214,3 +214,8 @@ USERS = {
 
 # List of potential issue tracker plugins supported by managesf
 ISSUE_TRACKERS = []
+
+
+ZUUL_MYSQL = {'host': groupvars['zuul_mysql_host'],
+              'password': groupvars['zuul_mysql_password'],
+              'user': 'zuul'}
