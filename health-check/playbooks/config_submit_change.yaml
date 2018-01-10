@@ -13,19 +13,17 @@
       register: commitsha
 
     - block:
-        - name: Wait config-update result using managesf API
+        - name: Wait config-update result using zuul2 SQL reporter
           when: sf_zuul_executor == '0'
-          uri:
-            url: "http://localhost:20001/v2/builds/?job_name=config-update&ref={{ commitsha.stdout }}&in_progress=false"
-            return_content: yes
-            status_code: "200,404"
-          register: job
-          until: job.json.results
+          command: |
+            /usr/bin/mysql --host={{ zuul_mysql_host }} --user=zuul --password={{ zuul_mysql_password }} zuul -N -B --execute="select result from zuul_build where buildset_id in (select id from zuul_buildset where ref = '{{ commitsha.stdout }}') and job_name = 'config-update'"
+          register: job_result
+          until: job_result.stdout
           retries: 120
           delay: 2
         - name: Abort if config-update job failed
           fail: msg="Config-update job failed"
-          when: not job.json.results or job.json.results[0]["result"] != "SUCCESS"
+          when: not job_result.stdout or job_result.stdout != "SUCCESS"
       when: sf_zuul_executor == '0'
 
     - block:
