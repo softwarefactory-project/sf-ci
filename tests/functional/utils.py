@@ -491,7 +491,7 @@ class JenkinsUtils(Tool):
                 if "SUCCESS" in out:
                     return out
                 else:
-                    logger.info(out)
+                    logger.debug(out)
                 time.sleep(1)
         except Exception as e:
             logger.exception('Retry%d: command "%s": resulted in error %s' % (
@@ -499,8 +499,10 @@ class JenkinsUtils(Tool):
         return "FAILED"
 
     def wait_for_config_update_zuul3(self, revision, return_result=False):
-        job_url = ("%s/zuul3/local/builds.json?job_name=config-update&"
-                   "newrev=%s") % (config.GATEWAY_URL, revision)
+        job_url = ("%sv2/zuul/local/builds.json?job_name=config-update&"
+                   "newrev=%s") % (
+                       config.MANAGESF_API,
+                       revision)
         logger.debug("Waiting for config-update using %s" % job_url)
         r = None
         try:
@@ -519,6 +521,8 @@ class JenkinsUtils(Tool):
                         return result
                     if job_log_url:
                         return requests.get(job_log_url).text
+                else:
+                    logger.debug(r.text)
                 time.sleep(1)
         except:
             logger.exception("Retry%d: Couldn't get %s: %s" % (
