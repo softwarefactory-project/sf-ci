@@ -1,0 +1,10 @@
+Verified+1: Zuul CI <zuul@softwarefactory-project.io>
+Code-Review+2: Nicolas HICHER <nhicher@redhat.com>
+Workflow+1: Matthieu Huin <mhuin@redhat.com>
+Code-Review+2: Matthieu Huin <mhuin@redhat.com>
+Verified+2: Jenkins CI <jenkins@softwarefactory-project.io>
+Submitted-by: Jenkins CI <jenkins@softwarefactory-project.io>
+Submitted-at: Mon, 15 Jan 2018 16:43:43 +0000
+Reviewed-on: https://softwarefactory-project.io/r/10820
+Project: software-factory/sf-ci
+Branch: refs/heads/master
