@@ -1,0 +1,24 @@
+---
+- hosts: install-server
+  vars:
+    sf_arch: minimal
+    sf_version: master
+    centos_cr: false
+  tasks:
+    - include: tasks/install_stable_repo.yml
+    - include: tasks/install_centos_ce_repo.yml
+    - name: Update all installed packages
+      yum:
+        name: '*'
+        state: latest
+        update_cache: yes
+      become: yes
+    - name: Install sf-config package
+      yum:
+        name: sf-config
+        exclude: ansible
+        state: latest
+      become: yes
+    - name: Run sfconfig
+      command: sfconfig --arch /usr/share/sf-config/refarch/{{ sf_arch }}.yaml
+      become: yes
