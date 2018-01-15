@@ -77,6 +77,11 @@ def has_issue_tracker():
     return set(config.ISSUE_TRACKERS) & set(services)
 
 
+def skipIfStrInFile(check_str, path):
+    return skipIf(check_str in file(path).read(),
+                  'File %s contains %s' % (path, check_str))
+
+
 def skipIfProvisionVersionLesserThan(wanted_version):
     return skipIf(cmp_version(os.environ.get("PROVISIONED_VERSION", "0.0"),
                               wanted_version),
