@@ -1,0 +1,4 @@
+- name: Install CentOS CR repository
+  command: yum-config-manager --enable cr
+  become: yes
+  when: centos_cr

@@ -47,3 +47,41 @@
     vars:
       sf_arch: allinone
       sf_version: 2.7
+
+- job:
+    name: sf-deploy-stable
+    description: The sf deploy lastest stable
+    parent: sf-ci
+    run: playbooks/stable.yaml
+    vars:
+      sf_arch: allinone
+      sf_version: 2.7
+      centos_cr: false
+
+- job:
+    name: sf-deploy-stable-cr
+    description: The sf deploy lastest stable with CentOS CR
+    parent: sf-ci
+    run: playbooks/stable.yaml
+    vars:
+      sf_arch: allinone
+      sf_version: 2.7
+      centos_cr: true
+
+- project:
+    name: software-factory/sf-ci
+    check:
+      jobs:
+        - linters
+        - sf-rpm-build
+        - sf-ci-functional-minimal:
+            dependencies:
+              - sf-rpm-build
+        - sf-ci-upgrade-minimal:
+            dependencies:
+              - sf-rpm-build
+    periodic:
+      jobs:
+        - sf-deploy-stable
+        - sf-deploy-stable-cr
+>>>>>>> Add zuulV3 sf-deploy-stable periodic
