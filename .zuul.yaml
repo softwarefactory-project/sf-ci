@@ -37,7 +37,7 @@
     run: playbooks/upgradev3.yaml
     vars:
       sf_arch: minimal
-      sf_version: 2.6
+      sf_version: 2.7
 
 - job:
     name: sf-ci-upgrade-allinone
@@ -46,6 +46,26 @@
     run: playbooks/upgradev3.yaml
     vars:
       sf_arch: allinone
+
+- job:
+    name: sf-deploy-stable
+    description: The sf deploy lastest stable
+    parent: sf-ci
+    run: playbooks/stablev3.yaml
+    vars:
+      sf_arch: allinone
+      sf_version: 2.7
+      centos_cr: false
+
+- job:
+    name: sf-deploy-stable-cr
+    description: The sf deploy lastest stable with CentOS CR
+    parent: sf-ci
+    run: playbooks/stablev3.yaml
+    vars:
+      sf_arch: allinone
+      sf_version: 2.7
+      centos_cr: true
 
 - project:
     name: software-factory/sf-ci
@@ -59,3 +79,7 @@
         - sf-ci-upgrade-minimal:
             dependencies:
               - sf-rpm-build
+    periodic:
+      jobs:
+        - sf-deploy-stable
+        - sf-deploy-stable-cr
