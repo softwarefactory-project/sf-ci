@@ -23,6 +23,7 @@ from utils import set_private_key
 from utils import GerritGitUtils
 from utils import JenkinsUtils
 from utils import create_random_str
+from utils import skipIfStrInFile
 
 from pysflib.sfgerrit import GerritUtils
 
@@ -68,6 +69,7 @@ class TestPages(Base):
         self.gitu_admin.add_commit_for_all_new_additions(clone_dir, msg)
         return self.gitu_admin.direct_push_branch(clone_dir, 'master')
 
+    @skipIfStrInFile('2.7', '/etc/yum.repos.d/sf-release.repo')
     def test_pages(self):
         """ Test sf-pages publication - raw content
         """
