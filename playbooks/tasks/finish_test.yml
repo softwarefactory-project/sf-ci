@@ -18,6 +18,16 @@
       become: yes
   when: get_logs_playbook.stat.exists
 
+- name: Check for ara database
+  stat:
+    path: /var/lib/software-factory/ansible/ara/ansible.sqlite
+  register: _ara_database
+
+- name: Generate ara report
+  command: "ara generate html {{ artifacts }}/ara-sf"
+  ignore_errors: yes
+  when: _ara_database.stat.exists
+
 - name: Ensure artifacts are owned by user
   file:
     path: "{{ artifacts }}"
