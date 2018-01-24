@@ -11,12 +11,32 @@
 - block:
     - name: Run get-logs playbook
       command: ansible-playbook /var/lib/software-factory/ansible/get_logs.yml
+      environment:
+        # FIXME: ara fail when this is not set
+        ARA_LOG_FILE: ""
+        ARA_DIR: "/var/lib/software-factory/ansible/ara"
       become: yes
 
     - name: Copy sf-logs
       command: "rsync -a --chmod=Duog+rx,Fuog+r --no-links /root/sf-logs/ {{ artifacts }}/"
       become: yes
   when: get_logs_playbook.stat.exists
+
+- name: Check for ara database
+  stat:
+    path: /var/lib/software-factory/ansible/ara/ansible.sqlite
+  become: yes
+  register: _ara_database
+
+- name: Generate ara report
+  command: "ara generate html {{ artifacts }}/ara-sf"
+  environment:
+    # FIXME: ara fail when this is not set
+    ARA_LOG_FILE: ""
+    ARA_DIR: "/var/lib/software-factory/ansible/ara"
+  ignore_errors: yes
+  become: yes
+  when: _ara_database.stat.exists
 
 - name: Ensure artifacts are owned by user
   file:
