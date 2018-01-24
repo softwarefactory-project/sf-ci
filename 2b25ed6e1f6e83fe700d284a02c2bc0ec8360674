@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba076199_fab3e708",
+        "filename": "playbooks/tasks/remove_deprecated.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2018-01-24T07:47:16Z",
+      "side": 1,
+      "message": "jenkins",
+      "revId": "2b25ed6e1f6e83fe700d284a02c2bc0ec8360674",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
