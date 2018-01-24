@@ -8,5 +8,5 @@
     - name: Fetch artifacts
       synchronize:
         src: "{{ artifacts }}/"
-        dest: "{{ zuul.executor.log_root }}/artifacts/"
+        dest: "{{ zuul.executor.log_root }}/"
         mode: pull
