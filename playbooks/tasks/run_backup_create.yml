@@ -2,4 +2,8 @@
 
 - name: Create backup
   command: ansible-playbook /var/lib/software-factory/ansible/sf_backup.yml
+  environment:
+    # FIXME: ara fail when this is not set
+    ARA_LOG_FILE: ""
+    ARA_DIR: "/var/lib/software-factory/ansible/ara"
   become: yes

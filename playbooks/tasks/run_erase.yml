@@ -1,3 +1,7 @@
 - name: "Run sf_erase playbook"
   command: ansible-playbook /var/lib/software-factory/ansible/sf_erase.yml -e "sfconfig_batch=true"
   become: yes
+  environment:
+    # FIXME: ara fail when this is not set
+    ARA_LOG_FILE: ""
+    ARA_DIR: "/var/lib/software-factory/ansible/ara"

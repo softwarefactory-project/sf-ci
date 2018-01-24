@@ -4,4 +4,8 @@
         -e 'sf_zuul_executor={{ sf_zuul_executor }}' \
         -e @{{ sf_ci }}/health-check/group_vars/all.yaml \
         {{ sf_ci }}/health-check/sf-health-check.yaml
+  environment:
+    # FIXME: ara fail when this is not set
+    ARA_LOG_FILE: ""
+    ARA_DIR: "/var/lib/software-factory/ansible/ara"
   become: yes
