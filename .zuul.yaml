@@ -37,7 +37,7 @@
     run: playbooks/upgradev3.yaml
     vars:
       sf_arch: minimal
-      sf_version: 2.6
+      sf_version: 2.7
 
 - job:
     name: sf-ci-upgrade-allinone
@@ -46,16 +46,4 @@
     run: playbooks/upgradev3.yaml
     vars:
       sf_arch: allinone
-
-- project:
-    name: software-factory/sf-ci
-    check:
-      jobs:
-        - linters
-        - sf-rpm-build
-        - sf-ci-functional-minimal:
-            dependencies:
-              - sf-rpm-build
-        - sf-ci-upgrade-minimal:
-            dependencies:
-              - sf-rpm-build
+      sf_version: 2.7
