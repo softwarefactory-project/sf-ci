@@ -64,8 +64,9 @@ curl -s -XPOST 'http://elasticsearch.%s:9200/%s/_search?pretty&size=1' -d '{
 """
         with open('/tmp/test_request.sh', 'w') as fd:
             fd.write(content % (config.GATEWAY_HOST, index, newhash))
-        cmd = ['scp', '/tmp/test_request.sh',
-               'root@%s:/tmp/test_request.sh' % config.GATEWAY_HOST]
+        cmd = [
+            'scp', '/tmp/test_request.sh',
+            'root@elasticsearch.%s:/tmp/test_request.sh' % config.GATEWAY_HOST]
         p = Popen(cmd, stdout=PIPE)
         return p.communicate(), p.returncode
 
@@ -80,8 +81,9 @@ curl -s -XPOST 'http://elasticsearch.%s:9200/%s/_search?pretty&size=1' -d '{
         index = []
         for retry in xrange(300):
             try:
-                out = self.run_ssh_cmd(config.SERVICE_PRIV_KEY_PATH, 'root',
-                                       config.GATEWAY_HOST, subcmd)
+                out = self.run_ssh_cmd(
+                    config.SERVICE_PRIV_KEY_PATH, 'root',
+                    'elasticsearch.' + config.GATEWAY_HOST, subcmd)
                 outlines = out[0][0].split('\n')
                 outlines.pop()
                 index = [o for o in outlines if
@@ -102,8 +104,9 @@ curl -s -XPOST 'http://elasticsearch.%s:9200/%s/_search?pretty&size=1' -d '{
         subcmd = "bash /tmp/test_request.sh"
         subcmd = shlex.split(subcmd)
         for retry in xrange(300):
-            out = self.run_ssh_cmd(config.SERVICE_PRIV_KEY_PATH, 'root',
-                                   config.GATEWAY_HOST, subcmd)
+            out = self.run_ssh_cmd(
+                config.SERVICE_PRIV_KEY_PATH, 'root',
+                'elasticsearch.' + config.GATEWAY_HOST, subcmd)
             ret = json.loads(out[0][0])
             if len(ret['hits']['hits']) >= 1:
                 break
