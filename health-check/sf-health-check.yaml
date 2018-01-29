@@ -4,7 +4,10 @@
 
 - name: Run health-check zuul3
   include: zuul3.yaml
-  when: '"zuul3" in roles'
+  when:
+    # TODO: fix this weird condition after sf-3.0 release
+    - '"zuul" in roles'
+    - '"zuul-launcher" not in roles'
 
 - include: gerritbot.yaml
   when: '"gerritbot" in roles'
