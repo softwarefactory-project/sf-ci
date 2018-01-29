@@ -79,7 +79,7 @@ class TestPages(Base):
 
         # Register it in zuul
         config_dir = self.clone_as_admin("config")
-        tenant = os.path.join(config_dir, "zuulV3", pname + ".yaml")
+        tenant = os.path.join(config_dir, "zuul", pname + ".yaml")
         job = os.path.join(config_dir, "zuul.d", pname + ".yaml")
         file(tenant, 'w').write("""---
 - tenant:

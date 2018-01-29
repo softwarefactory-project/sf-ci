@@ -14,7 +14,7 @@
     - name: Add python-readerlib to zuul3 main.yaml
       copy:
         content: "{{ zuul3_config|to_yaml }}"
-        dest: "{{ config_path }}/zuulV3/health-check.yaml"
+        dest: "{{ config_path }}/zuul/health-check.yaml"
       register: zuul3_conf
 
     - name: Update change
@@ -22,7 +22,7 @@
       command: chdir={{ config_path }}  {{ item }}
       with_items:
           - 'git add -A'
-          - 'git commit -m "Add zuulV3 health-check configuration"'
+          - 'git commit -m "Add zuul health-check configuration"'
 
 - name: "Submit config repos"
   include: playbooks/config_submit_change.yaml

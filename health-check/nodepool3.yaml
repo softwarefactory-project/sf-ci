@@ -45,7 +45,7 @@
     - name: Adds nodepool configuration
       template:
         src: templates/nodepool3.yaml.j2
-        dest: "{{ config_path }}/nodepoolV3/nodepool.yaml"
+        dest: "{{ config_path }}/nodepool/nodepool.yaml"
 
     - name: Update change
       register: changed

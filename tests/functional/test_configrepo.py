@@ -49,7 +49,8 @@ class TestConfigRepo(Base):
         self.assertTrue(os.path.isdir(clone_dir))
         # Check if the clone dir has projects file
         self.assertTrue(os.path.isfile(os.path.join(clone_dir,
-                                                    "jobs/projects.yaml")))
-
+                                                    "zuul/main.yaml")))
+        self.assertTrue(os.path.isfile(os.path.join(clone_dir,
+                                                    "zuul.d/_jobs-base.yaml")))
         self.assertTrue(os.path.isfile(os.path.join(clone_dir,
                                                     "policies/policy.yaml")))
