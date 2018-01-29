@@ -28,6 +28,17 @@
   when: "sf_version != '2.6'"
   become: yes
 
+# Special fixes for job-log-gearman
+- name: Remove job-log-gearman
+  lineinfile:
+    path: /etc/software-factory/arch.yaml
+    line: "{{ item }}"
+    state: absent
+  become: yes
+  with_items:
+    - "      - job-logs-gearman-client"
+    - "      - job-logs-gearman-worker"
+
 # Special fixes for ansible 2.4
 - name: "Patch zuul2 ansiblelauncher for ansible 2.4"
   shell: "patch /usr/lib/python2.7/site-packages/zuul/launcher/ansiblelaunchserver.py < {{ sf_ci }}/patches/ansiblelauncher-ansible-2.4.patch"
