@@ -1,11 +1,11 @@
 # SF architecture file
-sf_arch: minimal
+sf_arch: "{{ sf_arch|default('minimal') }}"
 # SF version
-sf_version: master
+sf_version: "{{ sf_version|default('master') }}"
 # Local repository path
 local_repo_path: ""
 # Default test case
-func_test_case: "tests/functional"
+func_test_case: "{{ func_test_case|default('tests/functional') }}"
 
 # workspace (use default(, true) to set default when env lookup return '')
 workspace: "./"
