@@ -1,7 +1,7 @@
 # SF architecture file
-sf_arch: minimal
+# sf_arch: minimal
 # SF version
-sf_version: master
+# sf_version: master
 # Local repository path
 local_repo_path: ""
 # Default test case
