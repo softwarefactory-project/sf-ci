@@ -33,4 +33,6 @@
     - include: tasks/run_sfconfig_upgrade.yml
     - include: tasks/run_checker.yml
     - include: tasks/run_health-check.yml
+    - set_fact:
+        sf_zuul_executor: 1
     - include: tasks/run_functional_tests.yml
