@@ -56,8 +56,9 @@ class TestGateway(Base):
         subpaths = ["/r/", "/docs/"]
         if "jenkins" in services:
             subpaths.append("/jenkins/")
-        if "zuul" in services:
-            subpaths.append("/zuul/")
+        # TODO: enable test after https://softwarefactory-project.io/r/11033
+        # if "zuul" in services:
+        #     subpaths.append("/zuul/")
         if "zuul3" in services:
             subpaths.append("/zuul3/local/status.html")
         if "etherpad" in services:
@@ -200,17 +201,18 @@ class TestGateway(Base):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('<title>Kibana</title>' in resp.text)
 
-    @skipIfServiceMissing('zuul')
-    def test_zuul_accessible(self):
-        """ Test if Zuul is accessible on gateway host
-        """
-        url = config.GATEWAY_URL + "/zuul/"
-        resp = requests.get(
-            url,
-            cookies=dict(
-                auth_pubtkt=config.USERS[config.USER_1]['auth_cookie']))
-        self.assertEqual(resp.status_code, 200)
-        self.assertTrue('<title>Zuul Status</title>' in resp.text)
+    # TODO: enable test after https://softwarefactory-project.io/r/11033
+    # @skipIfServiceMissing('zuul')
+    # def test_zuul_accessible(self):
+    #    """ Test if Zuul is accessible on gateway host
+    #    """
+    #    url = config.GATEWAY_URL + "/zuul/"
+    #    resp = requests.get(
+    #        url,
+    #        cookies=dict(
+    #            auth_pubtkt=config.USERS[config.USER_1]['auth_cookie']))
+    #    self.assertEqual(resp.status_code, 200)
+    #    self.assertTrue('<title>Zuul Status</title>' in resp.text)
 
     @skipIfServiceMissing('zuul3')
     def test_zuul3_accessible(self):
