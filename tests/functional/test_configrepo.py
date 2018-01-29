@@ -48,9 +48,9 @@ class TestConfigRepo(Base):
         # Test that the clone is a success
         self.assertTrue(os.path.isdir(clone_dir))
         # Check if the clone dir has projects file
-        # TODO: re-enable this with new config repo names
-        # self.assertTrue(os.path.isfile(os.path.join(clone_dir,
-        #                                             "jobs/projects.yaml")))
-
+        self.assertTrue(os.path.isfile(os.path.join(clone_dir,
+                                                    "zuul.d/_jobs-base.yaml")))
+        self.assertTrue(os.path.isfile(os.path.join(clone_dir,
+                                                    "zuul/_main.yaml")))
         self.assertTrue(os.path.isfile(os.path.join(clone_dir,
                                                     "policies/policy.yaml")))
