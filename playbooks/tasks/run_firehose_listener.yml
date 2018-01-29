@@ -4,6 +4,7 @@
         src: "{{ sf_ci }}/patches/mosquitto-client-tests.service"
         dest: /lib/systemd/system/mosquitto-client-tests.service
         mode: 064
+        remote_src: true
       become: yes
 
     - name: Start mosquitto_sub service
