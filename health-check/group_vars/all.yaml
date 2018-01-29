@@ -27,7 +27,7 @@ bot_name: health-check-bot
 channel_name: "irc-channel-health-check{{ suffix }}"
 
 # Zuul3 config
-zuul3_config:
+zuul_config:
   - tenant:
       name: 'local'
       source:

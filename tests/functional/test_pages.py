@@ -79,9 +79,9 @@ class TestPages(Base):
 
         # Register it in zuul
         config_dir = self.clone_as_admin("config")
-        tenant = os.path.join(config_dir, "zuulV3", pname + ".yaml")
+        tenant = os.path.join(config_dir, "zuul", pname + ".yaml")
         job = os.path.join(config_dir, "zuul.d", pname + ".yaml")
-        file(tenant, 'w').write("""---
+        open(tenant, 'w').write("""---
 - tenant:
     name: 'local'
     source:
@@ -89,7 +89,7 @@ class TestPages(Base):
         untrusted-projects:
           - %s
 """ % pname)
-        file(job, 'w').write("""---
+        open(job, 'w').write("""---
 - job:
     name: %(pname)s-build-and-publish-website
     parent: build-and-publish-pages
@@ -110,8 +110,8 @@ class TestPages(Base):
         clone_dir = self.clone_as_admin(pname)
         path = os.path.join(clone_dir, "index.html")
         zuul = os.path.join(clone_dir, ".zuul.yaml")
-        file(path, 'w').write("<b>Hello World !</b>")
-        file(zuul, 'w').write("""---
+        open(path, 'w').write("<b>Hello World !</b>")
+        open(zuul, 'w').write("""---
 - project:
     name: %s
     check:
