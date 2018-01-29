@@ -18,7 +18,7 @@
     name: sf-ci-functional-minimal
     description: The sf functional tests of the minimal architecture
     parent: sf-ci
-    run: playbooks/functionalv3.yaml
+    run: playbooks/functional.yaml
     vars:
       sf_arch: minimal
 
@@ -26,7 +26,7 @@
     name: sf-ci-functional-allinone
     description: The sf functional tests of the allinone architecture
     parent: sf-ci
-    run: playbooks/functionalv3.yaml
+    run: playbooks/functional.yaml
     vars:
       sf_arch: allinone
 
@@ -34,7 +34,7 @@
     name: sf-ci-upgrade-minimal
     description: The sf upgrade tests of the minimal architecture
     parent: sf-ci
-    run: playbooks/upgradev3.yaml
+    run: playbooks/upgrade.yaml
     vars:
       sf_arch: minimal
       sf_version: 2.7
@@ -43,7 +43,7 @@
     name: sf-ci-upgrade-allinone
     description: The sf upgrade tests of the allinone architecture
     parent: sf-ci
-    run: playbooks/upgradev3.yaml
+    run: playbooks/upgrade.yaml
     vars:
       sf_arch: allinone
       sf_version: 2.7
