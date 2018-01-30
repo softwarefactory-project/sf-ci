@@ -77,6 +77,19 @@ class TestGateway(Base):
             self.assertTrue(('href="%s"' % subpath) in resp.text,
                             '%s not present as a link' % subpath)
 
+    @skipIfServiceMissing('zuul3')
+    def test_apipassthrough(self):
+        """Test if REST services are accessible"""
+        direct_url = config.GATEWAY_URL + "/zuul3/local/builds.json"
+        passthrough_url = (config.GATEWAY_URL +
+                           "/manage/v2/zuul/local/builds.json")
+        direct_resp = requests.get(direct_url)
+        passthrough_rest = requests.get(passthrough_url)
+        self.assertEqual(direct_resp.status_code,
+                         passthrough_rest.status_code)
+        self.assertEqual(direct_resp.json(),
+                         passthrough_rest.json())
+
     @skipIfProvisionVersionLesserThan("2.4.0")
     def test_dashboard_data(self):
         """ Test if dashboard data are created
