@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba076199_2e05c1c1",
+        "filename": "tests/functional/test_gateway.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2018-01-31T05:37:30Z",
+      "side": 1,
+      "message": "s/zuul3/zuul/",
+      "revId": "380159fbec25d745fff30cbedbb4c5f56d515bd8",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba076199_0e0afdd2",
+        "filename": "tests/functional/test_gateway.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2018-01-31T05:37:30Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this test be in a test_managesf instead?",
+      "revId": "380159fbec25d745fff30cbedbb4c5f56d515bd8",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
