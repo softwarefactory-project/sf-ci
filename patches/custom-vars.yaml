@@ -19,6 +19,9 @@ jenkins_repo_desc: "Mirrored jenkins repo"
 zuul_loglevel: DEBUG
 nodepool_loglevel: DEBUG
 
+# Set retry attempts to 1 in CI
+zuul_default_retry_attempts: 1
+
 
 # Enable using hypervisor-oci on the install-server
 enable_insecure_slaves: true
