@@ -122,7 +122,7 @@ class TestResourcesWorkflow(Base):
 
     def get_resources(self):
         gateau = config.USERS[config.ADMIN_USER]['auth_cookie']
-        resp = requests.get("%s/manage/resources/" % config.GATEWAY_URL,
+        resp = requests.get("%s/manage/v2/resources/" % config.GATEWAY_URL,
                             cookies={'auth_pubtkt': gateau})
         return resp.json()
 
@@ -524,6 +524,6 @@ class TestResourcesWorkflow(Base):
     def test_GET_resources(self):
         """ Check resources - GET resources works as expected"""
         cookies = dict(auth_pubtkt=config.USERS[config.USER_1]['auth_cookie'])
-        ret = requests.get("%s/manage/resources/" % config.GATEWAY_URL,
+        ret = requests.get("%s/manage/v2/resources/" % config.GATEWAY_URL,
                            cookies=cookies)
         self.assertIn('resources', ret.json())
