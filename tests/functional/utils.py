@@ -604,7 +604,7 @@ class ResourcesUtils():
         self.yaml = yaml or default_yaml
 
     def get_resources(self):
-        r = requests.get(config.MANAGESF_API + 'resources/')
+        r = requests.get(config.MANAGESF_API + 'v2/resources/')
         return r.json()
 
     def _direct_push(self, cdir, msg):
@@ -639,7 +639,7 @@ class ResourcesUtils():
         cookie = get_cookie(config.SF_SERVICE_USER,
                             config.SF_SERVICE_USER_PASSWORD)
         cookie = {"auth_pubtkt": cookie}
-        r = requests.put(config.MANAGESF_API + 'resources/',
+        r = requests.put(config.MANAGESF_API + 'v2/resources/',
                          cookies=cookie,
                          json=data)
         assert r.status_code < 300
