@@ -53,11 +53,11 @@ class TestUserdata(Base):
                 'back': redirect}
         return requests.post(url, data=data)
 
-    def test_login_redirect_to_jenkins(self):
-        """ Verify the user creation and the login
+    def test_login_and_redirect(self):
+        """ Verify the user creation and the login redirection
         """
         self.logout()
-        url = config.GATEWAY_URL + "/jenkins/"
+        url = config.GATEWAY_URL + "/aservice/"
         quoted_url = urllib2.quote(url, safe='')
         response = self.login('user5', config.ADMIN_PASSWORD, quoted_url)
 
