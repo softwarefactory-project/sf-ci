@@ -42,23 +42,6 @@ logging.basicConfig(format="%(asctime)s: %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-# Empty job for jenkins
-EMPTY_JOB_XML = """<?xml version='1.0' encoding='UTF-8'?>
-<project>
-  <keepDependencies>false</keepDependencies>
-  <properties/>
-  <scm class='jenkins.scm.NullSCM'/>
-  <canRoam>true</canRoam>
-  <disabled>false</disabled>
-  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <triggers class='vector'/>
-  <concurrentBuild>false</concurrentBuild>
-  <builders/>
-  <publishers/>
-  <buildWrappers/>
-</project>"""
-
-
 # for easier imports
 skipIf = unittest.skipIf
 skip = unittest.skip
@@ -392,77 +375,11 @@ class GerritGitUtils(Tool):
         return out.split()
 
 
-class JenkinsUtils(Tool):
+class JobUtils(Tool):
     def __init__(self):
         Tool.__init__(self)
-        self.jenkins_user = 'jenkins'
-        self.jenkins_password = config.groupvars.get('jenkins_password')
-        self.jenkins_url = config.GATEWAY_URL + "/jenkins/"
         self.cookies = {'auth_pubtkt': get_cookie(config.USER_1,
                                                   config.USER_1_PASSWORD)}
-
-    def get(self, url):
-        return requests.get(url,
-                            auth=(self.jenkins_user, self.jenkins_password),
-                            cookies=self.cookies)
-
-    def post(self, url, params, data, headers):
-        return requests.post(url,
-                             params=params,
-                             data=data,
-                             headers=headers,
-                             auth=(self.jenkins_user,
-                                   self.jenkins_password),
-                             cookies=self.cookies)
-
-    def create_job(self, name, job=EMPTY_JOB_XML):
-        url = "%s/createItem" % self.jenkins_url
-        headers = {'content-type': 'text/xml'}
-        resp = self.post(url,
-                         params={'name': name},
-                         data=job,
-                         headers=headers)
-        return resp.status_code
-
-    def run_job(self, job_name, parameters=None):
-        url = "%s/job/%s/build" % (self.jenkins_url, job_name)
-        if parameters:
-            url += "WithParameters"
-            requests.post(url,
-                          params=parameters,
-                          auth=(self.jenkins_user,
-                                self.jenkins_password),
-                          cookies=self.cookies)
-        else:
-            self.get(url)
-
-    def list_jobs(self):
-        from xml.dom import minidom
-        url = "%s/api/xml" % self.jenkins_url
-        resp = self.get(url)
-        if resp.status_code == 200:
-            jobs = []
-            for job in minidom.parseString(resp.text).\
-                    getElementsByTagName('job'):
-                jobs.append(job.firstChild.childNodes[0].data)
-            return jobs
-        return None
-
-    def get_last_build_number(self, job_name, type):
-        url = "%(server)sjob/%(job_name)s/%(type)s/buildNumber" % {
-            'server': self.jenkins_url, 'job_name': job_name, 'type': type}
-        try:
-            resp = self.get(url)
-            return int(resp.text)
-        except:
-            return 0
-
-    def get_last_console(self, job_name):
-        try:
-            return self.get("%s/job/%s/lastBuild/consoleText" % (
-                self.jenkins_url, job_name)).text
-        except:
-            return ''
 
     def wait_for_config_update(self, revision, return_result=False):
         zuul3 = os.environ.get("SF_ZUUL_EXECUTOR", "1") != "0"
@@ -527,27 +444,6 @@ class JenkinsUtils(Tool):
                 logger.error("Response was %s : %s" % (r, r.text))
         return "FAILED"
 
-    def get_job_logs(self, job_name, job_id):
-        """Get timestamped logs
-        Works also if the timestamps wrapper is not set."""
-        url = "%(server)sjob/%(job_name)s/%(job_id)s"
-        url = url % {'server': self.jenkins_url,
-                     'job_name': job_name,
-                     'job_id': job_id}
-        url += "/timestamps/?time=HH:mm:ss.S&appendLog"
-        try:
-            resp = self.get(url)
-            return resp.text
-        except:
-            return None
-
-    def wait_till_job_completes(self, job_name, last, type, max_retries=120):
-        for retry in xrange(max_retries):
-            cur = self.get_last_build_number(job_name, type)
-            if cur > last:
-                break
-            time.sleep(1)
-
 
 class ResourcesUtils():
 
@@ -595,7 +491,7 @@ class ResourcesUtils():
       source-repositories:
         - %(name)s
 """
-        self.ju = JenkinsUtils()
+        self.ju = JobUtils()
         self.url = "ssh://admin@%s:29418/%s" % (config.GATEWAY_HOST, 'config')
         self.ggu = GerritGitUtils(
             'admin',
