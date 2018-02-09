@@ -21,6 +21,12 @@
         chdir: "{{ sfnamespace_path }}"
       become: yes
 
+    # TODO: remove this when image are rebuilt without sf-zuul-worker element
+    - name: "Remove /var/lib/zuul"
+      file:
+        path: /var/lib/zuul
+        state: absent
+
     - include: tasks/install_sf_ci_repo.yml
     - include: tasks/yum_update.yml
     - include: tasks/run_sfconfig.yml

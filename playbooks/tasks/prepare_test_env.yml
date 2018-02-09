@@ -4,6 +4,12 @@
   command: "sed -i '/^jenkins/ s#:[^:]*$#:/sbin/nologin#' /etc/passwd"
   become: yes
 
+# TODO: remove this when image are rebuilt without sf-zuul-worker element
+- name: "Remove /var/lib/zuul"
+  file:
+    path: /var/lib/zuul
+    state: absent
+
 - name: "Create artifact directory"
   file:
     path: "{{ artifacts }}"
