@@ -46,10 +46,6 @@ playbooks/gerritbot_fakeircd_check.yaml
 ---------
 * Check for a pattern in fake_ircd logs
 
-playbooks/jenkins_check_job.yaml
----------
-* Check if a jenkins jobs exists
-
 playbooks/managesf_project_create.yaml
 ---------
 * Create project and checkout or update local clone

@@ -21,7 +21,7 @@ from utils import Base
 from utils import ResourcesUtils
 from utils import set_private_key
 from utils import GerritGitUtils
-from utils import JenkinsUtils
+from utils import JobUtils
 from utils import create_random_str
 from utils import skipIfStrInFile
 
@@ -45,7 +45,7 @@ class TestPages(Base):
         self.gu = GerritUtils(
             config.GATEWAY_URL,
             auth_cookie=config.USERS[config.ADMIN_USER]['auth_cookie'])
-        self.ju = JenkinsUtils()
+        self.ju = JobUtils()
 
     def tearDown(self):
         for dirs in self.dirs_to_delete:

@@ -22,7 +22,7 @@ from utils import set_private_key
 from utils import skipIfServiceMissing
 from utils import GerritGitUtils
 from utils import create_random_str
-from utils import JenkinsUtils
+from utils import JobUtils
 
 from pysflib.sfgerrit import GerritUtils
 
@@ -40,7 +40,7 @@ class TestRepoxplorer(Base):
         self.gu = GerritUtils(
             config.GATEWAY_URL,
             auth_cookie=config.USERS[config.ADMIN_USER]['auth_cookie'])
-        self.ju = JenkinsUtils()
+        self.ju = JobUtils()
 
         self.dirs_to_delete = []
 
