@@ -416,13 +416,21 @@ class JobUtils(Tool):
         return "FAILED"
 
     def wait_for_config_update_zuul3(self, revision, return_result=False):
-        job_url = ("%s/zuul3/local/builds.json?job_name=config-update&"
-                   "newrev=%s") % (config.GATEWAY_URL, revision)
-        logger.debug("Waiting for config-update using %s" % job_url)
+        base_url = "%s/zuul/local/builds" % config.GATEWAY_URL
+        # TODO remove after 3.0 release
+        r = requests.head(base_url)
+        if r.status_code == 404:
+            base_url = "%s/zuul/local/builds.json" % config.GATEWAY_URL
+            r = requests.head(base_url)
+        if r.status_code == 404:
+            base_url = "%s/zuul3/local/builds.json" % config.GATEWAY_URL
+        job_url = "?job_name=config-update&newrev=%s" % revision
+        logger.debug(
+            "Waiting for config-update using %s" % (base_url + job_url))
         r = None
         try:
             for retry in range(240):
-                r = requests.get(job_url)
+                r = requests.get(base_url + job_url)
                 if r.ok:
                     j = r.json()
                     logger.debug("Got build results: %s" % j)
@@ -439,7 +447,7 @@ class JobUtils(Tool):
                 time.sleep(1)
         except:
             logger.exception("Retry%d: Couldn't get %s: %s" % (
-                retry, job_url, r.text))
+                retry, base_url + job_url, r.text))
             if not r.ok:
                 logger.error("Response was %s : %s" % (r, r.text))
         return "FAILED"
