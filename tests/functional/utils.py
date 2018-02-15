@@ -416,7 +416,7 @@ class JobUtils(Tool):
         return "FAILED"
 
     def wait_for_config_update_zuul3(self, revision, return_result=False):
-        job_url = ("%s/zuul3/local/builds.json?job_name=config-update&"
+        job_url = ("%s/zuul/local/builds.json?job_name=config-update&"
                    "newrev=%s") % (config.GATEWAY_URL, revision)
         logger.debug("Waiting for config-update using %s" % job_url)
         r = None
