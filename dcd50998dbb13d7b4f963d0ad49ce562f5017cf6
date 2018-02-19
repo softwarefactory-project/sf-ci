@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a016987_2def0eb2",
+        "filename": "tests/functional/utils.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 68
+      },
+      "writtenOn": "2018-02-19T09:48:28Z",
+      "side": 1,
+      "message": "HEAD is not supported by the zuul web server:\n\n$ curl -I -k https://softwarefactory-project.io/zuul3/local/builds.json\nHTTP/1.1 405 Method Not Allowed",
+      "revId": "dcd50998dbb13d7b4f963d0ad49ce562f5017cf6",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
