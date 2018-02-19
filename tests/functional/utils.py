@@ -420,9 +420,6 @@ class JobUtils(Tool):
         # TODO remove after 3.0 release
         r = requests.head(base_url)
         if r.status_code == 404:
-            base_url = "%s/zuul/local/builds.json" % config.GATEWAY_URL
-            r = requests.head(base_url)
-        if r.status_code == 404:
             base_url = "%s/zuul3/local/builds.json" % config.GATEWAY_URL
         job_url = "?job_name=config-update&newrev=%s" % revision
         logger.debug(

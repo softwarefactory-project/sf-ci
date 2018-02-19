@@ -12,5 +12,33 @@
     sfinfo_setup_args: "{% if buildset_artifacts_url %}--testing-repo {{ buildset_artifacts_url }}{% endif %}"
     sf_user: "zuul-worker"
   tasks:
-    - name: "Temporarly disabled"
-      command: echo True
+    - name: "Install sfinfo repo"
+      command: >
+        ./software-factory/sfinfo/zuul_rpm_setup.py \
+            --distro-info ./software-factory/sfinfo/sf-{{ zuul.branch }}.yaml \
+            {{ sfinfo_setup_args }}
+      args:
+        chdir: "{{ sfnamespace_path }}"
+      become: yes
+
+    # TODO: remove this when image are rebuilt without sf-zuul-worker element
+    - name: "Remove /var/lib/zuul"
+      file:
+        path: /var/lib/zuul
+        state: absent
+      become: yes
+
+    - include: tasks/install_sf_ci_repo.yml
+    - include: tasks/yum_update.yml
+    - include: tasks/run_sfconfig.yml
+    - include: tasks/install_test_env.yml
+    - include: tasks/set_environment_facts.yml
+    - include: tasks/run_provisioner.yml
+    - include: tasks/run_backup_create.yml
+    - include: tasks/run_health-check.yml
+    - include: tasks/run_firehose_listener.yml
+    - include: tasks/run_functional_tests.yml
+    - include: tasks/check_firehose_events.yml
+    - include: tasks/run_erase.yml
+    - include: tasks/run_sfconfig_recover.yml
+    - include: tasks/run_checker.yml
