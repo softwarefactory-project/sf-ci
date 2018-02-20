@@ -80,13 +80,13 @@ class TestRepoxplorer(Base):
                         config_update_result)
 
     def get_projects(self):
-        url = config.GATEWAY_URL + "/repoxplorer/projects.json/"
+        url = config.GATEWAY_URL + "/repoxplorer/api/v1/projects/projects"
         resp = requests.get(url)
         self.assertEqual(resp.status_code, 200)
         return resp.json()
 
     def get_groups(self):
-        url = config.GATEWAY_URL + "/repoxplorer/api_groups.json/"
+        url = config.GATEWAY_URL + "/repoxplorer/api/v1/groups/"
         resp = requests.get(url)
         self.assertEqual(resp.status_code, 200)
         return resp.json()
@@ -98,13 +98,15 @@ class TestRepoxplorer(Base):
         url = config.GATEWAY_URL + "/repoxplorer/"
         resp = requests.get(url)
         self.assertEqual(resp.status_code, 200)
-        self.assertTrue('[RepoXplorer]' in resp.text)
+        self.assertTrue('Welcome on RepoXplorer' in resp.text)
 
     @skipIfServiceMissing('repoxplorer')
     def test_repoxplorer_data_indexed(self):
         """ Test if RepoXplorer has indexed the config repository
         """
-        url = config.GATEWAY_URL + "/repoxplorer/commits.json?pid=internal"
+        url = (
+            config.GATEWAY_URL +
+            "/repoxplorer/api/v1/commits/commits.json?pid=internal")
         resp = requests.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(resp.json()[2] > 0)
@@ -159,7 +161,7 @@ class TestRepoxplorer(Base):
         self.assertIn(tmpl_keys['gname'], groups.keys())
         self.assertIn(tmpl_keys['pname'], projects['projects'].keys())
         project_repos = [r['name'] for r in
-                         projects['projects'][tmpl_keys['pname']]]
+                         projects['projects'][tmpl_keys['pname']]['repos']]
         self.assertIn(tmpl_keys['pname'] + '/' + tmpl_keys['rname'],
                       project_repos)
 
