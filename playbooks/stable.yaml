@@ -6,7 +6,7 @@
     centos_cr: false
   tasks:
     - include: tasks/install_stable_repo.yml
-    - include: tasks/install_centos_ce_repo.yml
+    - include: tasks/install_centos_cr_repo.yml
     - name: Update all installed packages
       yum:
         name: '*'

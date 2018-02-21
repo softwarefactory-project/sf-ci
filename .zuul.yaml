@@ -5,8 +5,8 @@
     post-run: playbooks/get-logs.yaml
     timeout: 7200
     required-projects:
-      - software-factory/sf-ci
       - software-factory/sfinfo
+      - software-factory/sf-ci
     nodeset:
       nodes:
         - name: install-server
@@ -67,3 +67,11 @@
       sf_arch: allinone
       sf_version: 2.7
       centos_cr: true
+
+- project:
+    name: software-factory/sf-ci
+    templates: []
+    check:
+      jobs:
+        - sf-deploy-stable
+        - sf-deploy-stable-cr
