@@ -67,3 +67,10 @@
       sf_arch: allinone
       sf_version: 2.7
       centos_cr: true
+
+- project:
+    name: software-factory/sf-ci
+    check:
+      jobs:
+        - sf-deploy-stable
+        - sf-deploy-stable-cr
