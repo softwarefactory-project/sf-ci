@@ -5,8 +5,10 @@
   tasks:
     - include: tasks/set_environment_facts.yml
     - include: tasks/finish_test.yml
+    - name: Remove empty directories
+      command: "find {{ artifacts }} -type d -empty -delete"
     - name: Fetch artifacts
       synchronize:
         src: "{{ artifacts }}/"
-        dest: "{{ zuul.executor.log_root }}/"
+        dest: "{{ zuul.executor.log_root }}/logs"
         mode: pull
