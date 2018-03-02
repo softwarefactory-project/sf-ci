@@ -12,3 +12,4 @@
         src: "{{ artifacts }}/"
         dest: "{{ zuul.executor.log_root }}/logs"
         mode: pull
+      no_log: True
