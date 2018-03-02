@@ -1,6 +1,7 @@
 ---
 - job:
     name: sf-ci
+    parent: new-base
     description: The sf ci tests
     post-run: playbooks/get-logs.yaml
     timeout: 7200
@@ -13,6 +14,8 @@
           label: dib-centos-7
     vars:
       sf_version: master
+      logclassify_logserver_dir: logs/
+      logclassify_debug: true
 
 - job:
     name: sf-ci-functional-minimal
