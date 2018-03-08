@@ -1,4 +1,8 @@
 ---
+- name: Switch zuul-executor to verbose mode
+  command: /opt/rh/rh-python35/root/usr/bin/zuul-executor -c /etc/opt/rh/rh-python35/zuul/zuul.conf verbose
+  become: yes
+
 - name: Run data provisionner
   command: python provisioner.py
   args:
