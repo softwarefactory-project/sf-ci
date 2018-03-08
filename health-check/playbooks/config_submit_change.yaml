@@ -1,6 +1,12 @@
 ---
 # * Submit and wait config repo change
 # * Check for SUCCESS in config-update post job log
+- hosts: zuul-executor
+  remote_user: root
+  tasks:
+    - name: Set executor to verbose
+      command: /opt/rh/rh-python35/root/usr/bin/zuul-executor -c /etc/opt/rh/rh-python35/zuul/zuul.conf verbose
+
 - hosts: install-server
   remote_user: root
   tasks:
@@ -28,3 +34,9 @@
     - name: Abort if config-update job failed
       fail: msg="Config-update job failed"
       when: job.json[0]["result"] != "SUCCESS"
+
+- hosts: zuul-executor
+  remote_user: root
+  tasks:
+    - name: Set executor to un-verbose
+      command: /opt/rh/rh-python35/root/usr/bin/zuul-executor unverbose
