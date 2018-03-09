@@ -144,6 +144,18 @@ class TestGateway(Base):
         a = GerritUtils(url, auth=HTTPBasicAuth("admin", "password"))
         self.assertRaises(HTTPError, a.get_account, 'john')
 
+    @skipIfServiceMissing('hound')
+    def test_codesearch(self):
+        """ Test if codesearch service works
+        """
+        # Look for 'config-check', it should returns a zuul.d path
+        url = config.GATEWAY_URL + "/codesearch"
+        search = "api/v1/search?q=config-check&repos=*"
+
+        resp = requests.get("%s/%s" % (url, search))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue('zuul.d' in resp.text)
+
     @skipIfServiceMissing('kibana')
     def test_kibana_accessible(self):
         """ Test if Kibana is accessible on gateway host
