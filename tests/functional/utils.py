@@ -439,8 +439,7 @@ class JobUtils(Tool):
                         result = j[0]['result']
                     if return_result and result:
                         return result
-                    if job_log_url:
-                        return requests.get(job_log_url).text
+                    return
                 time.sleep(1)
         except:
             logger.exception("Retry%d: Couldn't get %s: %s" % (
