@@ -112,9 +112,7 @@ users:
  - name: admin
  - name: user2
  - name: user3
-commands:
-  - cmd: echo "adev:OpPzvAQ.RbXb6" > /etc/httpd/managesf_htpasswd
+commands: []
 checksum:
-  - file: /etc/httpd/managesf_htpasswd
   - file: /etc/gerrit/ssh_host_rsa_key.pub
   - file: /etc/gerrit/ssh_host_rsa_key

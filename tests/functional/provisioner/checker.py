@@ -26,7 +26,7 @@ sys.path.append(os.path.dirname(pwd))             # flake8: noqa
 import config
 
 from utils import get_cookie
-from pysflib.sfgerrit import GerritUtils
+from utils import get_gerrit_utils
 from utils import GerritGitUtils
 from utils import is_present
 
@@ -45,9 +45,7 @@ class SFchecker:
             self.resources = yaml.load(rsc)
         config.USERS[config.ADMIN_USER]['auth_cookie'] = get_cookie(
             config.ADMIN_USER, config.USERS[config.ADMIN_USER]['password'])
-        self.gu = GerritUtils(
-            'http://%s/' % config.GATEWAY_HOST,
-            auth_cookie=config.USERS[config.ADMIN_USER]['auth_cookie'])
+        self.gu = get_gerrit_utils("admin")
         self.ggu = GerritGitUtils(config.ADMIN_USER,
                                   config.ADMIN_PRIV_KEY_PATH,
                                   config.USERS[config.ADMIN_USER]['email'])

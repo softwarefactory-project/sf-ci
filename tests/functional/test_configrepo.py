@@ -17,8 +17,7 @@ import config
 
 from utils import Base
 from utils import GerritGitUtils
-
-from pysflib.sfgerrit import GerritUtils
+from utils import get_gerrit_utils
 
 
 class TestConfigRepo(Base):
@@ -34,9 +33,7 @@ class TestConfigRepo(Base):
         """ Validate config repo has been bootstraped
         """
         pname = 'config'
-        gu = GerritUtils(
-            config.GATEWAY_URL,
-            auth_cookie=config.USERS[config.ADMIN_USER]['auth_cookie'])
+        gu = get_gerrit_utils("admin")
         self.assertTrue(gu.project_exists(pname))
 
         ggu = GerritGitUtils(config.ADMIN_USER,

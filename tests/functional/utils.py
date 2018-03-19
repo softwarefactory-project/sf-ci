@@ -30,6 +30,9 @@ import yaml
 import logging
 import pkg_resources
 
+from requests.auth import HTTPBasicAuth
+from pysflib.sfgerrit import GerritUtils
+
 from distutils.version import StrictVersion
 from subprocess import Popen, PIPE
 
@@ -123,6 +126,16 @@ def get_cookie(username, password):
                                       'back': '/'},
                          allow_redirects=False)
     return resp.cookies.get('auth_pubtkt', '')
+
+
+def get_gerrit_utils(user):
+    if config.groupvars.get("gerrit_admin_password") is None:
+        # Legacy cookie based gerrit authentication
+        return GerritUtils(
+            config.GATEWAY_URL, auth_cookie=config.USERS[user]['auth_cookie'])
+    return GerritUtils(
+        config.GATEWAY_URL + "/r",
+        auth=HTTPBasicAuth(user, config.USERS[user]['api_key']))
 
 
 def ssh_run_cmd(sshkey_priv_path, user, host, subcmd, verbose=False):
