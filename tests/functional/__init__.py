@@ -12,7 +12,7 @@ def assign_cookies():
 
 def assign_apikey():
     # Pre-create GerritUtils users api-key
-    for user in ("user2", ):
+    for user in ("user2", "user3"):
         v = config.USERS[user]
         cookie = {'auth_pubtkt': v['auth_cookie']}
         if not cookie['auth_pubtkt']:
