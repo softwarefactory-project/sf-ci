@@ -6,8 +6,15 @@
     state: absent
   become: yes
 
+# TODO: remove this after api-key refactor is merged
+- name: Check for cauth api-key refactor
+  command: grep "'password'" /etc/cauth/config.py
+  failed_when: false
+  register: _apikey_password
+
 - name: Start functional tests
   command: "{{ sf_ci }}/scripts/create_ns.sh nosetests --with-timer --with-html --html-file=nose_results.html --logging-format '%(asctime)s: %(levelname)s - %(message)s' -sv {{ sf_ci }}/{{ func_test_case }}"
   environment:
     SF_ZUUL_EXECUTOR: "{{ sf_zuul_executor }}"
+    SF_NO_APIKEY: "{{ _apikey_password.rc }}"
   become: yes

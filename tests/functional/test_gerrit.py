@@ -24,8 +24,7 @@ from utils import set_private_key
 from utils import ResourcesUtils
 from utils import GerritGitUtils
 from utils import create_random_str
-
-from pysflib.sfgerrit import GerritUtils
+from utils import get_gerrit_utils
 
 
 logger = logging.getLogger(__name__)
@@ -56,9 +55,7 @@ class TestGerrit(Base):
     def _prepare_review_submit_testing(self, data=None):
         pname = 'p_%s' % create_random_str()
         self.create_project(pname)
-        gu = GerritUtils(
-            config.GATEWAY_URL,
-            auth_cookie=config.USERS[config.ADMIN_USER]['auth_cookie'])
+        gu = get_gerrit_utils("admin")
         k_index = gu.add_pubkey(config.USERS[config.ADMIN_USER]["pubkey"])
         self.assertTrue(gu.project_exists(pname))
         priv_key_path = set_private_key(
@@ -121,9 +118,7 @@ class TestGerrit(Base):
     def test_plugins_installed(self):
         """ Test if plugins are present
         """
-        gu = GerritUtils(
-            config.GATEWAY_URL,
-            auth_cookie=config.USERS[config.ADMIN_USER]['auth_cookie'])
+        gu = get_gerrit_utils("admin")
         plugins = gu.list_plugins()
         self.assertIn('download-commands', plugins)
         self.assertIn('avatars-gravatar', plugins)
@@ -162,9 +157,7 @@ class TestGerrit(Base):
         gu.submit_change_note(change_id, "current", "Workflow", "1")
         self.assertTrue(gu.submit_patch(change_id, "current"))
 
-        gu2 = GerritUtils(
-            config.GATEWAY_URL,
-            auth_cookie=config.USERS[config.USER_2]['auth_cookie'])
+        gu2 = get_gerrit_utils(config.USER_2)
         # Change the file we have commited with Admin user
         k2_index = gu2.add_pubkey(config.USERS[config.USER_2]["pubkey"])
         priv_key_path = set_private_key(config.USERS[config.USER_2]["privkey"])

@@ -24,8 +24,7 @@ from utils import GerritGitUtils
 from utils import JobUtils
 from utils import create_random_str
 from utils import skipIfStrInFile
-
-from pysflib.sfgerrit import GerritUtils
+from utils import get_gerrit_utils
 
 
 class TestPages(Base):
@@ -42,9 +41,7 @@ class TestPages(Base):
             config.ADMIN_USER,
             priv_key_path,
             config.USERS[config.ADMIN_USER]['email'])
-        self.gu = GerritUtils(
-            config.GATEWAY_URL,
-            auth_cookie=config.USERS[config.ADMIN_USER]['auth_cookie'])
+        self.gu = get_gerrit_utils("admin")
         self.ju = JobUtils()
 
     def tearDown(self):

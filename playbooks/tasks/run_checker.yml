@@ -1,5 +1,13 @@
+# TODO: remove this after api-key refactor is merged
+- name: Check for cauth api-key refactor
+  command: grep "'password'" /etc/cauth/config.py
+  failed_when: false
+  register: _apikey_password
+
 - name: Run data checker
   command: python checker.py
   args:
     chdir: "{{ sf_ci }}/tests/functional/provisioner/"
+  environment:
+    SF_NO_APIKEY: "{{ _apikey_password.rc }}"
   become: yes

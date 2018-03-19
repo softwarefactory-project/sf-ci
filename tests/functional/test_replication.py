@@ -26,9 +26,10 @@ from utils import ResourcesUtils
 from utils import GerritGitUtils
 from utils import JobUtils
 from utils import Tool
+from utils import get_gerrit_utils
+
 from subprocess import Popen, PIPE, call
 
-from pysflib.sfgerrit import GerritUtils
 
 
 logger = logging.getLogger(__name__)
@@ -43,12 +44,8 @@ class TestProjectReplication(Base):
         self.ru = ResourcesUtils()
         self.un = config.ADMIN_USER
         self.ju = JobUtils()
-        self.gu = GerritUtils(
-            config.GATEWAY_URL,
-            auth_cookie=config.USERS[self.un]['auth_cookie'])
-        self.gu2 = GerritUtils(
-            config.GATEWAY_URL,
-            auth_cookie=config.USERS[config.USER_2]['auth_cookie'])
+        self.gu = get_gerrit_utils("admin")
+        self.gu2 = get_gerrit_utils(config.USER_2)
         self.k_idx = self.gu2.add_pubkey(config.USERS[config.USER_2]["pubkey"])
         priv_key_path = set_private_key(config.USERS[self.un]["privkey"])
         self.gitu_admin = GerritGitUtils(self.un,

@@ -22,8 +22,8 @@ from utils import GerritGitUtils
 from utils import create_random_str
 from utils import set_private_key
 from utils import skipIfServiceMissing
+from utils import get_gerrit_utils
 
-from pysflib.sfgerrit import GerritUtils
 from pysflib.sfstoryboard import SFStoryboard
 
 
@@ -41,9 +41,7 @@ class TestGerritHooks(Base):
         self.dirs_to_delete = []
         self.issues = []
         self.ru = ResourcesUtils()
-        self.gu = GerritUtils(
-            config.GATEWAY_URL,
-            auth_cookie=config.USERS[config.ADMIN_USER]['auth_cookie'])
+        self.gu = get_gerrit_utils("admin")
         self.gu.add_pubkey(config.USERS[config.ADMIN_USER]["pubkey"])
         priv_key_path = set_private_key(
             config.USERS[config.ADMIN_USER]["privkey"])
