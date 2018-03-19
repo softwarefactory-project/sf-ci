@@ -128,10 +128,6 @@ def get_cookie(username, password):
 
 
 def get_gerrit_utils(user):
-    if config.groupvars.get("gerrit_admin_password") is None:
-        # Legacy cookie based gerrit authentication
-        return GerritUtils(
-            config.GATEWAY_URL, auth_cookie=config.USERS[user]['auth_cookie'])
     return GerritUtils(
         config.GATEWAY_URL + "/r",
         auth=HTTPBasicAuth(user, config.USERS[user]['api_key']))
@@ -215,22 +211,17 @@ class ManageSfUtils(Tool):
 
     def create_gerrit_api_password(self, user):
         passwd = config.USERS[user]['password']
-        cmd = self.base_cmd % (user, passwd) + \
-            "--json gerrit_api_htpasswd generate_password"
-        output = json.loads(self.exe(cmd))
-        try:
-            output = output["password"]
-        except TypeError:
-            # Legacy output
-            pass
-        return output
+        cookie = {'auth_pubtkt': get_cookie(user, passwd)}
+        r = requests.get(config.GATEWAY_URL + "/auth/apikey/", cookies=cookie)
+        if r.status_code != 200:
+            r = requests.post(config.GATEWAY_URL + "/auth/apikey/",
+                              cookies=cookie)
+        return r.json()['api_key']
 
     def delete_gerrit_api_password(self, user):
         passwd = config.USERS[user]['password']
-        cmd = self.base_cmd % (user, passwd) + \
-            "gerrit_api_htpasswd delete_password"
-        output = self.exe(cmd)
-        return output
+        cookie = {'auth_pubtkt': get_cookie(user, passwd)}
+        requests.delete(config.GATEWAY_URL + "/auth/apikey/", cookies=cookie)
 
     def create_user(self, user, password, email, fullname=None):
         subcmd = (" user create --username=%s "
