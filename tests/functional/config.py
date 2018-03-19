@@ -176,6 +176,7 @@ USERS = {
              "pubkey": file(ADMIN_PUB_KEY_PATH).read(),
              "privkey": file(ADMIN_PRIV_KEY_PATH).read(),
              "auth_cookie": "",
+             "api_key": groupvars.get("gerrit_admin_password"),
              },
     USER_2: {"password": ADMIN_PASSWORD,
              "email": "user2@sftests.com",
