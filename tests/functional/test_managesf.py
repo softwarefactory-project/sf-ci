@@ -21,8 +21,7 @@ from utils import Base
 from utils import ManageSfUtils
 from utils import ResourcesUtils
 from utils import skipIfServiceMissing, skipIfServicePresent
-
-from pysflib.sfgerrit import GerritUtils
+from utils import get_gerrit_utils
 
 
 class TestConditionalTesting(Base):
@@ -48,9 +47,7 @@ class TestManageSF(Base):
         self.dirs_to_delete = []
         self.ru = ResourcesUtils()
         self.msu = ManageSfUtils(config.GATEWAY_URL)
-        self.gu = GerritUtils(
-            config.GATEWAY_URL,
-            auth_cookie=config.USERS[config.ADMIN_USER]['auth_cookie'])
+        self.gu = get_gerrit_utils("admin")
 
     def tearDown(self):
         super(TestManageSF, self).tearDown()

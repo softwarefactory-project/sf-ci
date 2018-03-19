@@ -24,17 +24,14 @@ from utils import Base
 from utils import ManageSfUtils
 from utils import skip
 from utils import get_cookie
-
-from pysflib.sfgerrit import GerritUtils
+from utils import get_gerrit_utils
 
 
 class TestUserdata(Base):
     @classmethod
     def setUpClass(cls):
         cls.msu = ManageSfUtils(config.GATEWAY_URL)
-        cls.gu = GerritUtils(
-            config.GATEWAY_URL,
-            auth_cookie=config.USERS[config.ADMIN_USER]['auth_cookie'])
+        cls.gu = get_gerrit_utils("admin")
 
     def verify_userdata_gerrit(self, login):
         # Now check that the correct data was stored in Gerrit
