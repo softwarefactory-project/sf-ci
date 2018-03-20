@@ -28,16 +28,12 @@
   when: "sf_version != '2.6'"
   become: yes
 
-# Special fixes for ansible 2.4
-- name: "Patch zuul2 ansiblelauncher for ansible 2.4"
-  shell: "patch /usr/lib/python2.7/site-packages/zuul/launcher/ansiblelaunchserver.py < {{ sf_ci }}/patches/ansiblelauncher-ansible-2.4.patch"
+# Make sure /etc/nodepool doesn't exists
+- name: "Ensure /etc/nodepool doesn't exists"
+  file:
+    path: /etc/nodepool
+    state: absent
   become: yes
-  ignore_errors: yes
-
-- name: "Patch sfconfig jenkins install.yaml for ansible 2.4"
-  shell: "patch /usr/share/sf-config/ansible/roles/sf-jenkins/tasks/install.yml < {{ sf_ci }}/patches/jenkins-install-yaml-cert-issue-ansible-2.4.patch"
-  become: yes
-  ignore_errors: yes
 
 - name: Run sfconfig
   command: sfconfig
