@@ -1,38 +1,5 @@
 ---
-- hosts: install-server
-  vars:
-    # Get sfinfo location
-    sfinfo_path_query: "[?name=='software-factory/sfinfo'].src_dir"
-    sfinfo_path: "{{ (zuul.projects.values() | list | json_query(sfinfo_path_query))[0] }}"
-    # Get sfci location
-    sf_ci_path_query: "[?name=='software-factory/sf-ci'].src_dir"
-    sf_ci: "{{ (zuul.projects.values() | list | json_query(sf_ci_path_query))[0] }}"
-    # Get workspace path to run zuul_rpm_* commands
-    sfnamespace_path: "{{ sfinfo_path | dirname | dirname }}"
-    sfinfo_setup_args: "{% if buildset_artifacts_url %}--testing-repo {{ buildset_artifacts_url }}{% endif %}"
-    sf_user: "zuul-worker"
+- hosts: all
   tasks:
-    - name: "Install sfinfo repo"
-      command: >
-        ./software-factory/sfinfo/zuul_rpm_setup.py \
-            --distro-info ./software-factory/sfinfo/sf-{{ zuul.branch }}.yaml \
-            {{ sfinfo_setup_args }}
-      args:
-        chdir: "{{ sfnamespace_path }}"
-      become: yes
-
-    - include: tasks/install_stable_repo.yml
-    - include: tasks/yum_update.yml
-    - include: tasks/run_sfconfig.yml
-    - include: tasks/install_test_env.yml
-    - include: tasks/restore_ci_repo.yml
-    - include: tasks/install_sf_ci_repo.yml
-    - include: tasks/set_environment_facts.yml
-    - include: tasks/run_provisioner.yml
-    - include: tasks/remove_deprecated.yml
-    - include: tasks/run_sfconfig_upgrade.yml
-    - include: tasks/run_checker.yml
-    - include: tasks/run_health-check.yml
-    - set_fact:
-        sf_zuul_executor: 1
-    - include: tasks/run_functional_tests.yml
+    - name: Noop
+      command: echo noop
