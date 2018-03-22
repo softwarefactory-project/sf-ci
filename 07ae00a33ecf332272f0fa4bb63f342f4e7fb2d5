@@ -22,6 +22,24 @@
       "revId": "07ae00a33ecf332272f0fa4bb63f342f4e7fb2d5",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba3cc151_7ac4b991",
+        "filename": "playbooks/tasks/run_sfconfig.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2018-03-22T09:53:17Z",
+      "side": 0,
+      "message": "good catch, though lineinfile insert at the end if the role is not found so it\u0027s a noop.",
+      "parentUuid": "ba3cc151_facf69b1",
+      "revId": "07ae00a33ecf332272f0fa4bb63f342f4e7fb2d5",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
