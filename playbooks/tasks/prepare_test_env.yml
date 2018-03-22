@@ -1,9 +1,3 @@
-# On slave node a Jenkins user is already created with login shell
-# To avoid further with sf-jenkins setup task issue reset it to /sbin/nologin
-- name: "Fix jenkins user shell"
-  command: "sed -i '/^jenkins/ s#:[^:]*$#:/sbin/nologin#' /etc/passwd"
-  become: yes
-
 # TODO: remove this when image are rebuilt without sf-zuul-worker element
 - name: "Remove /var/lib/zuul"
   file:

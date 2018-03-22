@@ -1,10 +1,8 @@
-# TODO: remove jenkins from exclude list
 - name: Update all installed packages
   yum:
     name: '*'
     state: latest
     exclude:
-      - jenkins
       - ansible
     update_cache: yes
   become: yes

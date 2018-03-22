@@ -1,8 +1,3 @@
-# TODO: remove this task
-- name: Restore jenkins shell
-  command: "sed -i '/^jenkins/ s#:[^:]*$#:/bin/bash#' /etc/passwd"
-  become: yes
-
 - name: Check for get_logs playbook
   stat: path=/var/lib/software-factory/ansible/get_logs.yml
   register: get_logs_playbook
