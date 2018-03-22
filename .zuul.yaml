@@ -70,3 +70,11 @@
       sf_arch: allinone
       sf_version: 3.0
       centos_cr: true
+
+- job:
+    name: sf-ci-functional-tenant
+    description: The sf functional tests of the tenant architecture
+    parent: sf-ci
+    run: playbooks/functional.yaml
+    vars:
+      sf_arch: tenant
