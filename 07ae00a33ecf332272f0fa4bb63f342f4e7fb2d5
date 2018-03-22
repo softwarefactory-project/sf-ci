@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba3cc151_facf69b1",
+        "filename": "playbooks/tasks/run_sfconfig.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-03-22T09:47:27Z",
+      "side": 0,
+      "message": "nodepool-launcher",
+      "range": {
+        "startLine": 26,
+        "startChar": 26,
+        "endLine": 26,
+        "endChar": 44
+      },
+      "revId": "07ae00a33ecf332272f0fa4bb63f342f4e7fb2d5",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
