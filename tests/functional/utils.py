@@ -382,45 +382,7 @@ class JobUtils(Tool):
                                                   config.USER_1_PASSWORD)}
 
     def wait_for_config_update(self, revision, return_result=False):
-        zuul3 = os.environ.get("SF_ZUUL_EXECUTOR", "1") != "0"
-        if zuul3:
-            return self.wait_for_config_update_zuul3(revision, return_result)
-        else:
-            return self.wait_for_config_update_zuul2(revision, return_result)
-
-    def wait_for_config_update_zuul2(self, revision, return_result=False):
-        params = deepcopy(config.ZUUL_MYSQL)
-        params['revision'] = revision
-        out = None
-        cmd = ["/usr/bin/mysql", "--host=%(host)s" % params,
-               "--user=%(user)s" % params, "--password=%(password)s" % params,
-               "zuul", "-N", "-B",
-               """--execute="select result from zuul_build where """
-               """buildset_id in (select id from zuul_buildset where """
-               """ref = '%(revision)s') and """
-               """job_name = 'config-update'" """ % params]
-        try:
-            for retry in range(240):
-                out, err = ssh_run_cmd(config.SERVICE_PRIV_KEY_PATH,
-                                       "root",
-                                       'managesf.' + config.GATEWAY_HOST,
-                                       cmd, verbose=False)
-                if "SUCCESS" in out:
-                    return out
-                else:
-                    logger.info(out)
-                time.sleep(1)
-        except Exception as e:
-            logger.exception('Retry%d: command "%s": resulted in error %s' % (
-                retry, cmd % params, e))
-        return "FAILED"
-
-    def wait_for_config_update_zuul3(self, revision, return_result=False):
         base_url = "%s/zuul/local/builds" % config.GATEWAY_URL
-        # TODO remove after 3.0 release
-        r = requests.head(base_url)
-        if r.status_code == 404:
-            base_url = "%s/zuul3/local/builds.json" % config.GATEWAY_URL
         job_url = "?job_name=config-update&newrev=%s" % revision
         logger.debug(
             "Waiting for config-update using %s" % (base_url + job_url))
@@ -442,7 +404,7 @@ class JobUtils(Tool):
                     if job_log_url:
                         return requests.get(job_log_url).text
                 time.sleep(1)
-        except:
+        except Exception:
             logger.exception("Retry%d: Couldn't get %s: %s" % (
                 retry, base_url + job_url, r.text))
             if not r.ok:

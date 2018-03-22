@@ -25,7 +25,6 @@
     path: /etc/software-factory/arch.yaml
     insertafter: '      - nodepool3-launcher'
     line: '      - hypervisor-oci'
-  when: "sf_version != '2.6'"
   become: yes
 
 # Make sure /etc/nodepool doesn't exists
