@@ -1,7 +1,6 @@
 - name: Execute health-check
   command: >
     ansible-playbook -i /var/lib/software-factory/ansible/hosts \
-        -e 'sf_zuul_executor={{ sf_zuul_executor }}' \
         -e @{{ sf_ci }}/health-check/group_vars/all.yaml \
         {{ sf_ci }}/health-check/sf-health-check.yaml
   become: yes

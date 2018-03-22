@@ -1,21 +1,4 @@
 ---
-# Define if zuul-executor is running config-update
-- name: Ensure /root/config/zuul.d exists
-  file:
-    path: /root/config/zuul.d
-    state: directory
-  become: yes
-
-- name: Check for zuulv3 config update
-  command: grep -q -r config-update /root/zuul-jobs/ /root/config/zuul.d/
-  register: _config_update_zuulv3
-  failed_when: false
-  become: yes
-
-- name: Set sf_zuul_executor fact
-  set_fact:
-    sf_zuul_executor: "{% if _config_update_zuulv3.rc == 0 %}1{% else %}0{% endif %}"
-
 # Define if firehose is enabled
 - name: Check for firehose role
   command: grep -q firehose /etc/software-factory/arch.yaml

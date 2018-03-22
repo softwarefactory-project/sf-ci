@@ -7,6 +7,4 @@
   command: python provisioner.py
   args:
     chdir: "{{ sf_ci }}/tests/functional/provisioner/"
-  environment:
-    SF_ZUUL_EXECUTOR: "{{ sf_zuul_executor }}"
   become: yes
