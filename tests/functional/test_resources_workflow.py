@@ -115,7 +115,7 @@ class TestResourcesWorkflow(Base):
 
         change_nr = self.gu.get_change_number(change_sha)
         note = self.gu.wait_for_verify(
-            change_nr, ['jenkins', 'zuul'], timeout=180)
+            change_nr, ['zuul'], timeout=180)
         self.assertEqual(note, expected_note)
 
     def get_resources(self):

@@ -113,8 +113,7 @@ class TestGateway(Base):
         """
         # Unauthenticated calls, unknown projects. Must return 404, not 30x
         urls = [config.GATEWAY_URL + "/r/dashboard",
-                config.GATEWAY_URL + "/r/grafana",
-                config.GATEWAY_URL + "/r/jenkinslogs"]
+                config.GATEWAY_URL + "/r/grafana"]
 
         for url in urls:
             resp = requests.get(url, allow_redirects=False)

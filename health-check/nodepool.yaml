@@ -1,151 +1,156 @@
 ---
-- hosts: nodepool-launcher
-  remote_user: root
-  tasks:
-    - name: "Check service"
-      command: systemctl status nodepool-launcher
-      register: nodepool_service
 
-    - name: "Check service errors"
-      fail: msg='Nodepool service is not happy'
-      when: nodepool_service.stdout.lower().find("fail") != -1
+# ansible-playbook -e "name=myimglabel provider_name=nv2fbo os_slave_net=net1" nodepool.yaml
 
-- name: "Reset config repos"
-  include: playbooks/config_reset.yaml
-
-# * Add image and node label to config-repo
 - hosts: install-server
   remote_user: root
   tasks:
-    - name: "Check if image is already defined"
-      command: python -c "import yaml; exit(len(yaml.safe_load(open('{{ config_path }}/nodepool/nodepool.yaml'))['diskimages']) == 0)"
-      register: sfconfiged
-      failed_when: False
+    - name: "Set fact zuul_executor"
+      set_fact:
+        # Set it to '0' if zuul2 is still the config-update executor
+        sf_zuul_executor: "{{ sf_zuul_executor | default('1') }}"
+    - name: "Set fact name"
+      set_fact:
+        # Set the name of the image/label
+        name: "{{ name | default('np3-dib-centos-7') }}"
 
-    - name: Adds nodepool configuration
-      template:
-        src: templates/nodepool.yaml.j2
-        dest: "{{ config_path }}/nodepool/nodepool.yaml"
-      when: sfconfiged.rc
+- hosts: nodepool-launcher
+  remote_user: root
+  tasks:
+    - name: "Check service nodepool-launcher"
+      command: systemctl status rh-python35-nodepool-launcher
+      register: nodepool_launcher_service
 
-    - name: Update change
-      when: sfconfiged.rc
-      command: chdir={{ config_path }}  {{ item }}
-      with_items:
-          - 'git commit -a -m "Add {{ provider_name }} provider"'
-      environment: {'EDITOR':'test'}
-
-- name: "Submit config repos"
-  include: playbooks/config_submit_change.yaml
-  when: sfconfiged.rc
+    - name: "Check service nodepool-launcher errors"
+      fail: msg='Nodepool3 launcher service is not happy'
+      when: nodepool_launcher_service.stdout.lower().find("fail") != -1
 
 - hosts: nodepool-builder
   remote_user: root
   tasks:
-    - name: "Wait for image build start"
-      wait_for:
-        path: /var/log/nodepool/builder.log
-        search_regex: "Building image.*dib-centos-7"
+    - name: "Check service nodepool-builder"
+      command: systemctl status rh-python35-nodepool-builder
+      register: nodepool_builder_service
 
-    - name: "Wait for image build to succeed"
-      wait_for:
-        path: /var/log/nodepool/builder.log
-        search_regex: "DIB image dib-centos-7 is built"
-        timeout: 1200
+    - name: "Check service nodepool-builder errors"
+      fail: msg='Nodepool3 builder service is not happy'
+      when: nodepool_builder_service.stdout.lower().find("fail") != -1
 
-    - name: "Wait for image upload start"
-      wait_for:
-        path: /var/log/nodepool/builder.log
-        search_regex: "Uploading DIB image build .*dib-centos-7"
-        timeout: 1200
-
-    - name: "Wait for image upload to succeed"
-      wait_for:
-        path: /var/log/nodepool/builder.log
-        search_regex: "Image build dib-centos-7.* is ready"
-        timeout: 1200
-
-- hosts: nodepool-launcher
-  remote_user: root
-  tasks:
-    - name: "Wait for node creation"
-      wait_for:
-        path: /var/log/nodepool/nodepool.log
-        search_regex: "Creating server .* from image dib-centos-7"
-        timeout: 1200
-
-    - name: "Wait for node ready"
-      wait_for:
-        path: /var/log/nodepool/nodepool.log
-        search_regex: "Node id.* is ready"
-        timeout: 1200
-
-
-- hosts: jenkins
-  remote_user: root
-  tasks:
-    - name: "Wait for the first slave to appear in Jenkins"
-      shell: curl -Ls http://localhost:8082/jenkins/computer/api/json | python -c "import sys, json; d = json.loads(sys.stdin.read()); slaves = [s for s in d['computer'] if ('dib-centos-7' in s['displayName'])]; len(slaves) > 0 and sys.exit(0) or sys.exit(1)"
-      register: result
-      until: result|success
-      retries: 30
-      delay: 10
-
+- name: "Reset config repos"
+  include: playbooks/config_reset.yaml
 
 - hosts: install-server
   remote_user: root
   tasks:
-    - name: "Query the nodes REST API to get last node info"
-      uri:
-        url: http://managesf:20001/nodes/
-        HEADER_X-Remote-User: admin
-        return_content: yes
-        body_format: json
-      register: nodes_info
+    - name: Adds nodepool configuration
+      template:
+        src: templates/nodepool.yaml.j2
+        dest: "{{ config_path }}/nodepoolV3/nodepool.yaml"
 
-    - name: "Node API returned value"
-      debug: var=nodes_info.json
+    - name: Update change
+      register: changed
+      command: 'git commit -a -m "Add {{ provider_name }} provider"'
+      args:
+        chdir: "{{ config_path }}"
+      environment: {'EDITOR':'test'}
+      failed_when: changed.rc >= 2
 
-    - name: "Hold the node with the REST API"
-      uri:
-        url: http://managesf:20001/nodes/id/{{ nodes_info.json['nodepool'][0]['node_id'] }}
-        HEADER_X-Remote-User: admin
+- name: "Submit config repos"
+  include: playbooks/config_submit_change.yaml
+  when: changed.rc == 0
 
-    - name: "Create a test ssh key"
-      command: ssh-keygen -N '' -f /tmp/{{ nodes_info.json['nodepool'][0]['node_name'] }}_id_rsa
+- hosts: nodepool-builder
+  remote_user: root
+  tasks:
+    - name: "Wait for image to be ready"
+      shell: nodepool image-list | egrep ".*{{ name }}.*ready.*"
+      register: result
+      until: result|success
+      retries: 15
+      delay: 60
+      environment:
+        OS_CLOUD: "{{ provider_name }}"
 
-    - name: "Read test ssh key"
-      command: cat /tmp/{{ nodes_info.json["nodepool"][0]["node_name"] }}_id_rsa.pub
-      register: tmp_key
+    - name: "Wait for an instance to be ready"
+      shell: nodepool list | egrep ".*{{ name }}.*ready.*"
+      register: result
+      until: result|success
+      retries: 30
+      delay: 10
+      environment:
+        OS_CLOUD: "{{ provider_name }}"
 
-    - name: "Add the test ssh key to node's authorized keys with the REST API"
-      uri:
-        url: http://managesf:20001/nodes/id/{{ nodes_info.json['nodepool'][0]['node_id'] }}/authorize_key/
-        method: POST
-        body: "public_key={{ tmp_key.stdout|urlencode() }}"
-        HEADER_X-Remote-User: admin
-        return_content: yes
-      register: ak_output
-      failed_when: "'OK' not in ak_output.content"
+    - name: "Get node fip"
+      shell: "nodepool list --detail | egrep '.*{{ name }}.*ready.*' | awk -F'|' '{ print $11}' | tr -d ' '"
+      register: result
+      until: result.stdout|ipaddr
+      retries: 30
+      delay: 10
+      environment:
+        OS_CLOUD: "{{ provider_name }}"
 
+- hosts: nodepool-launcher
+  remote_user: root
+  tasks:
     - name: "SSH into node with the test key"
-      command: ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q -i /tmp/{{ nodes_info.json.nodepool.0.node_name }}_id_rsa jenkins@{{ nodes_info.json.nodepool.0.ip }} whoami
-      register: ssh_whoami
-      failed_when: ssh_whoami.stdout.find("jenkins") == -1
+      command: ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o PasswordAuthentication=no -q -i /var/opt/rh/rh-python35/lib/nodepool/.ssh/id_rsa zuul@{{ result.stdout }} whoami
 
-    - name: "Schedule node for deletion"
-      uri:
-        url: http://managesf:20001/nodes/id/{{ nodes_info.json.nodepool.0.node_id }}/
-        method: DELETE
-        HEADER_X-Remote-User: admin
-        return_content: yes
-      register: del_node
-      failed_when: "'delete' not in del_node.content"
 
-    - name: "Delete test ssh key"
-      file:
-        path: "/tmp/{{ nodes_info.json.nodepool.0.node_name }}_{{ item }}"
-        state: absent
-      with_items:
-        - "id_rsa"
-        - "id_rsa.pub"
+# TODO: We will need to implement that
+#- hosts: install-server
+#  remote_user: root
+#  tasks:
+#    - name: "Query the nodes REST API to get last node info"
+#      uri:
+#        url: http://managesf:20001/nodes/
+#        HEADER_X-Remote-User: admin
+#        return_content: yes
+#        body_format: json
+#      register: nodes_info
+#
+#    - name: "Node API returned value"
+#      debug: var=nodes_info.json
+#
+#    - name: "Hold the node with the REST API"
+#      uri:
+#        url: http://managesf:20001/nodes/id/{{ nodes_info.json['nodepool'][0]['node_id'] }}
+#        HEADER_X-Remote-User: admin
+#
+#    - name: "Create a test ssh key"
+#      command: ssh-keygen -N '' -f /tmp/{{ nodes_info.json['nodepool'][0]['node_name'] }}_id_rsa
+#
+#    - name: "Read test ssh key"
+#      command: cat /tmp/{{ nodes_info.json["nodepool"][0]["node_name"] }}_id_rsa.pub
+#      register: tmp_key
+#
+#    - name: "Add the test ssh key to node's authorized keys with the REST API"
+#      uri:
+#        url: http://managesf:20001/nodes/id/{{ nodes_info.json['nodepool'][0]['node_id'] }}/authorize_key/
+#        method: POST
+#        body: "public_key={{ tmp_key.stdout|urlencode() }}"
+#        HEADER_X-Remote-User: admin
+#        return_content: yes
+#      register: ak_output
+#      failed_when: "'OK' not in ak_output.content"
+#
+#    - name: "SSH into node with the test key"
+#      command: ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q -i /tmp/{{ nodes_info.json.nodepool.0.node_name }}_id_rsa zuul@{{ nodes_info.json.nodepool.0.ip }} whoami
+#      register: ssh_whoami
+#      failed_when: ssh_whoami.stdout.find("zuul") == -1
+#
+#    - name: "Schedule node for deletion"
+#      uri:
+#        url: http://managesf:20001/nodes/id/{{ nodes_info.json.nodepool.0.node_id }}/
+#        method: DELETE
+#        HEADER_X-Remote-User: admin
+#        return_content: yes
+#      register: del_node
+#      failed_when: "'delete' not in del_node.content"
+#
+#    - name: "Delete test ssh key"
+#      file:
+#        path: "/tmp/{{ nodes_info.json.nodepool.0.node_name }}_{{ item }}"
+#        state: absent
+#      with_items:
+#        - "id_rsa"
+#        - "id_rsa.pub"

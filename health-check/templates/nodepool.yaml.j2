@@ -1,33 +1,32 @@
+---
 diskimages:
-  - name: dib-centos-7
+  - name: {{ name }}
+    formats:
+      - raw
     elements:
       - centos-minimal
       - nodepool-minimal
       - sf-zuul-worker
-      - sf-jenkins-worker
-    env-vars:
-      DIB_CHECKSUM: '1'
 
 labels:
-  - name: dib-centos-7
-    image: dib-centos-7
-    min-ready: 3
-    providers:
-      - name: default
+  - name: {{ name }}
+    min-ready: 1
 
 providers:
-  - name: default
+  - name: nodepool
     cloud: {{ provider_name }}
     clean-floating-ips: true
-    image-type: raw
-    max-servers: 10
+    image-name-format: '{image_name}-{timestamp}'
     boot-timeout: 120
-    pool: nova
     rate: 2.0
-    networks:
-      - name: {{ os_slave_net }}
-    images:
-      - name: dib-centos-7
-        diskimage: dib-centos-7
-        username: jenkins
-        min-ram: 1024
+    diskimages:
+      - name: {{ name }}
+    pools:
+      - name: main
+        max-servers: 2
+        networks:
+           - {{ os_slave_net }}
+        labels:
+          - name: {{ name }}
+            min-ram: 1024
+            diskimage: {{ name }}
