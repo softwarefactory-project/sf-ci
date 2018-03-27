@@ -19,12 +19,14 @@ import requests
 import time
 import urllib2
 import warnings
+import subprocess
 
 from utils import Base
 from utils import ManageSfUtils
 from utils import skip
 from utils import get_cookie
 from utils import get_gerrit_utils
+from utils import gerrit_version
 
 
 class TestUserdata(Base):
@@ -108,35 +110,17 @@ class TestUserdata(Base):
                             cookies={'auth_pubtkt': auth_cookie})
         self.assertTrue(int(d.status_code) < 400, d.status_code)
         # make sure the user does not exist anymore
-        self.assertEqual(False,
-                         self.gu.get_account('bootsy'))
-
-    def test_delete_user_in_backends_by_email(self):
-        """ Delete a user previously registered user by email
-        """
-        # first, create a user and register it with services
-        try:
-            self.msu.create_user('josh', 'homme', 'queen@stoneage.com')
-        except NotImplementedError:
-            skip("user management not supported in this version of managesf")
-        self.logout()
-        self.login('josh', 'homme', config.GATEWAY_URL)
-        # make sure user is in gerrit
-        self.assertEqual('queen@stoneage.com',
-                         self.gu.get_account('josh').get('email'))
-        # now suppress it
-        del_url = config.GATEWAY_URL +\
-            '/manage/services_users/?email=queen@stoneage.com'
-        auth_cookie = config.USERS[config.ADMIN_USER]['auth_cookie']
-        d = requests.delete(del_url,
-                            cookies={'auth_pubtkt': auth_cookie})
-        self.assertTrue(int(d.status_code) < 400, d.status_code)
-        # make sure the user does not exist anymore
-        self.assertEqual(False,
-                         self.gu.get_account('josh'))
+        if "2.11" not in gerrit_version:
+            subprocess.Popen([
+                "sudo", "/usr/share/sf-config/scripts/delete-user.sh",
+                "bootsy", "--batch"]).wait()
+            self.assertFalse(self.gu.is_account_active('bootsy'))
+        else:
+            self.assertEqual(False,
+                             self.gu.get_account('bootsy'))
 
     def test_delete_in_backend_and_recreate(self):
-        """Make sure we can recreate a user but as a different one"""
+        """Make sure we can recreate a user"""
         # first, create a user and register it with services
         try:
             self.msu.create_user('freddie', 'mercury', 'mrbadguy@queen.com')
@@ -146,13 +130,19 @@ class TestUserdata(Base):
         self.login('freddie', 'mercury', config.GATEWAY_URL)
         gerrit_id = self.gu.get_account('freddie').get('_account_id')
         del_url = config.GATEWAY_URL +\
-            '/manage/services_users/?email=mrbadguy@queen.com'
+            '/manage/services_users/?username=freddie'
         auth_cookie = config.USERS[config.ADMIN_USER]['auth_cookie']
         d = requests.delete(del_url,
                             cookies={'auth_pubtkt': auth_cookie})
         self.assertTrue(int(d.status_code) < 400, d.status_code)
-        self.assertEqual(False,
-                         self.gu.get_account('freddie'))
+        if "2.11" not in gerrit_version:
+            subprocess.Popen([
+                "sudo", "/usr/share/sf-config/scripts/delete-user.sh",
+                "freddie", "--batch"]).wait()
+            self.assertFalse(self.gu.is_account_active('freddie'))
+        else:
+            self.assertEqual(False,
+                             self.gu.get_account('freddie'))
         # recreate the user in the backends
         time.sleep(5)
         self.logout()
@@ -198,9 +188,7 @@ class TestUserdata(Base):
                          naru_gerrit.get('name'))
         # TODO this should be tested in the tracker as well
         del_url = config.GATEWAY_URL +\
-            '/manage/services_users/?email=datte@bayo.org'
+            '/manage/services_users/?username=naruto'
         d = requests.delete(del_url,
                             cookies={'auth_pubtkt': auth_cookie})
         self.assertTrue(int(d.status_code) < 400, d.status_code)
-        self.assertEqual(False,
-                         self.gu.get_account('naruto'))
