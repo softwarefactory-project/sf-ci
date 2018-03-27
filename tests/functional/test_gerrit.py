@@ -25,10 +25,11 @@ from utils import ResourcesUtils
 from utils import GerritGitUtils
 from utils import create_random_str
 from utils import get_gerrit_utils
+from utils import gerrit_version
+from utils import skipIf
 
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 
 class TestGerrit(Base):
@@ -56,7 +57,6 @@ class TestGerrit(Base):
         pname = 'p_%s' % create_random_str()
         self.create_project(pname)
         gu = get_gerrit_utils("admin")
-        k_index = gu.add_pubkey(config.USERS[config.ADMIN_USER]["pubkey"])
         self.assertTrue(gu.project_exists(pname))
         priv_key_path = set_private_key(
             config.USERS[config.ADMIN_USER]["privkey"])
@@ -79,12 +79,12 @@ class TestGerrit(Base):
         self.assertEqual(len(change_ids), 1)
         change_id = change_ids[0]
 
-        return change_id, gu, k_index, pname
+        return change_id, gu, pname
 
     def test_review_labels(self):
         """ Test if list of review labels are as expected
         """
-        change_id, gu, k_index, _ = self._prepare_review_submit_testing()
+        change_id, gu, _ = self._prepare_review_submit_testing()
 
         logger.info("Looking for labels for change %s" % change_id)
         labels = gu.get_labels_list_for_change(change_id)
@@ -94,26 +94,22 @@ class TestGerrit(Base):
         self.assertIn('Verified', labels)
         self.assertEqual(len(labels.keys()), 3)
 
-        gu.del_pubkey(k_index)
-
     def test_review_submit_approval(self):
         """ Test submit criteria - CR(+2s), V(+1), W(+1)
         """
-        change_id, gu, k_index, _ = self._prepare_review_submit_testing()
+        change_id, gu, _ = self._prepare_review_submit_testing()
 
         gu.submit_change_note(change_id, "current", "Code-Review", "1")
-        self.assertFalse(gu.submit_patch(change_id, "current"))
+        self.assertFalse(gu.submit_patch(change_id))
 
         gu.submit_change_note(change_id, "current", "Verified", "2")
-        self.assertFalse(gu.submit_patch(change_id, "current"))
+        self.assertFalse(gu.submit_patch(change_id))
 
         gu.submit_change_note(change_id, "current", "Workflow", "1")
-        self.assertFalse(gu.submit_patch(change_id, "current"))
+        self.assertFalse(gu.submit_patch(change_id))
 
         gu.submit_change_note(change_id, "current", "Code-Review", "2")
-        self.assertTrue(gu.submit_patch(change_id, "current"))
-
-        gu.del_pubkey(k_index)
+        self.assertTrue(gu.submit_patch(change_id))
 
     def test_plugins_installed(self):
         """ Test if plugins are present
@@ -127,8 +123,8 @@ class TestGerrit(Base):
     def test_check_download_commands(self):
         """ Test if download commands plugin works
         """
-        change_id, gu, k_index, _ = self._prepare_review_submit_testing()
-        resp = gu.get_change_last_patchset(change_id)
+        change_id, gu, _ = self._prepare_review_submit_testing()
+        resp = gu.get_change(change_id)
 
         self.assertIn("current_revision", resp)
         self.assertIn("revisions", resp)
@@ -136,30 +132,22 @@ class TestGerrit(Base):
         fetch = resp["revisions"][current_rev]["fetch"]
         self.assertGreater(fetch.keys(), 0)
 
-        # enable the plugin and check if the fetch information is valid
-        gu.e_d_plugin("download-commands", 'enable')
-        resp = gu.get_change_last_patchset(change_id)
-        fetch = resp["revisions"][current_rev]["fetch"]
-        self.assertGreater(len(fetch.keys()), 0)
-
-        gu.del_pubkey(k_index)
-
     def test_check_add_automatic_reviewers(self):
         """ Test if reviewers-by-blame plugin works
         """
         data = "this\nis\na\ncouple\nof\nlines"
-        change_id, gu, k1_index, pname = self._prepare_review_submit_testing(
+        change_id, gu, pname = self._prepare_review_submit_testing(
             ('file', data))
 
         # Merge the change
         gu.submit_change_note(change_id, "current", "Code-Review", "2")
         gu.submit_change_note(change_id, "current", "Verified", "2")
         gu.submit_change_note(change_id, "current", "Workflow", "1")
-        self.assertTrue(gu.submit_patch(change_id, "current"))
+        self.assertTrue(gu.submit_patch(change_id))
 
         gu2 = get_gerrit_utils(config.USER_2)
         # Change the file we have commited with Admin user
-        k2_index = gu2.add_pubkey(config.USERS[config.USER_2]["pubkey"])
+        gu2.add_pubkey(config.USERS[config.USER_2]["pubkey"])
         priv_key_path = set_private_key(config.USERS[config.USER_2]["privkey"])
         gitu2 = GerritGitUtils(
             config.USER_2, priv_key_path,
@@ -177,7 +165,7 @@ class TestGerrit(Base):
         self.assertEqual(len(change_ids), 1)
         change_id = change_ids[0]
         # Verify first_u has been automatically added to reviewers
-        for retry in xrange(3):
+        for retry in range(3):
             if len(gu2.get_reviewers(change_id)) > 0:
                 break
             time.sleep(1)
@@ -185,18 +173,12 @@ class TestGerrit(Base):
         self.assertEqual(len(reviewers), 1)
         self.assertEqual(reviewers[0], config.ADMIN_USER)
 
-        gu.del_pubkey(k1_index)
-        gu2.del_pubkey(k2_index)
-
+    @skipIf("2.11" in gerrit_version, "Gerrit-2.14 is needed for this test")
     def test_gerrit_version(self):
         """ Test if correct Gerrit version is running
         """
-        url = config.GATEWAY_URL + "/r/config/server/version"
-        resp = requests.get(
-            url,
-            cookies=dict(
-                auth_pubtkt=config.USERS[config.USER_1]['auth_cookie']))
-        self.assertTrue('"2.11.10"' in resp.text)
+        gu = get_gerrit_utils("admin")
+        self.assertIn("2.14", gu.get("config/server/version"))
 
     def test_gitweb_access(self):
         """ Test if gitweb access works correctly

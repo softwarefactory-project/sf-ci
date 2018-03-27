@@ -23,6 +23,7 @@ import stat
 import tempfile
 import requests
 import time
+import urllib
 import uuid
 import yaml
 
@@ -40,9 +41,10 @@ import config
 
 logging.getLogger("requests").setLevel(logging.WARNING)
 logging.captureWarnings(True)
-logging.basicConfig(format="%(asctime)s: %(levelname)s - %(message)s")
+logging.basicConfig(
+    format="%(asctime)s: %(levelname)-5.5s %(name)s - %(message)s",
+    level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 # for easier imports
 skipIf = unittest.skipIf
@@ -127,9 +129,16 @@ def get_cookie(username, password):
     return resp.cookies.get('auth_pubtkt', '')
 
 
+gerrit_version = subprocess.check_output(["rpm", "-q", "gerrit"])
+
+
 def get_gerrit_utils(user):
-    return GerritUtils(
-        config.GATEWAY_URL + "/r",
+    if "2.11" in gerrit_version:
+        return GerritUtils(
+            config.GATEWAY_URL + "/r",
+            auth=HTTPBasicAuth(user, config.USERS[user]['api_key']))
+    return GerritClient(
+        config.GATEWAY_URL + "/r/a",
         auth=HTTPBasicAuth(user, config.USERS[user]['api_key']))
 
 
@@ -232,6 +241,191 @@ class ManageSfUtils(Tool):
         cmd = self.base_cmd % (auth_user, auth_password) + subcmd
         output = self.exe(cmd)
         return output
+
+
+class NotFound(Exception):
+    pass
+
+
+class GerritClient:
+    log = logging.getLogger("GerritClient")
+
+    def __init__(self, url, auth):
+        self.url = url
+        self.auth = auth
+        # TEMP: fix this usage in test_resources_workflow when 3.1 is released
+        self.g = self
+
+    def decode(self, resp):
+        try:
+            return json.loads(resp.text[4:])
+        except ValueError:
+            self.log.error("Couldn't decode: [%s]" % resp.text)
+
+    def quote(self, toquote):
+        return urllib.quote_plus(toquote)
+
+    def request(self, method, url, json_data=None, raw_data=None):
+        resp = requests.request(
+            method, url, json=json_data, data=raw_data, auth=self.auth)
+        self.log.debug("%6s | %s (%s) -> %s" % (method, url, json_data, resp))
+        return resp
+
+    def get(self, url):
+        # TEMP: fix this usage in test_resources_workflow when 3.1 is released
+        if url[0] == "/":
+            url = url[1:]
+        resp = self.request("get", os.path.join(self.url, url))
+        if resp.status_code == 404:
+            raise NotFound()
+        if not resp.ok:
+            raise RuntimeError(resp.text)
+        return self.decode(resp)
+
+    def post(self, url, json_data=None, raw_data=None):
+        resp = self.request(
+            "post", os.path.join(self.url, url), json_data, raw_data)
+        if resp.status_code >= 400:
+            return None
+        return self.decode(resp)
+
+    def delete(self, url):
+        resp = self.request("delete", os.path.join(self.url, url))
+        if not resp.ok:
+            raise RuntimeError("Couldn't delete %s" % url)
+
+    # Account
+    def get_account(self, username):
+        return self.get('accounts/%s' % self.quote(username))
+
+    # Changes
+    def get_info(self, change_number):
+        return self.get("changes/%d/detail" % change_number)
+
+    def get_vote(self, change_number, label, username="jenkins"):
+        info = self.get_info(change_number)
+        if not info:
+            return None
+        for vote in info["labels"][label].get("all", []):
+            if vote.get("username") == username:
+                return vote.get("value")
+
+    def wait_for_verify(self, change_number, users=None, timeout=60):
+        # make sure users is a list
+        if not users:
+            users = ['jenkins']
+        if isinstance(users, str):
+            users = [users]
+        for retry in range(timeout):
+            votes = [self.get_vote(change_number,
+                                   "Verified", user) for user in users]
+            if any(votes):
+                return [vote for vote in votes if vote][0]
+            time.sleep(1)
+        msg = "%s didn't vote on %d" % (users, change_number)
+        logger.error(msg)
+        raise RuntimeError(msg)
+
+    def get_change_number(self, commit):
+        try:
+            changes = self.get("changes/?q=commit:%s" % commit)
+        except Exception:
+            self.log.exception("Couldn't get changes for commit %s" % (commit))
+            raise
+        if len(changes) != 1:
+            self.log.warning("Multiple change match commit %s" % commit)
+        return changes[0]['_number']
+
+    def get_my_changes_for_project(self, project):
+        try:
+            changes = self.get('changes/?q=owner:self+project:%s' % project)
+            return [c['change_id'] for c in changes]
+        except Exception:
+            self.log.exception("Couldn't get changes for project %s" % project)
+            raise
+
+    def get_labels_list_for_change(self, change):
+        try:
+            ret = self.get('changes/%s/?o=LABELS' % change)
+            return ret['labels']
+        except Exception:
+            self.log.exception("Couldn't get labels for %s" % change)
+            raise
+
+    def get_reviewers(self, change):
+        try:
+            ret = self.get('changes/%s/reviewers' % change)
+            return [r['username'] for r in ret]
+        except Exception:
+            self.log.exception("Couldn't get reviewers of %s" % change)
+            raise
+
+    def get_change(self, change, o="CURRENT_REVISION"):
+        return self.get('changes/%s/?o=%s' % (change, o))
+
+    def submit_change_note(self, change, revision, label, rate):
+        try:
+            self.post('changes/%s/revisions/%s/review' % (change, revision),
+                      {"labels": {label: int(rate)}})
+        except Exception:
+            self.log.exception("Couldn't submit vote on %s" % change)
+            raise
+
+    def submit_patch(self, change):
+        try:
+            ret = self.post('changes/%s/submit' % change,
+                            {"wait_for_merge": True})
+            if ret and ret['status'] == 'MERGED':
+                return True
+            else:
+                return False
+        except Exception:
+            self.log.exception("Couldn't submit patch %s" % change)
+            raise
+
+    # Pub keys
+    def del_pubkey(self, index, user='self'):
+        self.delete('accounts/%s/sshkeys/%s' % (user, index))
+
+    def add_pubkey(self, pubkey, user='self'):
+        response = self.post('accounts/%s/sshkeys' % user, raw_data=pubkey)
+        return response['seq']
+
+    # Groups
+    def get_group_id(self, name):
+        try:
+            name = self.quote(name)
+            gid = self.get('groups/%s/detail' % name)['id']
+            return urllib.unquote_plus(gid)
+        except NotFound:
+            return False
+        except Exception:
+            self.log.exception("Couldn't get group id %s" % name)
+            raise
+
+    def get_group_members(self, name):
+        try:
+            name = self.quote(name)
+            return self.get('groups/%s/members/' % name)
+        except Exception:
+            self.log.exception("Couldn't get group members %s" % name)
+            raise
+
+    # Projects
+    def project_exists(self, name):
+        try:
+            name = self.quote(name)
+            self.get('projects/%s' % name)
+            return True
+        except NotFound:
+            return False
+        except Exception:
+            self.log.exception("Couldn't check project %s" % name)
+            raise
+
+    # Config
+    def list_plugins(self):
+        return self.get('plugins/?all')
 
 
 class GerritGitUtils(Tool):
