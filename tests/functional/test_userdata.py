@@ -25,6 +25,7 @@ from utils import ManageSfUtils
 from utils import skip
 from utils import get_cookie
 from utils import get_gerrit_utils
+from utils import gerrit_version
 
 
 class TestUserdata(Base):
@@ -108,8 +109,11 @@ class TestUserdata(Base):
                             cookies={'auth_pubtkt': auth_cookie})
         self.assertTrue(int(d.status_code) < 400, d.status_code)
         # make sure the user does not exist anymore
-        self.assertEqual(False,
-                         self.gu.get_account('bootsy'))
+        if "2.11" in gerrit_version:
+            self.assertEqual(False,
+                             self.gu.get_account('bootsy'))
+        else:
+            self.assertFalse(self.gu.is_account_active('bootsy'))
 
     def test_delete_user_in_backends_by_email(self):
         """ Delete a user previously registered user by email
@@ -126,17 +130,20 @@ class TestUserdata(Base):
                          self.gu.get_account('josh').get('email'))
         # now suppress it
         del_url = config.GATEWAY_URL +\
-            '/manage/services_users/?email=queen@stoneage.com'
+            '/manage/services_users/?username=josh'
         auth_cookie = config.USERS[config.ADMIN_USER]['auth_cookie']
         d = requests.delete(del_url,
                             cookies={'auth_pubtkt': auth_cookie})
         self.assertTrue(int(d.status_code) < 400, d.status_code)
         # make sure the user does not exist anymore
-        self.assertEqual(False,
-                         self.gu.get_account('josh'))
+        if "2.11" in gerrit_version:
+            self.assertEqual(False,
+                             self.gu.get_account('josh'))
+        else:
+            self.assertFalse(self.gu.is_account_active('josh'))
 
     def test_delete_in_backend_and_recreate(self):
-        """Make sure we can recreate a user but as a different one"""
+        """Make sure we can recreate a user"""
         # first, create a user and register it with services
         try:
             self.msu.create_user('freddie', 'mercury', 'mrbadguy@queen.com')
@@ -146,19 +153,26 @@ class TestUserdata(Base):
         self.login('freddie', 'mercury', config.GATEWAY_URL)
         gerrit_id = self.gu.get_account('freddie').get('_account_id')
         del_url = config.GATEWAY_URL +\
-            '/manage/services_users/?email=mrbadguy@queen.com'
+            '/manage/services_users/?username=freddie'
         auth_cookie = config.USERS[config.ADMIN_USER]['auth_cookie']
         d = requests.delete(del_url,
                             cookies={'auth_pubtkt': auth_cookie})
         self.assertTrue(int(d.status_code) < 400, d.status_code)
-        self.assertEqual(False,
-                         self.gu.get_account('freddie'))
+        if "2.11" in gerrit_version:
+            self.assertEqual(None,
+                             self.gu.get_account('freddie'))
+        else:
+            self.assertFalse(self.gu.is_account_active('freddie'))
         # recreate the user in the backends
         time.sleep(5)
         self.logout()
         self.login('freddie', 'mercury', config.GATEWAY_URL)
         new_gerrit_id = self.gu.get_account('freddie').get('_account_id')
-        self.assertTrue(gerrit_id != new_gerrit_id)
+        if "2.11" in gerrit_version:
+            self.assertTrue(gerrit_id != new_gerrit_id)
+        else:
+            # New gerrit keeps account_id
+            self.assertEquals(gerrit_id, new_gerrit_id)
 
     def test_unicode_user(self):
         """ Try to create a local user with unicode charset, login, delete
@@ -198,7 +212,7 @@ class TestUserdata(Base):
                          naru_gerrit.get('name'))
         # TODO this should be tested in the tracker as well
         del_url = config.GATEWAY_URL +\
-            '/manage/services_users/?email=datte@bayo.org'
+            '/manage/services_users/?username=naruto'
         d = requests.delete(del_url,
                             cookies={'auth_pubtkt': auth_cookie})
         self.assertTrue(int(d.status_code) < 400, d.status_code)
