@@ -54,9 +54,8 @@ class TestGateway(Base):
         """ Test if all service links are shown in topmenu
         """
         subpaths = ["/r/", "/docs/"]
-# TEMP disable
-#        if "zuul" in services:
-#            subpaths.append("/zuul/local/status.html")
+        if "zuul" in services:
+            subpaths.append("/zuul/t/local/status.html")
         if "etherpad" in services:
             subpaths.append("/etherpad/")
         if "lodgeit" in services:
@@ -166,18 +165,17 @@ class TestGateway(Base):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('<title>Kibana</title>' in resp.text)
 
-# TEMP disable
-#    @skipIfServiceMissing('zuul')
-#    def test_zuul_accessible(self):
-#        """ Test if Zuul3 is accessible on gateway host
-#        """
-#        url = config.GATEWAY_URL + "/zuul/local/status.html"
-#        resp = requests.get(
-#            url,
-#            cookies=dict(
-#                auth_pubtkt=config.USERS[config.USER_1]['auth_cookie']))
-#        self.assertEqual(resp.status_code, 200)
-#        self.assertTrue('Zuul Status' in resp.text)
+    @skipIfServiceMissing('zuul')
+    def test_zuul_accessible(self):
+        """ Test if Zuul3 is accessible on gateway host
+        """
+        url = config.GATEWAY_URL + "/zuul/t/local/status.html"
+        resp = requests.get(
+            url,
+            cookies=dict(
+                auth_pubtkt=config.USERS[config.USER_1]['auth_cookie']))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue('Zuul Status' in resp.text)
 
     @skipIfServiceMissing('etherpad')
     def test_etherpad_accessible(self):
