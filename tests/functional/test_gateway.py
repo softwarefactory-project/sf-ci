@@ -55,7 +55,7 @@ class TestGateway(Base):
         """
         subpaths = ["/r/", "/docs/"]
         if "zuul" in services:
-            subpaths.append("/zuul/local/status.html")
+            subpaths.append("/zuul/t/local/status.html")
         if "etherpad" in services:
             subpaths.append("/etherpad/")
         if "lodgeit" in services:
@@ -172,7 +172,7 @@ class TestGateway(Base):
     def test_zuul_accessible(self):
         """ Test if Zuul3 is accessible on gateway host
         """
-        url = config.GATEWAY_URL + "/zuul/local/status.html"
+        url = config.GATEWAY_URL + "/zuul/t/local/status.html"
         resp = requests.get(
             url,
             cookies=dict(

@@ -416,11 +416,7 @@ class JobUtils(Tool):
         return "FAILED"
 
     def wait_for_config_update_zuul3(self, revision, return_result=False):
-        base_url = "%s/zuul/local/builds" % config.GATEWAY_URL
-        # TODO remove after 3.0 release
-        r = requests.head(base_url)
-        if r.status_code == 404:
-            base_url = "%s/zuul3/local/builds.json" % config.GATEWAY_URL
+        base_url = "%s/zuul/api/tenant/local/builds" % config.GATEWAY_URL
         job_url = "?job_name=config-update&newrev=%s" % revision
         logger.debug(
             "Waiting for config-update using %s" % (base_url + job_url))
