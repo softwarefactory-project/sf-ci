@@ -385,7 +385,7 @@ class JobUtils(Tool):
                                                   config.USER_1_PASSWORD)}
 
     def wait_for_config_update(self, revision, return_result=False):
-        base_url = "%s/zuul/local/builds" % config.GATEWAY_URL
+        base_url = "%s/zuul/api/tenant/local/builds" % config.GATEWAY_URL
         job_url = "?job_name=config-update&newrev=%s" % revision
         logger.debug(
             "Waiting for config-update using %s" % (base_url + job_url))
