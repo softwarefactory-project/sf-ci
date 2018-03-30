@@ -118,8 +118,11 @@ class SFchecker:
         users = [u['name'] for u in self.resources['users']]
         c = {'auth_pubtkt': config.USERS[config.ADMIN_USER]['auth_cookie']}
         url = 'http://%s/manage/services_users/' % config.GATEWAY_HOST
-        registered = requests.get(url,
-                                  cookies=c).json()
+        resp = requests.get(url, cookies=c)
+        try:
+            registered = resp.json()
+        except Exception:
+            print "FAIL: couldn't decode users list: %s" % (resp.text)
         # usernames are in first position
         r_users = [u['username'] for u in registered]
         if not set(users).issubset(set(r_users)):
