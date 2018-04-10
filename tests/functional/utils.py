@@ -31,7 +31,6 @@ import logging
 import pkg_resources
 
 from requests.auth import HTTPBasicAuth
-from pysflib.sfgerrit import GerritUtils
 
 from distutils.version import StrictVersion
 from subprocess import Popen, PIPE
@@ -129,14 +128,7 @@ def get_cookie(username, password):
     return resp.cookies.get('auth_pubtkt', '')
 
 
-gerrit_version = subprocess.check_output(["rpm", "-q", "gerrit"])
-
-
 def get_gerrit_utils(user):
-    if "2.11" in gerrit_version:
-        return GerritUtils(
-            config.GATEWAY_URL + "/r",
-            auth=HTTPBasicAuth(user, config.USERS[user]['api_key']))
     return GerritClient(
         config.GATEWAY_URL + "/r/a",
         auth=HTTPBasicAuth(user, config.USERS[user]['api_key']))

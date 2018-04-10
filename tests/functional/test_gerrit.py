@@ -25,8 +25,6 @@ from utils import ResourcesUtils
 from utils import GerritGitUtils
 from utils import create_random_str
 from utils import get_gerrit_utils
-from utils import gerrit_version
-from utils import skipIf
 
 
 logger = logging.getLogger(__name__)
@@ -124,11 +122,7 @@ class TestGerrit(Base):
         """ Test if download commands plugin works
         """
         change_id, gu, _ = self._prepare_review_submit_testing()
-        if "2.11" in gerrit_version:
-            # pysflib/sfgerrit get_change does not have the same interface
-            resp = gu.get_change_last_patchset(change_id)
-        else:
-            resp = gu.get_change(change_id)
+        resp = gu.get_change(change_id)
 
         self.assertIn("current_revision", resp)
         self.assertIn("revisions", resp)
@@ -177,12 +171,11 @@ class TestGerrit(Base):
         self.assertEqual(len(reviewers), 1)
         self.assertEqual(reviewers[0], config.ADMIN_USER)
 
-    @skipIf("2.11" in gerrit_version, "Gerrit-2.14 is needed for this test")
     def test_gerrit_version(self):
         """ Test if correct Gerrit version is running
         """
         gu = get_gerrit_utils("admin")
-        self.assertIn("2.14", gu.get("config/server/version"))
+        self.assertIn("2.1", gu.get("config/server/version"))
 
     def test_gitweb_access(self):
         """ Test if gitweb access works correctly

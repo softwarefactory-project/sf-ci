@@ -26,7 +26,6 @@ from utils import ManageSfUtils
 from utils import skip
 from utils import get_cookie
 from utils import get_gerrit_utils
-from utils import gerrit_version
 
 
 class TestUserdata(Base):
@@ -110,14 +109,11 @@ class TestUserdata(Base):
                             cookies={'auth_pubtkt': auth_cookie})
         self.assertTrue(int(d.status_code) < 400, d.status_code)
         # make sure the user does not exist anymore
-        if "2.11" not in gerrit_version:
-            subprocess.Popen([
-                "sudo", "/usr/share/sf-config/scripts/delete-gerrit-user.sh",
-                "bootsy", "--batch"]).wait()
-            self.assertFalse(self.gu.is_account_active('bootsy'))
-        else:
-            self.assertEqual(False,
-                             self.gu.get_account('bootsy'))
+        subprocess.Popen([
+            "sudo", "/usr/share/sf-config/scripts/delete-gerrit-user.sh",
+            "bootsy", "--batch"]).wait()
+        time.sleep(1)
+        self.assertFalse(self.gu.is_account_active('bootsy'))
 
     def test_delete_in_backend_and_recreate(self):
         """Make sure we can recreate a user"""
@@ -135,16 +131,12 @@ class TestUserdata(Base):
         d = requests.delete(del_url,
                             cookies={'auth_pubtkt': auth_cookie})
         self.assertTrue(int(d.status_code) < 400, d.status_code)
-        if "2.11" not in gerrit_version:
-            subprocess.Popen([
-                "sudo", "/usr/share/sf-config/scripts/delete-gerrit-user.sh",
-                "freddie", "--batch"]).wait()
-            self.assertFalse(self.gu.is_account_active('freddie'))
-        else:
-            self.assertEqual(False,
-                             self.gu.get_account('freddie'))
+        subprocess.Popen([
+            "sudo", "/usr/share/sf-config/scripts/delete-gerrit-user.sh",
+            "freddie", "--batch"]).wait()
+        time.sleep(1)
+        self.assertFalse(self.gu.is_account_active('freddie'))
         # recreate the user in the backends
-        time.sleep(5)
         self.logout()
         self.login('freddie', 'mercury', config.GATEWAY_URL)
         new_gerrit_id = self.gu.get_account('freddie').get('_account_id')
