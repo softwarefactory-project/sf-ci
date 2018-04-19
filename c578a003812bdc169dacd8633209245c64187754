@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa1b9901_ba87b1d6",
+        "filename": ".zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-04-19T17:25:06Z",
+      "side": 0,
+      "message": "Ok, in that case only remove stable jobs definitions, not the whole file.",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 21
+      },
+      "revId": "c578a003812bdc169dacd8633209245c64187754",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
