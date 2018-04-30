@@ -41,8 +41,13 @@ HOOK_USER = SF_SERVICE_USER
 HOOK_USER_PASSWORD = SF_SERVICE_USER_PASSWORD
 
 ADMIN_USER = USER_1
-ADMIN_PRIV_KEY_PATH = '%s/ssh_keys/gerrit_admin_rsa' % SF_BOOTSTRAP_DATA
-ADMIN_PUB_KEY_PATH = '%s/ssh_keys/gerrit_admin_rsa.pub' % SF_BOOTSTRAP_DATA
+ADMIN_PRIV_KEY_PATH = '%s/ssh_keys/admin_rsa' % SF_BOOTSTRAP_DATA
+ADMIN_PUB_KEY_PATH = '%s/ssh_keys/admin_rsa.pub' % SF_BOOTSTRAP_DATA
+
+# TODO: remove this once https://softwarefactory-project.io/r/12090 merged
+if not os.path.isfile(ADMIN_PRIV_KEY_PATH):
+    ADMIN_PRIV_KEY_PATH = '%s/ssh_keys/gerrit_admin_rsa' % SF_BOOTSTRAP_DATA
+    ADMIN_PUB_KEY_PATH = '%s/ssh_keys/gerrit_admin_rsa.pub' % SF_BOOTSTRAP_DATA
 
 USER_2 = 'user2'
 USER_2_PUB_KEY = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDV6R5m5a' + \
