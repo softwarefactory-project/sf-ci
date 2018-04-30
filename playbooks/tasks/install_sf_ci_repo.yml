@@ -25,6 +25,9 @@
     - not sf_release_repo.stat.exists
   become: yes
 
+- name: Activate CentOS continous release repo
+  command: yum-config-manager --enable cr
+
 - name: Install zuul-built.repo in place of sf-release
   command: mv /etc/yum.repos.d/zuul-built.repo /etc/yum.repos.d/sf-release.repo
   when: zuul_built_repo.stat.exists
