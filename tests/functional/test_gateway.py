@@ -152,6 +152,26 @@ class TestGateway(Base):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('zuul.d' in resp.text)
 
+    @skipIfServiceMissing('cgit')
+    def test_cgit(self):
+        """ Test if cgit service works
+        """
+        # Look for 'config' repository, it should returns a zuul.d path
+        url = config.GATEWAY_URL + "/cgit"
+        search = "Config repository"
+
+        resp = requests.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(search in resp.text)
+
+        # Look for 'zuul' directory in config repository
+        url = config.GATEWAY_URL + "/cgit/config/tree/"
+        search = "zuul"
+
+        resp = requests.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(search in resp.text)
+
     @skipIfServiceMissing('kibana')
     def test_kibana_accessible(self):
         """ Test if Kibana is accessible on gateway host
