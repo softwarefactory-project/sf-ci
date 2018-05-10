@@ -42,3 +42,4 @@
     - include: tasks/run_erase.yml
     - include: tasks/run_sfconfig_recover.yml
     - include: tasks/run_checker.yml
+    - include: tasks/run_sfconfig_update_fqdn.yml
