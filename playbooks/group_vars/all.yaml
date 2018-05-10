@@ -8,7 +8,7 @@ workspace: "./"
 sf_ci: "{{ workspace }}"
 sf_user: "centos"
 artifacts: "{{ workspace }}/artifacts"
-home: "/home/centos"
+home: "/home/{{ sf_user }}"
 
 # sfconfig.yaml customization
 sf_domain: "sftests.com"

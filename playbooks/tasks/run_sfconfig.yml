@@ -34,6 +34,14 @@
     state: absent
   become: yes
 
+- name: Update fqdn in sfconfig.yaml
+  lineinfile:
+    path: /etc/software-factory/sfconfig.yaml
+    regexp: '^fqdn:'
+    line: 'fqdn: sfdomain.com'
+  when: change_fqdn is defined
+  become: yes
+
 - name: Run sfconfig
   command: sfconfig
   become: yes
