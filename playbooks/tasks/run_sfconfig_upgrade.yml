@@ -12,11 +12,22 @@
         path: /etc/software-factory/sfconfig.yaml.rpmnew
       register: sfconfig_rpmnew
 
-    - name: Ensure last sfconfig.yaml version
-      copy:
-        src: /etc/software-factory/sfconfig.yaml.rpmnew
-        dest: /etc/software-factory/sfconfig.yaml
-        remote_src: true
+    - block:
+        - name: Get fqdn from sfconfig.yaml
+          command: awk '/^fqdn/ {print $2}' /etc/software-factory/sfconfig.yaml
+          register: configured_fqdn
+
+        - name: Ensure last sfconfig.yaml version
+          copy:
+            src: /etc/software-factory/sfconfig.yaml.rpmnew
+            dest: /etc/software-factory/sfconfig.yaml
+            remote_src: true
+
+        - name: Restore fqdn in sfconfig.yaml
+          lineinfile:
+              path: /etc/software-factory/sfconfig.yaml
+              regexp: '^fqdn:'
+              line: 'fqdn: {{ configured_fqdn.stdout }}'
       when: sfconfig_rpmnew.stat.exists
 
     - name: Run sfconfig --upgrade
