@@ -1,0 +1,11 @@
+- name: Update fqdn in sfconfig.yaml
+  lineinfile:
+    path: /etc/software-factory/sfconfig.yaml
+    regexp: '^fqdn:'
+    line: 'fqdn: sftests2.com'
+
+- name: Run sfconfig --update-fqdn
+  command: sfconfig --update-fqdn
+  become: yes
+
+- include: update_bootstrap_mode.yml
