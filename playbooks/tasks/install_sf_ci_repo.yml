@@ -4,6 +4,12 @@
     dest: /etc/sf-release
   become: yes
 
+- name: Fix diskimage-builder rpm-distro element (see: https://review.openstack.org/568180)
+  copy:
+    content: "centos"
+    dest: /etc/yum/vars/contentdir
+  become: yes
+
 - name: Check for zuul-built.repo
   stat: path=/etc/yum.repos.d/zuul-built.repo
   register: zuul_built_repo
