@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "9a1a9d01_200370ba",
+        "filename": "playbooks/functional.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-05-14T09:18:12Z",
+      "side": 1,
+      "message": "What if we run that after line 33 ?",
+      "range": {
+        "startLine": 45,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 49
+      },
+      "revId": "cccf0d7e4636ee3aebef0a84d492dd06baa9a6dd",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a1a9d01_20905095",
         "filename": "playbooks/tasks/run_sfconfig_update_fqdn.yml",
         "patchSetId": 3
