@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a1a9d01_20905095",
+        "filename": "playbooks/tasks/run_sfconfig_update_fqdn.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2018-05-14T01:38:40Z",
+      "side": 1,
+      "message": "Shouldn\u0027t we verify this actually worked, e.g. checks .gitreview file?",
+      "revId": "cccf0d7e4636ee3aebef0a84d492dd06baa9a6dd",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
