@@ -2,8 +2,8 @@
 zuul_loglevel: DEBUG
 nodepool_loglevel: DEBUG
 
-# Set retry attempts to 1 in CI
-zuul_default_retry_attempts: 1
+# Set retry attempts to 2 in CI
+zuul_default_retry_attempts: 2
 
 # Enable using hypervisor-oci on the install-server
 enable_insecure_slaves: true
