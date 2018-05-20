@@ -19,3 +19,5 @@
   register: package_diff
   failed_when: package_diff.rc not in [0, 1]
   become: yes
+
+- include: add_deployed_file.yml

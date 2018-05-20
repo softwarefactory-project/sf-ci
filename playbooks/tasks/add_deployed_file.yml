@@ -1,0 +1,12 @@
+---
+- name: "Push a change to the config repo to warm zuul-executor"
+  command: "{{ item }}"
+  with_items:
+    - touch deployed
+    - git add deployed
+    - git commit -m "add deployed file"
+    - git push
+    - sleep 3
+  args:
+    chdir: /root/config
+  become: yes

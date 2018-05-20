@@ -39,3 +39,5 @@
   become: yes
 
 - include: update_bootstrap_mode.yml
+- include: add_deployed_file.yml
+
