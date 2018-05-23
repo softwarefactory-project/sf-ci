@@ -1,21 +1,43 @@
 ---
-- name: Install sf-config package
-  yum:
-    name: sf-config
-    state: latest
-    exclude: ansible
-    update_cache: yes
-  become: yes
+- block:
+    - name: Install sf-config package
+      yum:
+        name: sf-config
+        state: latest
+        exclude: ansible
+        update_cache: yes
 
-- name: "Run sfconfig --upgrade"
-  command: sfconfig --upgrade
-  become: yes
+    - name: Check if sfconfig.yaml.rpmnew exists
+      stat:
+        path: /etc/software-factory/sfconfig.yaml.rpmnew
+      register: sfconfig_rpmnew
 
-- name: "Collect package upgraded"
-  shell: "rpm -qa | sort > package_upgraded"
+    - block:
+        - name: Get fqdn from sfconfig.yaml
+          command: awk '/^fqdn/ {print $2}' /etc/software-factory/sfconfig.yaml
+          register: configured_fqdn
 
-- name: "Package diff"
-  shell: "diff /var/lib/software-factory/package_installed package_upgraded  | tee {{ artifacts }}/package_upgrade.txt"
-  register: package_diff
-  failed_when: package_diff.rc not in [0, 1]
+        - name: Ensure last sfconfig.yaml version
+          copy:
+            src: /etc/software-factory/sfconfig.yaml.rpmnew
+            dest: /etc/software-factory/sfconfig.yaml
+            remote_src: true
+
+        - name: Restore fqdn in sfconfig.yaml
+          lineinfile:
+              path: /etc/software-factory/sfconfig.yaml
+              regexp: '^fqdn:'
+              line: 'fqdn: {{ configured_fqdn.stdout }}'
+      when: sfconfig_rpmnew.stat.exists
+
+    - name: Run sfconfig --upgrade
+      command: sfconfig --upgrade
+
+    - name: Collect package upgraded
+      shell: "rpm -qa | sort > package_upgraded"
+
+    - name: Package diff
+      shell: "diff /var/lib/software-factory/package_installed package_upgraded  | tee {{ artifacts }}/package_upgrade.txt"
+      register: package_diff
+      failed_when: package_diff.rc not in [0, 1]
   become: yes
