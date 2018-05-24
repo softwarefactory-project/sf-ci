@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a2fa921_4b7485fc",
+        "filename": "playbooks/tasks/run_sfconfig_upgrade.yml",
+        "patchSetId": 4
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-05-24T08:22:18Z",
+      "side": 1,
+      "message": "If a new default section need to be added in sfconfig.yaml then it must be handled by sfconfig itself. We always did that. Could you explain why this is required now ?",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 39
+      },
+      "revId": "fc97d01a60c54775ede075888109eab5b1f67f4e",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
