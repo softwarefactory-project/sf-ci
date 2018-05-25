@@ -23,8 +23,7 @@ from utils import create_random_str
 from utils import set_private_key
 from utils import skipIfServiceMissing
 from utils import get_gerrit_utils
-
-from pysflib.sfstoryboard import SFStoryboard
+from utils import SFStoryboard
 
 
 TEST_MSGS = [
