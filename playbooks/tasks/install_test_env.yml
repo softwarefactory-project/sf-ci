@@ -5,6 +5,7 @@
     - python-nose
     - python-nose-timer
     - python-nose-htmloutput
+    - python2-storyboardclient
   become: yes
 
 # TODO: remove the auto-creation of sfmanager.log and delete the task bellow
