@@ -27,8 +27,7 @@ from utils import JobUtils
 from utils import create_random_str
 from utils import skipIfServiceMissing
 from utils import get_gerrit_utils
-
-from pysflib.sfstoryboard import SFStoryboard
+from utils import SFStoryboard
 
 
 class TestResourcesWorkflow(Base):

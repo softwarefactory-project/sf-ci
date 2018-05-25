@@ -35,6 +35,8 @@ from requests.auth import HTTPBasicAuth
 from distutils.version import StrictVersion
 from subprocess import Popen, PIPE
 
+from storyboardclient.v1.client import Client as StoryboardClient
+
 import config
 
 
@@ -184,6 +186,14 @@ class Tool:
         finally:
             os.chdir(ocwd)
         return output
+
+
+class SFStoryboard(StoryboardClient):
+    def __init__(self, api_url, auth_cookie):
+        uid = filter(lambda x: x.startswith('uid='),
+                     urllib.unquote(auth_cookie).split(';'))[0].split('=')[1]
+        super(SFStoryboard, self).__init__(api_url=api_url, access_token=uid)
+        self.http_client.http.cookies['auth_pubtkt'] = auth_cookie
 
 
 class ManageSfUtils(Tool):
