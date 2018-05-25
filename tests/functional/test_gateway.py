@@ -21,7 +21,7 @@ from utils import services
 from utils import ManageSfUtils
 from utils import skipIfProvisionVersionLesserThan
 from utils import ssh_run_cmd
-from pysflib.sfgerrit import GerritUtils
+from utils import GerritClient
 
 from requests.auth import HTTPBasicAuth
 from requests.exceptions import HTTPError
@@ -125,20 +125,20 @@ class TestGateway(Base):
         m = ManageSfUtils(config.GATEWAY_URL)
         url = config.GATEWAY_URL + "/r/a/"
 
-        a = GerritUtils(url, auth=HTTPBasicAuth("admin", "password"))
-        self.assertRaises(HTTPError, a.get_account, config.USER_1)
+        a = GerritClient(url, auth=HTTPBasicAuth("admin", "password"))
+        self.assertRaises(RuntimeError, a.get_account, config.USER_1)
 
         api_passwd = m.create_gerrit_api_password("user3")
         auth = HTTPBasicAuth("user3", api_passwd)
-        a = GerritUtils(url, auth=auth)
+        a = GerritClient(url, auth=auth)
         self.assertTrue(a.get_account("user3"))
 
         m.delete_gerrit_api_password("user3")
-        a = GerritUtils(url, auth=auth)
-        self.assertRaises(HTTPError, a.get_account, "user3")
+        a = GerritClient(url, auth=auth)
+        self.assertRaises(RuntimeError, a.get_account, "user3")
 
-        a = GerritUtils(url, auth=HTTPBasicAuth("admin", "password"))
-        self.assertRaises(HTTPError, a.get_account, 'john')
+        a = GerritClient(url, auth=HTTPBasicAuth("admin", "password"))
+        self.assertRaises(RuntimeError, a.get_account, 'john')
 
     @skipIfServiceMissing('hound')
     def test_codesearch(self):
