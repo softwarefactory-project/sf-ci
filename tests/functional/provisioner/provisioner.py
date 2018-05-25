@@ -29,8 +29,7 @@ from utils import ResourcesUtils
 from utils import GerritGitUtils
 from utils import get_cookie
 from utils import is_present
-
-from pysflib.sfstoryboard import SFStoryboard
+from utils import SFStoryboard
 
 # TODO: Create pads and pasties.
 
