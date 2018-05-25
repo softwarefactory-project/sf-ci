@@ -29,8 +29,7 @@ from utils import get_cookie
 from utils import get_gerrit_utils
 from utils import GerritGitUtils
 from utils import is_present
-
-from pysflib.sfstoryboard import SFStoryboard
+from utils import SFStoryboard
 
 
 class SFchecker:
