@@ -19,9 +19,9 @@ import time
 import uuid
 
 import config
-from utils import Base, skipIfServiceMissing
 
-from pysflib.sfstoryboard import SFStoryboard
+from utils import Base, skipIfServiceMissing
+from utils import SFStoryboard
 
 
 class TestStoryboard(Base):
