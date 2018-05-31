@@ -4,6 +4,7 @@
   command: grep -q firehose /etc/software-factory/arch.yaml
   failed_when: false
   register: _firehose_in_arch
+  become: true
 
 - name: Set sf_firehose_enabled
   set_fact:
