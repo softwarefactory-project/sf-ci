@@ -1,0 +1,159 @@
+---
+- hosts: all
+  vars:
+    # Get sfinfo location
+    sfinfo_path_query: "[?name=='software-factory/sfinfo'].src_dir"
+    sfinfo_path: "{{ (zuul.projects.values() | list | json_query(sfinfo_path_query))[0] }}"
+    # Get sfci location
+    sf_ci_path_query: "[?name=='software-factory/sf-ci'].src_dir"
+    sf_ci: "{{ (zuul.projects.values() | list | json_query(sf_ci_path_query))[0] }}"
+    # Get workspace path to run zuul_rpm_* commands
+    sfnamespace_path: "{{ sfinfo_path | dirname | dirname }}"
+    sfinfo_setup_args: "{% if buildset_artifacts_url %}--testing-repo {{ buildset_artifacts_url }}{% endif %}"
+    sf_user: "zuul-worker"
+  tasks:
+    - name: "Install sfinfo repo"
+      command: >
+        ./software-factory/sfinfo/zuul_rpm_setup.py \
+            --distro-info ./software-factory/sfinfo/sf-{{ zuul.branch }}.yaml \
+            {{ sfinfo_setup_args }}
+      args:
+        chdir: "{{ sfnamespace_path }}"
+      become: yes
+
+    # TODO: remove this when image are rebuilt without sf-zuul-worker element
+    - name: "Remove /var/lib/zuul"
+      file:
+        path: /var/lib/zuul
+        state: absent
+      become: yes
+    - name: "Ensure /etc/nodepool doesn't exists"
+      file:
+        path: /etc/nodepool
+        state: absent
+      become: yes
+
+    - include: tasks/install_sf_ci_repo.yml
+    - include: tasks/yum_update.yml
+    - name: Install sf-config package
+      yum:
+        name: sf-config
+        exclude: ansible
+        state: latest
+      become: yes
+
+
+# First deploy sf without gerrit
+- hosts: zuul-host
+  tasks:
+    - name: Setup zuul-minimal architecture
+      copy:
+        src: "/usr/share/sf-config/refarch/zuul-minimal.yaml"
+        dest: /etc/software-factory/arch.yaml
+        remote_src: true
+      become: yes
+
+    - name: Inject gerrit host local name
+      command: |
+        python -c 'import yaml
+        sfconfig = yaml.load(open("/etc/software-factory/sfconfig.yaml"))
+        sfconfig["network"]["static_hostnames"].append("{{ hostvars["gerrit-host"].ansible_default_ipv4.address }} gerrit.com")
+        open("/etc/software-factory/sfconfig.yaml", "w").write(yaml.dump(sfconfig))
+        '
+      become: yes
+
+    - name: Run sfconfig
+      command: sfconfig
+      become: yes
+
+    - name: Fetch admin ssh key
+      fetch:
+        src: /root/.ssh/id_rsa.pub
+        dest: "{{ zuul.executor.work_root }}/id_rsa.pub"
+        flat: yes
+      become: yes
+    - name: Fetch zuul ssh key
+      fetch:
+        src: /var/lib/zuul/.ssh/id_rsa.pub
+        dest: "{{ zuul.executor.work_root }}/zuul_rsa.pub"
+        flat: yes
+      become: yes
+
+# Then deploy SF to get a gerrit service
+- hosts: gerrit-host
+  tasks:
+    - name: Inject gerrit host local name
+      command: |
+        python -c 'import yaml
+        sfconfig = yaml.load(open("/etc/software-factory/sfconfig.yaml"))
+        sfconfig["fqdn"] = "gerrit.com"
+        sfconfig["network"]["static_hostnames"].append("{{ hostvars["zuul-host"].ansible_default_ipv4.address }} sftests.com")
+        open("/etc/software-factory/sfconfig.yaml", "w").write(yaml.dump(sfconfig))
+        '
+      become: yes
+
+    - name: Run sfconfig
+      command: sfconfig
+      become: yes
+
+    - name: Copy zuul host admin key
+      copy:
+        src: "{{ zuul.executor.work_root }}/id_rsa.pub"
+        dest: /root/main_instance_admin_key.pub
+      become: yes
+    - name: Copy zuul host zuul key
+      copy:
+        src: "{{ zuul.executor.work_root }}/zuul_rsa.pub"
+        dest: /root/main_instance_zuul_key.pub
+      become: yes
+
+    - name: Create new zuulci account
+      shell: cat /root/main_instance_zuul_key.pub | ssh gerrit gerrit create-account zuulci -g \"Non-Interactive Users\" --email "zuul@sftests.com" --full-name "ZuulCI" --ssh-key -
+      become: yes
+
+    - name: Setup zuul host admin key
+      shell: "cat /root/main_instance_admin_key.pub | ssh gerrit gerrit set-account {{ item }} --add-ssh-key -"
+      with_items:
+        - admin
+        - zuulci
+      become: yes
+
+    - name: Create sf-config and new-jobs projects
+      command: "{{ item }}"
+      args:
+        chdir: "/root/config"
+      with_items:
+        - /usr/share/sf-config/scripts/create_project_resources.py --repo sf-config --repo new-jobs --core admin@gerrit.com resources/new-config.yaml
+        - /usr/local/bin/resources.sh direct_apply /var/lib/software-factory/bootstrap-data/empty_resources.yaml resources/new-config.yaml
+        - git add resources/new-config.yaml
+        - git commit -m 'Provision new config resources'
+        - git push git+ssh://gerrit/config master
+      become: yes
+
+    - name: Wait for sf-config project creation
+      wait_for:
+        path: /var/lib/gerrit/git/sf-config.git
+        state: present
+
+# Then finish main deployment
+- hosts: zuul-host
+  tasks:
+    - name: Inject gerrit.com location and connection
+      command: |
+        python -c 'import yaml
+        sfconfig = yaml.load(open("/etc/software-factory/sfconfig.yaml"))
+        sfconfig["config-locations"] = {
+          "config-repo": "http://gerrit.com/r/sf-config",
+          "jobs-repo": "http://gerrit.com/r/new-jobs"}
+        sfconfig["zuul"]["gerrit_connections"].append({
+          "name": "gerrit.com",
+          "hostname": "gerrit.com",
+          "puburl": "http://gerrit.com/r",
+          "username": "zuulci"})
+        open("/etc/software-factory/sfconfig.yaml", "w").write(yaml.dump(sfconfig))
+        '
+      become: yes
+
+    - name: Re-run sfconfig
+      command: sfconfig
+      become: yes
