@@ -1,4 +1,10 @@
 ---
+# Temp trigger of the job
+- project:
+    check:
+      jobs:
+        - sf-ci-remote-gerrit
+
 - job:
     name: sf-ci
     parent: new-base
@@ -16,6 +22,18 @@
       sf_version: master
       logclassify_logserver_dir: logs/
       logclassify_debug: true
+
+- job:
+    name: sf-ci-remote-gerrit
+    description: A job to test the remote config-location options
+    parent: sf-ci
+    run: playbooks/remote-gerrit.yaml
+    nodeset:
+      nodes:
+        - name: zuul-host
+          label: dib-centos-7
+        - name: gerrit-host
+          label: dib-centos-7
 
 - job:
     name: sf-ci-functional-minimal
