@@ -48,6 +48,4 @@ class TestConfigRepo(Base):
         self.assertTrue(os.path.isfile(os.path.join(clone_dir,
                                                     "zuul.d/_jobs-base.yaml")))
         self.assertTrue(os.path.isfile(os.path.join(clone_dir,
-                                                    "zuul/_main.yaml")))
-        self.assertTrue(os.path.isfile(os.path.join(clone_dir,
                                                     "policies/policy.yaml")))
