@@ -591,7 +591,24 @@ class JobUtils(Tool):
         self.cookies = {'auth_pubtkt': get_cookie(config.USER_1,
                                                   config.USER_1_PASSWORD)}
 
-    def wait_for_config_update(self, revision, return_result=False):
+    def restart_executor(self, revision):
+        # This is an temporary solution to ci issue where the executor is
+        # loosing the ssh-agent socket and failed to run jobs.
+        logger.info("Restarting executor")
+        Popen(["sudo", "systemctl", "restart",
+               "rh-python35-zuul-executor"]).wait()
+        time.sleep(30)
+        logger.info("Re-enqueing change %s" % revision)
+        Popen(["sudo", "zuul", "enqueue-ref", "--trigger", "gerrit",
+               "--tenant", "local", "--pipeline", "post",
+               "--project", "config", "--ref", "master",
+               "--newrev", revision]).wait()
+        time.sleep(30)
+
+    def wait_for_config_update(
+            self, revision, return_result=False, restart_executor=False):
+        if restart_executor:
+            self.restart_executor(revision)
         base_url = "%s/zuul/api/tenant/local/builds" % config.GATEWAY_URL
         # Remove this when 3.0 is updated with last zuul package
         r = requests.get(base_url)
@@ -623,6 +640,9 @@ class JobUtils(Tool):
                 retry, base_url + job_url, r.text))
             if not r.ok:
                 logger.error("Response was %s : %s" % (r, r.text))
+            if not restart_executor:
+                return self.wait_for_config_update(
+                    revision, return_result, restart_executor=True)
         return "FAILED"
 
 
