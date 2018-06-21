@@ -1,0 +1,19 @@
+---
+- name: Fix nodepool driver init task
+  shell: sed -e 's/mount .srv.host-rootfs/mount -a/' -i /usr/lib/python3.5/site-packages/nodepool/driver/*/playbooks/init.yml
+  become: yes
+
+- name: Umount leaks
+  shell: while true; do umount -l /srv/host-rootfs || break; done; cat /proc/mounts; mount -a
+  ignore_errors: yes
+  become: yes
+
+- name: Check bwrap works
+  command: >-
+    bwrap --dir /tmp --tmpfs /tmp --chdir /tmp/ --dir /var
+          --dir /var/tmp --dir /run/user/974 --ro-bind /usr /usr
+          --ro-bind /lib /lib  --ro-bind /lib64 /lib64 --ro-bind /bin /bin
+          --ro-bind /sbin /sbin --ro-bind /etc/resolv.conf /etc/resolv.conf
+          --ro-bind /etc/hosts /etc/hosts  --proc /proc --dev /dev
+          --unshare-all --share-net --die-with-parent  /bin/echo toto
+  become: yes
