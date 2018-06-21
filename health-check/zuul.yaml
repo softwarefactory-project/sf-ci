@@ -35,11 +35,9 @@
         /opt/rh/rh-python35/root/bin/zuul-executor
             -c /etc/opt/rh/rh-python35/zuul/zuul.conf keep
 
+
 - hosts: install-server
   remote_user: root
-  vars:
-    # Glob fragment to get executor jobdir
-    id8: "[0-9a-z][0-9a-z][0-9a-z][0-9a-z][0-9a-z][0-9a-z][0-9a-z][0-9a-z]"
   tasks:
     - block:
         - name: Add bad YAML file
@@ -90,14 +88,3 @@
           command: >
             /opt/rh/rh-python35/root/bin/zuul-executor
                 -c /etc/opt/rh/rh-python35/zuul/zuul.conf nokeep
-
-        - name: "List jobdir"
-          shell: "ls -d /tmp/systemd-private-*-rh-python35-zuul-executor.service-*/tmp/{{id8}}{{id8}}{{id8}}{{id8}}"
-          register: _jobdir
-
-        - name: "Fetch jobdir"
-          synchronize:
-            mode: pull
-            src: "{{ item }}"
-            dest: "/var/log/software-factory/executor-{{ item|basename }}"
-          with_items: "{{ _jobdir.stdout_lines }}"
