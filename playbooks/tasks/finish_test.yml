@@ -21,7 +21,7 @@
   register: _ara_database
 
 - name: Generate ara report
-  command: "ara generate html {{ artifacts }}/ara-sf"
+  command: "scl enable rh-python35 -- ara generate html {{ artifacts }}/ara-sf"
   environment:
     # FIXME: ara fail when this is not set
     ARA_LOG_FILE: ""
