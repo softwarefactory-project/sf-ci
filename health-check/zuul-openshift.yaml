@@ -1,0 +1,156 @@
+---
+- name: "Reset config repos"
+  include: playbooks/config_reset.yaml
+
+- hosts: install-server
+  remote_user: root
+  tasks:
+    - name: Create unprivilged openshift service account on the local oc-cluster-up service
+      command: "oc {{ item }}"
+      with_items:
+        - login -u nodepool-unprivileged -p devel
+        - new-project nodepool
+        - create sa nodepool-sa
+        - policy add-role-to-user admin --serviceaccount=nodepool-sa
+
+    - name: Read service account token
+      command: "oc sa get-token nodepool-sa"
+      register: _sa_token
+
+    - name: Add unprivileged openshift provider to sfconfig
+      command: |
+        python -c 'import yaml
+        data = yaml.safe_load(open("/etc/software-factory/sfconfig.yaml"))
+        data["nodepool"]["openshiftpods_providers"].append({"name": "unprivileged",
+        "url": "https://managesf.sftests.com:8443",
+        "insecure_skip_tls_verify": True,
+        "token": "{{ _sa_token.stdout }}"})
+        yaml.safe_dump(data, open("/etc/software-factory/sfconfig.yaml", "w"), default_flow_style=False)'
+
+    - name: Re-run sfconfig
+      command: sfconfig --skip-install
+
+- hosts: zuul-executor
+  tasks:
+    - name: "Set executor keep/verbose mode"
+      command: "/opt/rh/rh-python35/root/bin/zuul-executor {{ item }}"
+      with_items:
+        - keep
+        - verbose
+
+- hosts: install-server
+  remote_user: root
+  tasks:
+    - name: Add unprivileged openshift provider to nodepool config
+      copy:
+        content: |
+          ---
+          labels:
+            - name: linter-pod
+              min-ready: 0
+
+          providers:
+            - name: openshift-user
+              driver: openshiftpods
+              context: "nodepool/managesf-sftests-com:8443/system:serviceaccount:nodepool:nodepool-sa"
+              pools:
+                - name: nodepool
+                  labels:
+                    - name: linter-pod
+                      image: docker.io/fedora:28
+        dest: "{{ config_path }}/nodepool/openshift.yaml"
+      register: nodepool_conf
+
+    - name: Commit change
+      when: nodepool_conf|changed
+      command: chdir={{ config_path }} {{ item }}
+      with_items:
+        - 'git add -A'
+        - 'git commit -m "Add openshift unprivileged configuration"'
+
+- name: "Submit config repos"
+  include: playbooks/config_submit_change.yaml
+  when: nodepool_conf|changed
+
+- hosts: install-server
+  remote_user: root
+  tasks:
+    - name: Setup demo-project zuul.yaml configuration
+      copy:
+        content: |
+          ---
+          # Test regular openshift project
+          - job:
+              name: demo-project-native
+              parent: base-openshift-native
+              run: native.yaml
+              vars:
+                base_image: "python:3.6"
+
+          # Test regular openshift pod running in a dedicated project
+          - job:
+              name: demo-project-pod
+              parent: base-openshift-pod
+              run: pod.yaml
+
+          # Test openshiftpods provider running in a shared project with regular sa
+          - job:
+              name: linter-job
+              parent: base-openshift-pod
+              nodeset:
+                nodes:
+                  - name: pod
+                    label: linter-pod
+              run: pod.yaml
+
+          - project:
+              check:
+                jobs:
+                  - demo-project-native
+                  - demo-project-pod
+                  - linter-job
+              gate:
+                jobs:
+                  - noop
+        dest: /root/demo-project/.zuul.yaml
+
+    - name: Setup demo-project native.yaml playbook
+      copy:
+        content: |
+          ---
+          - hosts: demo-project
+            tasks:
+              - command: ls
+              - command: python demo.py
+                register: demo_output
+              - debug: var=demo_output.stdout
+              - fail:
+                when: "'Hello' not in demo_output.stdout"
+        dest: /root/demo-project/native.yaml
+
+    - name: Setup demo-project pod.yaml playbook
+      copy:
+        content: |
+          ---
+          - hosts: pod
+            tasks:
+              - command: python3 demo.py
+                args:
+                  chdir: "{{'{{'}} zuul.project.src_dir {{'}}'}}"
+        dest: /root/demo-project/pod.yaml
+
+    - name: Submit change and check for SUCCESS
+      command: "{{ item }}"
+      args:
+        chdir: /root/demo-project
+      with_items:
+        - git add .zuul.yaml pod.yaml native.yaml
+        - git commit -m "Test openshift-base job"
+        - /usr/share/sf-config/scripts/submit_and_wait.py --delay 1200 --approve
+        - git fetch --all
+      environment: {'EDITOR':'test'}
+
+    - name: "Check change was merged"
+      command: chdir=/root/demo-project git diff HEAD origin/master
+      register: diff
+      failed_when: diff.stdout != ''
