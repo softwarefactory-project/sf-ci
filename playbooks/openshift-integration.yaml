@@ -1,0 +1,42 @@
+---
+- hosts: install-server
+  tasks:
+    - name: Activate hypervisor-openshift role in the arch.yaml file
+      lineinfile:
+        path: /etc/software-factory/arch.yaml
+        insertafter: '      - nodepool-launcher'
+        line: '      - hypervisor-openshift'
+      become: yes
+
+    - name: Run sfconfig
+      command: sfconfig --provision-demo
+      become: yes
+
+    - name: Execute health-check
+      command: >
+        ansible-playbook -i /var/lib/software-factory/ansible/hosts \
+            -e @{{ sf_ci }}/health-check/group_vars/all.yaml \
+            {{ sf_ci }}/health-check/zuul-openshift.yaml
+      become: yes
+      ignore_errors: yes
+      register: health_check
+
+    - name: Fetch job artifacts
+      synchronize:
+        src: "/var/www/logs"
+        dest: "{{ zuul.executor.log_root }}/job-logs"
+        mode: pull
+      no_log: True
+
+    - name: Fetch nodepool launcher logs
+      synchronize:
+        src: "/var/log/nodepool"
+        dest: "{{ zuul.executor.log_root }}/nodepool"
+        mode: pull
+      no_log: True
+      become: yes
+
+    - name: Fail if health-check failed
+      fail:
+        msg: "Health check failed"
+      when: health_check is failed
