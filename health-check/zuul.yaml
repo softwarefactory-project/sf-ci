@@ -58,6 +58,24 @@
             - /usr/share/sf-config/scripts/submit_and_wait.py --delay 1200 --failure
           when: bad_project_status|changed
 
+        - name: Fetch logs url
+          uri:
+            url: "https://{{ fqdn }}/zuul/api/tennat/local/builds?job_name=linters&project=python-readerlib"
+            return_content: yes
+            status_code: "200,404"
+            validate_certs: no
+          register: _job_logs
+          until: "'json' in job and job.json"
+          retries: 120
+          delay: 2
+
+        - name: Ensure ara-report exists
+          uri:
+            url: "{{ job.json[0]['log_url'] }}/ara-report/ansible.sqlite"
+            return_content: no
+            status_code: 200
+            validate_certs: no
+
         - name: Add good YAML file
           template:
             src: "{{ item.src }}.j2"
