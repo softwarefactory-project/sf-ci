@@ -8,6 +8,12 @@
             branches: master
         - sf-deploy-stable-cr:
             branches: master
+    experimental:
+      jobs:
+        - sf-rpm-build
+        - sf-ci-openshift-integration:
+            dependencies:
+              - sf-rpm-build
 
 - job:
     name: sf-ci
@@ -61,6 +67,14 @@
     vars:
       sf_arch: allinone
       sf_version: 3.0
+
+- job:
+    name: sf-ci-openshift-integration
+    description: The sf openshift integration test
+    parent: sf-ci
+    run: playbooks/openshift-integration.yaml
+    vars:
+      sf_arch: minimal
 
 - job:
     name: sf-deploy-stable
