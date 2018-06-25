@@ -1,0 +1,80 @@
+---
+- hosts: install-server
+  vars:
+    # Get sfinfo location
+    sfinfo_path_query: "[?name=='software-factory/sfinfo'].src_dir"
+    sfinfo_path: "{{ (zuul.projects.values() | list | json_query(sfinfo_path_query))[0] }}"
+    # Get sfci location
+    sf_ci_path_query: "[?name=='software-factory/sf-ci'].src_dir"
+    sf_ci: "{{ (zuul.projects.values() | list | json_query(sf_ci_path_query))[0] }}"
+    # Get workspace path to run zuul_rpm_* commands
+    sfnamespace_path: "{{ sfinfo_path | dirname | dirname }}"
+    sfinfo_setup_args: "{% if buildset_artifacts_url %}--testing-repo {{ buildset_artifacts_url }}{% endif %}"
+    sf_user: "zuul-worker"
+  tasks:
+    - name: "Install sfinfo repo"
+      command: >
+        ./software-factory/sfinfo/zuul_rpm_setup.py \
+            --distro-info ./software-factory/sfinfo/sf-{{ zuul.branch }}.yaml \
+            {{ sfinfo_setup_args }}
+      args:
+        chdir: "{{ sfnamespace_path }}"
+      become: yes
+
+    # TODO: remove this when image are rebuilt without sf-zuul-worker element
+    - name: "Remove /var/lib/zuul"
+      file:
+        path: /var/lib/zuul
+        state: absent
+      become: yes
+    - name: "Ensure /etc/nodepool doesn't exists"
+      file:
+        path: /etc/nodepool
+        state: absent
+      become: yes
+
+    - include: tasks/install_sf_ci_repo.yml
+    - include: tasks/yum_update.yml
+    - name: Install sf-config package
+      yum:
+        name: sf-config
+        state: latest
+      become: yes
+
+    - name: Install extra custom-vars for mirrors
+      copy:
+        src: "{{ sf_ci }}/patches/custom-vars.yaml"
+        dest: /etc/software-factory/custom-vars.yaml
+        remote_src: true
+      become: yes
+
+    - name: Activate hypervisor-openshift role in the arch.yaml file
+      lineinfile:
+        path: /etc/software-factory/arch.yaml
+        insertafter: '      - nodepool-launcher'
+        line: '      - hypervisor-openshift'
+      become: yes
+
+    - name: "Ensure /etc/nodepool doesn't exists"
+      file:
+        path: /etc/nodepool
+        state: absent
+      become: yes
+
+    - name: Run sfconfig
+      command: sfconfig --provision-demo
+      become: yes
+
+    - name: Execute health-check
+      command: >
+        ansible-playbook -i /var/lib/software-factory/ansible/hosts \
+            -e @{{ sf_ci }}/health-check/group_vars/all.yaml \
+            {{ sf_ci }}/health-check/zuul-openshift.yaml
+      become: yes
+
+    - name: Fetch job artifacts
+      synchronize:
+        src: "/var/www/logs"
+        dest: "{{ zuul.executor.log_root }}/job-logs"
+        mode: pull
+      no_log: True
