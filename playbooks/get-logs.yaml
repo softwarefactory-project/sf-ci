@@ -3,6 +3,9 @@
   vars:
     sf_user: "zuul-worker"
   tasks:
+    - name: Check mount points
+      command: cat /proc/mounts
+
     - include: tasks/set_environment_facts.yml
     - include: tasks/finish_test.yml
     - name: Remove empty directories

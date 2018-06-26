@@ -30,14 +30,11 @@
 
     - include: tasks/install_sf_ci_repo.yml
     - include: tasks/yum_update.yml
+    - include: tasks/check_bubblewrap.yml
     - include: tasks/run_sfconfig.yml change_fqdn=True
     - include: tasks/run_sfconfig_update_fqdn.yml
-    # TODO: remove all fix_runc_driver task once nodepool package is fixed
-    - include: tasks/fix_runc_driver.yml
     - include: tasks/install_test_env.yml
     - include: tasks/set_environment_facts.yml
-    # Fix again in case nodepool init.yml is run again
-    - include: tasks/fix_runc_driver.yml
     - include: tasks/run_provisioner.yml
     - include: tasks/run_backup_create.yml
     - include: tasks/run_health-check.yml
