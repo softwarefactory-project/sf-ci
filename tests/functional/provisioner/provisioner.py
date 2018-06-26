@@ -23,6 +23,7 @@ import subprocess
 pwd = os.path.dirname(os.path.abspath(__file__))  # flake8: noqa
 sys.path.append(os.path.dirname(pwd))             # flake8: noqa
 import config
+import logging
 
 from utils import ManageSfUtils
 from utils import ResourcesUtils
@@ -43,6 +44,8 @@ class SFProvisioner(object):
 
     Provisioned data should remain really simple.
     """
+    log = logging.getLogger("Provisioner")
+
     def __init__(self):
         with open("%s/resources.yaml" % pwd, 'r') as rsc:
             self.resources = yaml.load(rsc)
@@ -66,7 +69,7 @@ class SFProvisioner(object):
             self.create_review(project, "Test review for %s" % project)
 
     def create_project(self, name):
-        print " Creating project %s ..." % name
+        self.log.info(" Creating project %s ..." % name)
         self.ru.create_repo(name)
 
     def clone_project(self, name):
@@ -76,7 +79,7 @@ class SFProvisioner(object):
         self.clone_dir = self.ggu.clone(self.url, name, config_review=False)
 
     def push_files_in_project(self, name, files):
-        print " Add files(%s) in a commit ..." % ",".join(files)
+        self.log.info(" Add files(%s) in a commit ..." % ",".join(files))
         self.clone_project(name)
         for f in files:
             file(os.path.join(self.clone_dir, f), 'w').write('data')
@@ -93,7 +96,7 @@ class SFProvisioner(object):
         return task.id, story.id
 
     def create_issues_on_project(self, name, issues):
-        print " Create %s issue(s) for that project ..." % len(issues)
+        self.log.info(" Create %s issue(s) for that project ..." % len(issues))
         for i in issues:
             if is_present('storyboard'):
                 issue = self.create_storyboard_issue(name, i['name'])
@@ -103,7 +106,10 @@ class SFProvisioner(object):
 
     def simple_login(self, user, password):
         """log as user to make the user listable"""
-        get_cookie(user, password)
+        if not get_cookie(user, password):
+            self.log.error("Couldn't log in as %s" % user)
+            exit(1)
+
 
     def create_review(self, project, commit_message, branch='master'):
         """Very basic review creator for statistics and restore tests
@@ -135,13 +141,13 @@ class SFProvisioner(object):
 
     def provision(self):
         for cmd in self.resources['commands']:
-            print "Execute command %s" % cmd['cmd']
+            self.log.info("Execute command %s" % cmd['cmd'])
             out = self.command(cmd['cmd'])
             if out:
-                print out
+                self.log.info(out)
         checksum_list = {}
         for checksum in self.resources['checksum'] :
-            print "Compute checksum for file %s" % checksum['file']
+            self.log.info("Compute checksum for file %s" % checksum['file'])
             checksum_list[checksum['file']] = self.compute_checksum(
                 checksum['file'])
             checksum_list['content_' + checksum['file']] = self.read_file(
@@ -149,25 +155,25 @@ class SFProvisioner(object):
         yaml.dump(checksum_list, file('pc_checksums.yaml', 'w'),
             default_flow_style=False)
         for user in self.resources['local_users']:
-            print "Create local user %s" % user['username']
+            self.log.info("Create local user %s" % user['username'])
             self.create_local_user(user['username'],
                                    user['password'],
                                    user['email'])
             self.simple_login(user['username'], user['password'])
-            print "log in as %s" % user['username']
+            self.log.info("log in as %s" % user['username'])
         for u in self.resources['users']:
-            print "log in as %s" % u['name']
+            self.log.info("log in as %s" % u['name'])
             self.simple_login(u['name'], config.USERS[u['name']]['password'])
         for project in self.resources['projects']:
-            print "Create user datas for %s" % project['name']
+            self.log.info("Create user datas for %s" % project['name'])
             self.create_project(project['name'])
             self.push_files_in_project(project['name'],
                                        [f['name'] for f in project['files']])
             for i, review in self.create_issues_on_project(project['name'],
                                                            project['issues']):
                 if review:
-                    print "Create review for bug %s in %s" % (
-                        i, project['name'])
+                    self.log.info("Create review for bug %s in %s" %
+                                  (i, project['name']))
                     self.create_review_for_issue(project['name'], i)
 
         self.create_resources()
