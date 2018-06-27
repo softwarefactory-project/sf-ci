@@ -46,4 +46,9 @@
   command: sfconfig
   become: yes
 
+# TODO: remove this after 3.1 is released since the admin_password is auto-generated
+- name: Taint sfconfig.yaml to prevent auto update of the file
+  shell: echo "# Deployed" >> /etc/software-factory/sfconfig.yaml
+  become: yes
+
 - include: update_bootstrap_mode.yml
