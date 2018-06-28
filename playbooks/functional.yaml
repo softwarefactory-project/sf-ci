@@ -35,6 +35,7 @@
     - include: tasks/run_sfconfig_update_fqdn.yml
     - include: tasks/install_test_env.yml
     - include: tasks/set_environment_facts.yml
+    - include: tasks/prevent_bwrap_issue.yml
     - include: tasks/run_provisioner.yml
     - include: tasks/run_backup_create.yml
     - include: tasks/run_health-check.yml
