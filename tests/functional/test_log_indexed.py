@@ -18,6 +18,7 @@ import random
 import string
 import json
 import datetime
+import logging
 import time
 
 from utils import Base, skipIfServiceMissing
@@ -29,6 +30,8 @@ from subprocess import Popen, PIPE
 class TestLogExportedInElasticSearch(Base):
     """ Functional tests to verify job logs are exported in ElasticSearch
     """
+    log = logging.getLogger("TestELK")
+
     def setUp(self):
         super(TestLogExportedInElasticSearch, self).setUp()
         self.un = config.ADMIN_USER
@@ -78,7 +81,8 @@ curl -s -XPOST 'http://elasticsearch.%s:9200/%s/_search?pretty&size=1' -d '{
         # Here we fetch the index name, but also we wait for
         # it to appears in ElasticSearch for 5 mins
         index = []
-        for retry in xrange(300):
+        self.log.debug("Looking for index")
+        for retry in range(300):
             try:
                 out = self.run_ssh_cmd(config.SERVICE_PRIV_KEY_PATH, 'root',
                                        config.GATEWAY_HOST, subcmd)
@@ -88,20 +92,22 @@ curl -s -XPOST 'http://elasticsearch.%s:9200/%s/_search?pretty&size=1' -d '{
                          o.split()[2].startswith('logstash-%s' % today_str)]
                 if len(index):
                     break
-            except:
+            except Exception:
                 time.sleep(1)
         self.assertEqual(
             len(index),
             1,
             "No logstash index has been found for today logstash-%s (%s)" % (
                 today_str, str(index)))
+        self.log.info("Found index: %s" % str(index))
         index = index[0].split()[2]
         return index
 
     def verify_logs_exported(self):
         subcmd = "bash /tmp/test_request.sh"
         subcmd = shlex.split(subcmd)
-        for retry in xrange(300):
+        self.log.debug("Looking for logs")
+        for retry in range(300):
             out = self.run_ssh_cmd(config.SERVICE_PRIV_KEY_PATH, 'root',
                                    config.GATEWAY_HOST, subcmd)
             ret = json.loads(out[0][0])
@@ -109,9 +115,9 @@ curl -s -XPOST 'http://elasticsearch.%s:9200/%s/_search?pretty&size=1' -d '{
                 break
             elif len(ret['hits']['hits']) == 0:
                 time.sleep(1)
-        self.assertEqual(len(ret['hits']['hits']),
-                         1,
-                         "Fail to find our log in ElasticSeach")
+        self.log.info("Found logs: %s" % ret)
+        self.assertTrue(len(ret['hits']['hits']) >= 1,
+                        "Fail to find our log in ElasticSeach")
         return ret['hits']['hits'][0]
 
     def direct_push_in_config_repo(self, url, pname='config'):
