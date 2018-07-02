@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "208dee20_c636f4d1",
+        "filename": "tests/functional/test_gateway.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-07-02T10:50:00Z",
+      "side": 1,
+      "message": "A reason for that change ?",
+      "range": {
+        "startLine": 72,
+        "startChar": 38,
+        "endLine": 72,
+        "endChar": 39
+      },
+      "revId": "2ca30cf4db45ed615ba24232eeb8dff4f6f35e22",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
