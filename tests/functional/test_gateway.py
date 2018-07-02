@@ -54,7 +54,7 @@ class TestGateway(Base):
         """
         subpaths = ["/r/", "/docs/"]
         if "zuul" in services:
-            subpaths.append("/zuul/t/local/status.html")
+            subpaths.append("/zuul/")
         if "etherpad" in services:
             subpaths.append("/etherpad/")
         if "lodgeit" in services:
@@ -69,7 +69,7 @@ class TestGateway(Base):
         resp = requests.get(url)
         self.assertEqual(resp.status_code, 200)
         for subpath in subpaths:
-            self.assertTrue(('href="%s"' % subpath) in resp.text,
+            self.assertTrue(('href="%s' % subpath) in resp.text,
                             '%s not present as a link' % subpath)
 
     @skipIfProvisionVersionLesserThan("2.4.0")
