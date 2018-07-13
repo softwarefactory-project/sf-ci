@@ -1,4 +1,14 @@
 ---
+- project:
+    templates:
+      - sf-ci-jobs
+    periodic:
+      jobs:
+        - sf-deploy-stable:
+            branches: master
+        - sf-deploy-stable-cr:
+            branches: master
+
 - job:
     name: sf-ci
     parent: base
