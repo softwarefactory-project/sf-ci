@@ -1,0 +1,8 @@
+Code-Review+2: Tristan de Cacqueray <tdecacqu@redhat.com>
+Workflow+1: Tristan de Cacqueray <tdecacqu@redhat.com>
+Verified+2: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-by: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-at: Fri, 13 Jul 2018 10:08:31 +0000
+Reviewed-on: https://softwarefactory-project.io/r/13033
+Project: software-factory/sf-ci
+Branch: refs/heads/master
