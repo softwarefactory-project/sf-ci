@@ -20,14 +20,20 @@
   when: not zuul_success | default(false) | bool
   register: _ara_database
 
-- name: Generate ara report
-  command: "scl enable rh-python35 -- ara generate html {{ artifacts }}/ara-sf"
-  environment:
-    # FIXME: ara fail when this is not set
-    ARA_LOG_FILE: ""
-    ARA_DIR: "/var/lib/software-factory/ansible/ara"
-  ignore_errors: yes
-  become: yes
+- name: Grab ara report
+  block:
+    - name: Ensure ara-report directory exists
+      file:
+        path: "{{ artifacts }}/ara-report"
+        state: directory
+      become: yes
+
+    - name: Copy the ansible.sqlite database
+      copy:
+        src: /var/lib/software-factory/ansible/ara/ansible.sqlite
+        dest: "{{ artifacts }}/ara-report/ansible.sqlite"
+        remote_src: yes
+      become: yes
   when:
     - not zuul_success | default(false) | bool
     - _ara_database.stat.exists
