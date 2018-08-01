@@ -60,18 +60,18 @@
 
         - name: Fetch logs url
           uri:
-            url: "https://{{ fqdn }}/zuul/api/tennat/local/builds?job_name=linters&project=python-readerlib"
+            url: "https://{{ fqdn }}/zuul/api/tenant/local/builds?job_name=linters&project=python-readerlib"
             return_content: yes
             status_code: "200,404"
             validate_certs: no
           register: _job_logs
-          until: "'json' in job and job.json"
+          until: "'json' in _job_logs and _job_logs.json"
           retries: 120
           delay: 2
 
         - name: Ensure ara-report exists
           uri:
-            url: "{{ job.json[0]['log_url'] }}/ara-report/ansible.sqlite"
+            url: "{{ _job_logs.json[0]['log_url'] }}/ara-report/ansible.sqlite"
             return_content: no
             status_code: 200
             validate_certs: no
