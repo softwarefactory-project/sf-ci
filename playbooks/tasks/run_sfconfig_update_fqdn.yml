@@ -5,6 +5,11 @@
     line: 'fqdn: sftests.com'
   become: yes
 
+- name: Update hostname
+  hostname:
+    name: "managesf.sftests.com"
+  become: yes
+
 - name: Run sfconfig to update fqdn
   command: sfconfig --skip-install
   become: yes

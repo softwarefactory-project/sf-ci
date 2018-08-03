@@ -42,6 +42,11 @@
   when: change_fqdn is defined
   become: yes
 
+- name: Update hostname
+  hostname:
+    name: "{% if change_fqdn is defined %}managesf.sfdomain.com{% else %}managesf.sftests.com{% endif %}"
+  become: yes
+
 - name: Run sfconfig
   command: sfconfig
   become: yes
