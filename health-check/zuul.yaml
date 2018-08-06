@@ -38,6 +38,18 @@
 - hosts: install-server
   remote_user: root
   tasks:
+    - name: Check zuul web routes
+      uri:
+        url: "{{ zuul_web_url }}/api/{{ item }}"
+      with_items:
+        - info
+        - "tenant/{{ tenant_name }}/config-errors"
+        - "tenant/{{ tenant_name }}/pipelines"
+        - "tenant/{{ tenant_name }}/projects"
+        - "tenant/{{ tenant_name }}/jobs"
+        - "tenant/{{ tenant_name }}/project/config"
+        - "tenant/{{ tenant_name }}/job/linters"
+
     - block:
         - name: Add bad YAML file
           template:
