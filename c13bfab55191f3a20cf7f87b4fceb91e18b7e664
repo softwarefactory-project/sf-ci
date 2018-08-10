@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d7ef3d99_ff370fff",
+        "filename": "playbooks/openshift-integration.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2018-08-10T18:49:39Z",
+      "side": 1,
+      "message": "add empty line before",
+      "range": {
+        "startLine": 30,
+        "startChar": 4,
+        "endLine": 30,
+        "endChar": 49
+      },
+      "revId": "c13bfab55191f3a20cf7f87b4fceb91e18b7e664",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bcf994c2_ab125655",
+        "filename": "playbooks/openshift-integration.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2018-08-10T18:49:39Z",
+      "side": 1,
+      "message": "duplicate from line 30",
+      "range": {
+        "startLine": 64,
+        "startChar": 0,
+        "endLine": 68,
+        "endChar": 17
+      },
+      "revId": "c13bfab55191f3a20cf7f87b4fceb91e18b7e664",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
