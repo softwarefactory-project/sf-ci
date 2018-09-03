@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "18d6b5d1_ccbe353c",
+        "filename": "tests/functional/test_managesf.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2018-09-03T07:58:41Z",
+      "side": 1,
+      "message": "That URL should be /zuul/api/tenant/local/builds",
+      "revId": "3fa52b08b74f15b71fc9e9b76a7f19d390f1accb",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
