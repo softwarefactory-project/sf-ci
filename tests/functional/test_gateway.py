@@ -187,13 +187,20 @@ class TestGateway(Base):
     def test_zuul_accessible(self):
         """ Test if Zuul3 is accessible on gateway host
         """
-        url = config.GATEWAY_URL + "/zuul/t/local/status.html"
-        resp = requests.get(
-            url,
-            cookies=dict(
-                auth_pubtkt=config.USERS[config.USER_1]['auth_cookie']))
+        url = config.GATEWAY_URL + "/zuul/"
+        resp = requests.get(url)
+        if resp.status_code == 404:
+            # Legacy url, to remove after 13726 is merged
+            url = config.GATEWAY_URL + "/zuul/t/local/status.html"
+            resp = requests.get(url)
         self.assertEqual(resp.status_code, 200)
-        self.assertTrue('Zuul Status' in resp.text)
+        self.assertIn('Zuul', resp.text)
+
+        # Test api accesss
+        url = config.GATEWAY_URL + "/zuul/api/info"
+        resp = requests.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('capabilities', resp.text)
 
     @skipIfServiceMissing('etherpad')
     def test_etherpad_accessible(self):
