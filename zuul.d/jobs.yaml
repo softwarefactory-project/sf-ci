@@ -1,20 +1,4 @@
 ---
-- project:
-    templates:
-      - sf-ci-jobs
-    periodic:
-      jobs:
-        - sf-deploy-stable:
-            branches: master
-        - sf-deploy-stable-cr:
-            branches: master
-    experimental:
-      jobs:
-        - sf-rpm-build
-        - sf-ci-openshift-integration:
-            dependencies:
-              - sf-rpm-build
-
 - job:
     name: sf-ci
     parent: base
@@ -57,7 +41,7 @@
     run: playbooks/upgrade.yaml
     vars:
       sf_arch: minimal
-      sf_version: 3.0
+      sf_version: 3.1
 
 - job:
     name: sf-ci-upgrade-allinone
@@ -66,7 +50,7 @@
     run: playbooks/upgrade.yaml
     vars:
       sf_arch: allinone
-      sf_version: 3.0
+      sf_version: 3.1
 
 - job:
     name: sf-ci-openshift-integration
@@ -83,7 +67,7 @@
     run: playbooks/stable.yaml
     vars:
       sf_arch: allinone
-      sf_version: 3.0
+      sf_version: 3.1
       centos_cr: false
 
 - job:
@@ -93,5 +77,5 @@
     run: playbooks/stable.yaml
     vars:
       sf_arch: allinone
-      sf_version: 3.0
+      sf_version: 3.1
       centos_cr: true
