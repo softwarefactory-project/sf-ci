@@ -79,3 +79,19 @@
       sf_arch: allinone
       sf_version: 3.1
       centos_cr: true
+
+- job:
+    name: sf-ci-centos-7
+    parent: sf-ci
+    nodeset:
+      nodes:
+        - name: install-server
+          label: sf-centos-7
+
+- job:
+    name: sf-ci-centos-7-functional-minimal
+    description: The sf functional tests of the minimal architecture
+    parent: sf-ci-centos-7
+    run: playbooks/functional.yaml
+    vars:
+      sf_arch: minimal
