@@ -1,71 +1,87 @@
-- name: Setup /etc/sf-release file
-  copy:
-    content: "{{ sf_version }}"
-    dest: /etc/sf-release
-  become: yes
+- name: Prepare yum repositories
+  block:
+  - name: Setup /etc/sf-release file
+    copy:
+      content: "{{ sf_version }}"
+      dest: /etc/sf-release
 
-- name: Check for zuul-built.repo
-  stat: path=/etc/yum.repos.d/zuul-built.repo
-  register: zuul_built_repo
+  - name: Check for zuul-built.repo
+    stat: path=/etc/yum.repos.d/zuul-built.repo
+    register: zuul_built_repo
 
-- name: Check for sf-release.repo
-  stat: path=/etc/yum.repos.d/sf-release.repo
-  register: sf_release_repo
+  - name: Check for sf-release.repo
+    stat: path=/etc/yum.repos.d/sf-release.repo
+    register: sf_release_repo
 
-- name: Check for local-build.repo
-  stat: path=/etc/yum.repos.d/local-built.repo
-  register: local_built_repo
+  - name: Check for local-build.repo
+    stat: path=/etc/yum.repos.d/local-built.repo
+    register: local_built_repo
 
-- name: Install sf-release master when no zuul-built
-  yum:
-    name: "https://softwarefactory-project.io/repos/sf-release-master.rpm"
-    validate_certs: no
-  when:
-    - not zuul_built_repo.stat.exists
-    - not sf_release_repo.stat.exists
-  become: yes
+  - name: Install sf-release master when no zuul-built
+    yum:
+      name: "https://softwarefactory-project.io/repos/sf-release-master.rpm"
+      validate_certs: no
+    when:
+      - not zuul_built_repo.stat.exists
+      - not sf_release_repo.stat.exists
 
-- name: Install zuul-built.repo in place of sf-release
-  command: mv /etc/yum.repos.d/zuul-built.repo /etc/yum.repos.d/sf-release.repo
-  when: zuul_built_repo.stat.exists
-  become: yes
+  - name: Install zuul-built.repo in place of sf-release
+    block:
+      - name: Copy zuul-built.repo file
+        copy:
+          src: /etc/yum.repos.d/zuul-built.repo
+          dest: /etc/yum.repos.d/sf-release.repo
+          remote_src: yes
+      - name: Delete zuul-built.repo
+        file:
+          path: /etc/yum.repos.d/zuul-built.repo
+          state: absent
+    when: zuul_built_repo.stat.exists
 
-- name: Exclude sf-release package from zuul-built repo
-  when: zuul_built_repo.stat.exists
-  ini_file:
-    path: /etc/yum.repos.d/sf-release.repo
-    section: "{{ item }}"
-    option: exclude
-    value: sf-release
-  with_items:
-    - sfmaster
-  become: yes
+  - name: Exclude sf-release package from zuul-built repo
+    when: zuul_built_repo.stat.exists
+    ini_file:
+      path: /etc/yum.repos.d/sf-release.repo
+      section: "{{ item }}"
+      option: exclude
+      value: sf-release
+    with_items:
+      - sfmaster
 
-- name: Check for locally built packages
-  stat:
-    path: "{{ local_repo_path }}"
-  register: local_build
+  - name: Check for locally built packages
+    stat:
+      path: "{{ local_repo_path }}"
+    register: local_build
 
-- name: Remove local_built repo
-  file:
-    path: /etc/yum.repos.d/local-built.repo
-    state: absent
-  when: not local_build.stat.exists
-  become: yes
+  - name: Remove local_built repo
+    file:
+      path: /etc/yum.repos.d/local-built.repo
+      state: absent
+    when: not local_build.stat.exists
 
-- name: Add local_built repo
-  yum_repository:
-    name: "local-built"
-    description: "Local build repo"
-    baseurl: "file://{{ local_repo_path }}"
-    gpgcheck: "0"
-  when: local_build.stat.exists
-  become: yes
+  - name: Add local_built repo
+    yum_repository:
+      name: "local-built"
+      description: "Local build repo"
+      baseurl: "file://{{ local_repo_path }}"
+      gpgcheck: "0"
+    when: local_build.stat.exists
 
-- name: Exclude older package from scl
-  ini_file:
-    path: /etc/yum.repos.d/CentOS-SCLo-scl-rh.repo
-    section: centos-sclo-rh
-    option: exclude
-    value: rh-python35-python-jinja2
+  - name: Install extra repositories
+    block:
+      - name: Install repositories
+        yum:
+          name: centos-release-scl
+        with_items:
+          - centos-release-scl
+          - centos-release-openstack-queens
+        when: ansible_distribution == "CentOS"
+
+      - name: Exclude older package from scl
+        ini_file:
+          path: /etc/yum.repos.d/CentOS-SCLo-scl-rh.repo
+          section: centos-sclo-rh
+          option: exclude
+          value: rh-python35-python-jinja2
+    when: ansible_distribution == "CentOS"
   become: yes
