@@ -62,6 +62,11 @@
   when: local_build.stat.exists
   become: yes
 
+- name: Install scl repository
+  yum:
+    name: centos-release-scl
+  become: yes
+
 - name: Exclude older package from scl
   ini_file:
     path: /etc/yum.repos.d/CentOS-SCLo-scl-rh.repo
