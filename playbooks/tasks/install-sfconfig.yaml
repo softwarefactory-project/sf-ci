@@ -38,6 +38,7 @@
   become: yes
 
 - include: install_sf_ci_repo.yml
+- include: install_sf_ci_packages.yml
 - include: yum_update.yml
 
 - name: Set hostname

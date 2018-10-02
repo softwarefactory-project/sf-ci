@@ -1,0 +1,106 @@
+---
+- name: Install sf-ci requirements
+  yum:
+    name:
+      - GitPython
+      - PyYAML
+      - Xvfb
+      - ansible-lint
+      - ara
+      - bashate
+      - bridge-utils
+      - createrepo
+      - curl
+      - expect
+      - firefox
+      - gcc
+      - git
+      - gnupg2
+      - graphviz
+      - iproute
+      - java
+      - koji
+      - libffi-devel
+      - libpcap-devel
+      - libseccomp-devel
+      - libselinux-python
+      - libxml2-devel
+      - libxslt-devel
+      - libyaml
+      - lsof
+      - make
+      - mariadb-devel
+      - mock
+      - net-tools
+      - openldap-devel
+      - openssl
+      - openssl-devel
+      - patch
+      - pigz
+      - pycrypto
+      - python-alembic
+      - python-babel
+      - python-cffi
+      - python-crypto
+      - python-cryptography
+      - python-daemon
+      - python-devel
+      - python-extras
+      - python-flake8
+      - python-gear
+      - python-glob2
+      - python-jinja2
+      - python-magic
+      - python-nose
+      - python-nose-htmloutput
+      - python-nose-timer
+      - python-paramiko
+      - python-paste
+      - python-pip
+      - python-prettytable
+      - python-requests
+      - python-setuptools
+      - python-six
+      - python-sphinx
+      - python-sphinx_rtd_theme
+      - python-sqlalchemy
+      - python-statsd
+      - python-tox
+      - python-virtualenv
+      - python-voluptuous
+      - python-webob
+      - python2-jmespath
+      - python2-markupsafe
+      - python2-mock
+      - python2-twine
+      - pytz
+      - readline-devel
+      - redhat-lsb-core
+      - redhat-rpm-config
+      - rh-git29-git
+      - rh-python35-python
+      - rpm-sign
+      - rpmdevtools
+      - rpmlint
+      - ruby-devel
+      - rubygems
+      - scl-utils
+      - screen
+      - systemd-devel
+      - systemd-python
+      - unzip
+      - wget
+      - yaml-cpp
+      - yamllint
+      - yum-plugin-priorities
+      - zlib-devel
+  become: true
+
+- name: Add ci users in mock group
+  user:
+    name: '{{ item }}'
+    group: mock
+    append: yes
+  with_items:
+    - zuul
+    - zuul-worker
