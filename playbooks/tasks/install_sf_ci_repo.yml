@@ -1,71 +1,112 @@
-- name: Setup /etc/sf-release file
-  copy:
-    content: "{{ sf_version }}"
-    dest: /etc/sf-release
-  become: yes
+- name: Prepare yum repositories
+  block:
+  - name: Setup /etc/sf-release file
+    copy:
+      content: "{{ sf_version }}"
+      dest: /etc/sf-release
 
-- name: Check for zuul-built.repo
-  stat: path=/etc/yum.repos.d/zuul-built.repo
-  register: zuul_built_repo
+  - name: Check for zuul-built.repo
+    stat: path=/etc/yum.repos.d/zuul-built.repo
+    register: zuul_built_repo
 
-- name: Check for sf-release.repo
-  stat: path=/etc/yum.repos.d/sf-release.repo
-  register: sf_release_repo
+  - name: Check for sf-release.repo
+    stat:
+      path: /etc/yum.repos.d/sf-release.repo
+    register: sf_release_repo
 
-- name: Check for local-build.repo
-  stat: path=/etc/yum.repos.d/local-built.repo
-  register: local_built_repo
+  - name: Check for local-build.repo
+    stat:
+      path: /etc/yum.repos.d/local-built.repo
+    register: local_built_repo
 
-- name: Install sf-release master when no zuul-built
-  yum:
-    name: "https://softwarefactory-project.io/repos/sf-release-master.rpm"
-    validate_certs: no
-  when:
-    - not zuul_built_repo.stat.exists
-    - not sf_release_repo.stat.exists
-  become: yes
+  - name: Install sf-release master when no zuul-built
+    block:
+      - name: Get pkglist on koji
+        get_url:
+          url: "http://koji.softwarefactory-project.io/kojifiles/repos/sf-master-el7-build/latest/x86_64/pkglist"
+          dest: /tmp/pkglist
 
-- name: Install zuul-built.repo in place of sf-release
-  command: mv /etc/yum.repos.d/zuul-built.repo /etc/yum.repos.d/sf-release.repo
-  when: zuul_built_repo.stat.exists
-  become: yes
+      - name: Load pkglist
+        set_fact:
+          pkglists: "{{ lookup('file', '/tmp/pkglist') }}"
 
-- name: Exclude sf-release package from zuul-built repo
-  when: zuul_built_repo.stat.exists
-  ini_file:
-    path: /etc/yum.repos.d/sf-release.repo
-    section: "{{ item }}"
-    option: exclude
-    value: sf-release
-  with_items:
-    - sfmaster
-  become: yes
+      - name: Get sf-release package path
+        set_fact:
+          path: "{{ pkglists.split('\n') | select('match', '^.*sf-release-.*.noarch.rpm$') | list | join }}"
 
-- name: Check for locally built packages
-  stat:
-    path: "{{ local_repo_path }}"
-  register: local_build
+      - name: Create sf-release package url
+        set_fact:
+          sf_release_rpm: "https://softwarefactory-project.io/kojifiles/{{ path | regex_replace('^toplink/(.*)$', '\\1') }}"
 
-- name: Remove local_built repo
-  file:
-    path: /etc/yum.repos.d/local-built.repo
-    state: absent
-  when: not local_build.stat.exists
-  become: yes
+        yum:
+          name: sf_release_rpm
+          validate_certs: no
+    when:
+      - not zuul_built_repo.stat.exists
+      - not sf_release_repo.stat.exists
 
-- name: Add local_built repo
-  yum_repository:
-    name: "local-built"
-    description: "Local build repo"
-    baseurl: "file://{{ local_repo_path }}"
-    gpgcheck: "0"
-  when: local_build.stat.exists
-  become: yes
+  - name: Install zuul-built.repo in place of sf-release
+    block:
+      - name: Copy zuul-built.repo file
+        copy:
+          src: /etc/yum.repos.d/zuul-built.repo
+          dest: /etc/yum.repos.d/sf-release.repo
+          remote_src: yes
 
-- name: Exclude older package from scl
-  ini_file:
-    path: /etc/yum.repos.d/CentOS-SCLo-scl-rh.repo
-    section: centos-sclo-rh
-    option: exclude
-    value: rh-python35-python-jinja2
+      - name: Delete zuul-built.repo
+        file:
+          path: /etc/yum.repos.d/zuul-built.repo
+          state: absent
+
+      - name: Exclude sf-release package from zuul-built repo
+        ini_file:
+          path: /etc/yum.repos.d/sf-release.repo
+          section: sfmaster
+          option: exclude
+          value: sf-release
+    when: zuul_built_repo.stat.exists
+
+
+  - name: Check for locally built packages
+    stat:
+      path: "{{ local_repo_path }}"
+    register: local_build
+
+  - name: Remove local_built repo
+    file:
+      path: /etc/yum.repos.d/local-built.repo
+      state: absent
+    when: not local_build.stat.exists
+
+  - name: Add local_built repo
+    yum_repository:
+      name: "local-built"
+      description: "Local build repo"
+      baseurl: "file://{{ local_repo_path }}"
+      gpgcheck: "0"
+    when: local_build.stat.exists
+
+  - name: Remove unrelevant repos from /etc/yum.repos.d/sf-release.repo
+    yum_repository:
+      name: openstack-queens
+      file: /etc/yum.repos.d/sf-release
+      state: absent
+
+  - name: Install extra repositories
+    block:
+      - name: Install repositories
+        yum:
+          name: centos-release-scl
+        with_items:
+          - centos-release-scl
+          - centos-release-openstack-queens
+        when: ansible_distribution == "CentOS"
+
+      - name: Exclude older package from scl
+        ini_file:
+          path: /etc/yum.repos.d/CentOS-SCLo-scl-rh.repo
+          section: centos-sclo-rh
+          option: exclude
+          value: rh-python35-python-jinja2
+    when: ansible_distribution == "CentOS"
   become: yes
