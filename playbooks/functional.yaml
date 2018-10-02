@@ -29,6 +29,7 @@
       become: yes
 
     - include: tasks/install_sf_ci_repo.yml
+    - include: tasks/install_sf_ci_packages.yml
     - include: tasks/yum_update.yml
     - include: tasks/check_bubblewrap.yml
     - include: tasks/run_sfconfig.yml change_fqdn=True

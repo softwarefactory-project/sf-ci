@@ -28,6 +28,7 @@
     - include: tasks/install_test_env.yml
     - include: tasks/restore_ci_repo.yml
     - include: tasks/install_sf_ci_repo.yml
+    - include: tasks/install_sf_ci_packages.yml
     - include: tasks/set_environment_facts.yml
     - include: tasks/prevent_bwrap_issue.yml
     - include: tasks/run_provisioner.yml
