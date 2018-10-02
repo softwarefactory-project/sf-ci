@@ -62,6 +62,14 @@
   when: local_build.stat.exists
   become: yes
 
+- name: Install repositories
+  yum:
+    name: centos-release-scl
+  with_items:
+    - centos-release-scl
+    - centos-release-openstack-queens
+  become: yes
+
 - name: Exclude older package from scl
   ini_file:
     path: /etc/yum.repos.d/CentOS-SCLo-scl-rh.repo
