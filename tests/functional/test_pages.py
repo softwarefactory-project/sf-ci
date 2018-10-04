@@ -24,7 +24,7 @@ from utils import GerritGitUtils
 from utils import JobUtils
 from utils import create_random_str
 # from utils import skipIfStrInFile
-# from utils import skipIf
+from utils import skipIf
 from utils import get_gerrit_utils
 
 
@@ -67,6 +67,9 @@ class TestPages(Base):
         self.gitu_admin.add_commit_for_all_new_additions(clone_dir, msg)
         return self.gitu_admin.direct_push_branch(clone_dir, 'master')
 
+    # Not stable need to be check carefuly
+    # https://tree.taiga.io/project/morucci-software-factory/us/1427
+    @skipIf(True, 'Test too flaky')
     def test_pages(self):
         """ Test sf-pages publication - raw content
         """
