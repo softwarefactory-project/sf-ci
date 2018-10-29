@@ -12,18 +12,17 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import shlex
 import config
 import random
 import string
 import json
 import datetime
 import time
+import subprocess
 
 from utils import Base, skipIfServiceMissing
 from utils import set_private_key
 from utils import GerritGitUtils
-from subprocess import Popen, PIPE
 
 
 class TestLogExportedInElasticSearch(Base):
@@ -31,27 +30,16 @@ class TestLogExportedInElasticSearch(Base):
     """
     def setUp(self):
         super(TestLogExportedInElasticSearch, self).setUp()
-        self.un = config.ADMIN_USER
-        self.priv_key_path = set_private_key(config.USERS[self.un]["privkey"])
-        self.gitu_admin = GerritGitUtils(self.un,
-                                         self.priv_key_path,
-                                         config.USERS[self.un]['email'])
+        priv_key_path = set_private_key(
+            config.USERS[config.ADMIN_USER]["privkey"])
+        self.gitu_admin = GerritGitUtils(
+            config.ADMIN_USER, priv_key_path,
+            config.USERS[config.ADMIN_USER]['email'])
 
-    def run_ssh_cmd(self, sshkey_priv_path, user, host, subcmd):
-        host = '%s@%s' % (user, host)
-        sshcmd = ['ssh', '-o', 'LogLevel=ERROR',
-                  '-o', 'StrictHostKeyChecking=no',
-                  '-o', 'UserKnownHostsFile=/dev/null', '-i',
-                  sshkey_priv_path, host]
-        cmd = sshcmd + subcmd
-
-        p = Popen(cmd, stdout=PIPE)
-        return p.communicate(), p.returncode
-
-    def push_request_script(self, index, newhash):
+    def copy_request_script(self, index, newhash):
         newhash = newhash.rstrip()
         content = """
-curl -s -XPOST 'http://elasticsearch.%s:9200/%s/_search?pretty&size=1' -d '{
+curl -s -XPOST 'http://%s:9200/%s/_search?pretty&size=1' -d '{
       "query": {
           "bool": {
               "must": [
@@ -64,15 +52,10 @@ curl -s -XPOST 'http://elasticsearch.%s:9200/%s/_search?pretty&size=1' -d '{
 """
         with open('/tmp/test_request.sh', 'w') as fd:
             fd.write(content % (config.GATEWAY_HOST, index, newhash))
-        cmd = ['scp', '/tmp/test_request.sh',
-               'root@%s:/tmp/test_request.sh' % config.GATEWAY_HOST]
-        p = Popen(cmd, stdout=PIPE)
-        return p.communicate(), p.returncode
 
     def find_index(self):
-        subcmd = "curl -s -XGET http://elasticsearch.%s:9200/_cat/indices" % (
-            config.GATEWAY_HOST)
-        subcmd = shlex.split(subcmd)
+        subcmd = ["ssh", "elasticsearch", "curl", "-s",
+                  "http://elasticsearch:9200/_cat/indices"]
         # A logstash index is created by day
         today_str = datetime.datetime.utcnow().strftime('%Y.%m.%d')
         # Here we fetch the index name, but also we wait for
@@ -80,41 +63,37 @@ curl -s -XPOST 'http://elasticsearch.%s:9200/%s/_search?pretty&size=1' -d '{
         index = []
         for retry in xrange(300):
             try:
-                out = self.run_ssh_cmd(config.SERVICE_PRIV_KEY_PATH, 'root',
-                                       config.GATEWAY_HOST, subcmd)
-                outlines = out[0][0].split('\n')
-                outlines.pop()
-                index = [o for o in outlines if
-                         o.split()[2].startswith('logstash-%s' % today_str)]
-                if len(index):
+                outlines = subprocess.check_output(subcmd).split('\n')
+                indexes = filter(
+                    lambda l: l.find('logstash-%s' % today_str) >= 0,
+                    outlines)
+                if indexes:
                     break
-            except:
-                time.sleep(1)
+            except Exception:
+                time.sleep(2)
         self.assertEqual(
-            len(index),
-            1,
+            len(indexes), 1,
             "No logstash index has been found for today logstash-%s (%s)" % (
-                today_str, str(index)))
-        index = index[0].split()[2]
+                today_str, str(indexes)))
+        index = indexes[0].split()[2]
         return index
 
     def verify_logs_exported(self):
-        subcmd = "bash /tmp/test_request.sh"
-        subcmd = shlex.split(subcmd)
+        subcmd = ["ssh", "elasticsearch", "bash", "/tmp/test_request.sh"]
         for retry in xrange(300):
-            out = self.run_ssh_cmd(config.SERVICE_PRIV_KEY_PATH, 'root',
-                                   config.GATEWAY_HOST, subcmd)
-            ret = json.loads(out[0][0])
+            out = subprocess.check_output(subcmd)
+            ret = json.loads(out)
             if len(ret['hits']['hits']) >= 1:
                 break
             elif len(ret['hits']['hits']) == 0:
-                time.sleep(1)
+                time.sleep(2)
         self.assertEqual(len(ret['hits']['hits']),
                          1,
                          "Fail to find our log in ElasticSeach")
         return ret['hits']['hits'][0]
 
     def direct_push_in_config_repo(self, url, pname='config'):
+        url = url.rstrip('/') + "/%s" % pname
         rand_str = ''.join(random.choice(
             string.ascii_uppercase + string.digits) for _ in range(5))
         clone = self.gitu_admin.clone(url, pname)
@@ -122,20 +101,18 @@ curl -s -XPOST 'http://elasticsearch.%s:9200/%s/_search?pretty&size=1' -d '{
             fd.write('test')
         self.gitu_admin.add_commit_in_branch(
             clone, 'master', ['test_%s' % rand_str])
-        head = file('%s/.git/refs/heads/master' % clone).read()
-        self.gitu_admin.direct_push_branch(clone, 'master')
+        head = self.gitu_admin.direct_push_branch(clone, 'master')
         return head
 
     @skipIfServiceMissing('job-logs-gearman-worker')
     def test_log_indexation(self):
         """ Test job log are exported in Elasticsearch
         """
-#        head = self.direct_push_in_config_repo(
-#            'ssh://admin@%s:29418/config' % (
-#                config.GATEWAY_HOST))
-#        index = self.find_index()
-#        self.push_request_script(index, head)
-#        log = self.verify_logs_exported()
-#        self.assertEqual(log['_source']["build_name"], "config-update")
-#       Deactivate for now. Test is flaky need a rewrite
-        return
+        head = self.direct_push_in_config_repo(
+            'ssh://%s@%s:29418' % (
+                config.ADMIN_USER,
+                config.GATEWAY_HOST))
+        index = self.find_index()
+        self.copy_request_script(index, head)
+        log = self.verify_logs_exported()
+        self.assertEqual(log['_source']["build_name"], "config-update")
