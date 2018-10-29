@@ -50,18 +50,6 @@ class TestResourcesWorkflow(Base):
         for dirs in self.dirs_to_delete:
             shutil.rmtree(dirs)
 
-    def ssh_run_cmd(self, sshkey_priv_path, user, host, subcmd):
-        host = '%s@%s' % (user, host)
-        sshcmd = ['ssh', '-o', 'LogLevel=ERROR',
-                  '-o', 'StrictHostKeyChecking=no',
-                  '-o', 'UserKnownHostsFile=/dev/null', '-i',
-                  sshkey_priv_path, host]
-        cmd = sshcmd + subcmd
-
-        devnull = open(os.devnull, 'wb')
-        p = Popen(cmd, stdout=devnull, stderr=devnull)
-        return p.communicate(), p.returncode
-
     def clone_as_admin(self, pname):
         url = "ssh://%s@%s:29418/%s" % (config.ADMIN_USER,
                                         config.GATEWAY_HOST,
