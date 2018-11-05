@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "73c6be4e_a59eef83",
+        "filename": "playbooks/tasks/install_sf_ci_repo.yml",
+        "patchSetId": 15
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2018-11-05T15:41:39Z",
+      "side": 1,
+      "message": "I updated the file on sf.io, we need to find a better solution to ensure this file is always up-to-date on sf.io. We always forget to update it",
+      "parentUuid": "018dbbdd_70ca9505",
+      "revId": "01d00215891c04e2fac9d8328e847dd6a96b06bd",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5247aafc_4d240fb0",
         "filename": "playbooks/tasks/install_sf_ci_repo.yml",
         "patchSetId": 15
@@ -42,6 +60,30 @@
     },
     {
       "key": {
+        "uuid": "c6527e8d_892bf185",
+        "filename": "playbooks/tasks/install_sf_ci_repo.yml",
+        "patchSetId": 15
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2018-11-05T15:41:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5247aafc_4d240fb0",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 49,
+        "endChar": 16
+      },
+      "revId": "01d00215891c04e2fac9d8328e847dd6a96b06bd",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "53a1fd62_db06a6b9",
         "filename": "playbooks/tasks/install_sf_ci_repo.yml",
         "patchSetId": 15
@@ -53,6 +95,30 @@
       "writtenOn": "2018-11-05T10:40:10Z",
       "side": 1,
       "message": "Let\u0027s handle that (for rhel support) in another change. Here we want to enable sf-ci on sf-centos7.\nRegarding the rhel support: We are going to test the master SF repo periodically so we don\u0027t need to bother with zuul-built.repo stuff. AFAIU we are blocked by the dependencies in sf-release.rpm. So why not having the proper rpm macro in the spec file to add or not the scl and openstack deps in case of CentOS and add what we need in case of rhel.",
+      "range": {
+        "startLine": 70,
+        "startChar": 0,
+        "endLine": 92,
+        "endChar": 42
+      },
+      "revId": "01d00215891c04e2fac9d8328e847dd6a96b06bd",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "61770d7a_4f88c9d7",
+        "filename": "playbooks/tasks/install_sf_ci_repo.yml",
+        "patchSetId": 15
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2018-11-05T15:41:39Z",
+      "side": 1,
+      "message": "I will check how to build sf-release for centos and rhel with dedicated depends. There is an issue for rhel because we need to install openstack-queens from url, it\u0027s not available on rhel repos. Also we can try to use rhos repos instead",
+      "parentUuid": "53a1fd62_db06a6b9",
       "range": {
         "startLine": 70,
         "startChar": 0,
