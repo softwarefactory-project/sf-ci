@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a0b8ce0_0c527564",
+        "filename": "playbooks/tasks/install_sf_ci_repo.yml",
+        "patchSetId": 17
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-11-06T10:03:33Z",
+      "side": 1,
+      "message": "Could we replace that by:\n```\n    - get_url:\n        url: \"http://koji.softwarefactory-project.io/kojifiles/repos/sf-master-el7-build/latest/x86_64/pkglist\"\n        dest: /tmp/pkglist\n    - set_fact:\n        pkglists: \"{{ lookup(\u0027file\u0027, \u0027/tmp/pkglist\u0027) }}\"\n    - set_fact:\n        path: \"{{ pkglists.split(\u0027\\n\u0027) | select(\u0027match\u0027, \u0027^.*sf-release-.*.noarch.rpm$\u0027) | list | join }}\"\n    - set_fact:\n        sf_release_rpm: \"https://softwarefactory-project.io/kojifiles/{{ path | regex_replace(\u0027^toplink/(.*)$\u0027, \u0027\\\\1\u0027) }}\"\n\n```",
+      "revId": "fc59335839391a8a4eb6c259f298bdbca1ecf02e",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
