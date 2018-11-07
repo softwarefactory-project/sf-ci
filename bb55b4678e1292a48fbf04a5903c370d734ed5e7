@@ -111,6 +111,30 @@
     },
     {
       "key": {
+        "uuid": "215d958e_73851728",
+        "filename": "playbooks/tasks/install_sf_ci_repo.yml",
+        "patchSetId": 19
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2018-11-07T14:50:43Z",
+      "side": 1,
+      "message": "No I can\u0027t, CI jobs failed on sf-centos-7 image if I don\u0027t install these repos",
+      "parentUuid": "ce9b7fff_1c3d1cc0",
+      "range": {
+        "startLine": 91,
+        "startChar": 0,
+        "endLine": 105,
+        "endChar": 46
+      },
+      "revId": "bb55b4678e1292a48fbf04a5903c370d734ed5e7",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "52b164bb_e3ee35cc",
         "filename": "playbooks/tasks/install_sf_ci_repo.yml",
         "patchSetId": 19
