@@ -1,0 +1,136 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c0d4bc1c_6786ad06",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 19
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-11-07T09:23:14Z",
+      "side": 1,
+      "message": "Active sf-centos7 image instead of dib-centos7 for sf func tests",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 51
+      },
+      "revId": "bb55b4678e1292a48fbf04a5903c370d734ed5e7",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ca3a86b0_071b776f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 19
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-11-07T09:23:14Z",
+      "side": 1,
+      "message": "remove",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 49
+      },
+      "revId": "bb55b4678e1292a48fbf04a5903c370d734ed5e7",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "071d4d6a_9bd91ff9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 19
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-11-07T09:23:14Z",
+      "side": 1,
+      "message": "remove",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 36
+      },
+      "revId": "bb55b4678e1292a48fbf04a5903c370d734ed5e7",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "92a26865_1da96a3e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 19
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-11-07T09:23:14Z",
+      "side": 1,
+      "message": "- some style refactoring",
+      "revId": "bb55b4678e1292a48fbf04a5903c370d734ed5e7",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ce9b7fff_1c3d1cc0",
+        "filename": "playbooks/tasks/install_sf_ci_repo.yml",
+        "patchSetId": 19
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-11-07T09:23:14Z",
+      "side": 1,
+      "message": "Could you remove this, let\u0027s tackle rhel test support in another patch. Better to look what we can do at the sf-release package level by using macro logic.",
+      "range": {
+        "startLine": 91,
+        "startChar": 0,
+        "endLine": 105,
+        "endChar": 46
+      },
+      "revId": "bb55b4678e1292a48fbf04a5903c370d734ed5e7",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "52b164bb_e3ee35cc",
+        "filename": "playbooks/tasks/install_sf_ci_repo.yml",
+        "patchSetId": 19
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-11-07T09:23:14Z",
+      "side": 1,
+      "message": "This too then.",
+      "range": {
+        "startLine": 113,
+        "startChar": 0,
+        "endLine": 113,
+        "endChar": 42
+      },
+      "revId": "bb55b4678e1292a48fbf04a5903c370d734ed5e7",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
