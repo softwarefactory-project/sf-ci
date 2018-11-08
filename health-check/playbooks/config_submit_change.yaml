@@ -20,7 +20,7 @@
         validate_certs: no
       register: job
       until: "'json' in job and job.json"
-      retries: 120
+      retries: 300
       delay: 2
 
     - debug: "msg={{ job }}"
