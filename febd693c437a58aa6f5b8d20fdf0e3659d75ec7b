@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a54a3c97_a11b8e3e",
+        "filename": "playbooks/tasks/install_sf_ci_repo.yml",
+        "patchSetId": 21
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-11-12T08:25:47Z",
+      "side": 0,
+      "message": "A reason why you remove that ? maybe that\u0027s no longer needed ?",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 70,
+        "endChar": 36
+      },
+      "revId": "febd693c437a58aa6f5b8d20fdf0e3659d75ec7b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
