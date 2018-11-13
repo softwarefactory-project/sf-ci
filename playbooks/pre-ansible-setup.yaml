@@ -1,0 +1,7 @@
+- hosts: install-server
+  tasks:
+    - name: Create ansible.cfg symlink
+      file:
+        src: /var/lib/software-factory/ansible/ara.cfg
+        dest: /home/zuul-worker/.ansible.cfg
+        force: yes

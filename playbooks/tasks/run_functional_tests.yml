@@ -1,4 +1,4 @@
-- include: update_bootstrap_mode.yml
+- include_tasks: update_bootstrap_mode.yml
 
 - name: Remove any sfmanager.log
   file:
