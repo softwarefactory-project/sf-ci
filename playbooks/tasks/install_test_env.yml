@@ -8,6 +8,28 @@
     - python2-storyboardclient
   become: yes
 
+- name: Create ansible facts.d directory
+  file:
+    path: /etc/ansible/facts.d
+    state: directory
+
+- name: Create script to generate ansible json fact file
+  blockinfile:
+    create: yes
+    dest: /usr/local/bin/gen_ansible_fact.py
+    mode: 0550
+    content: |
+      #!/usr/bin/env python
+      import yaml, json
+      group_var = '/var/lib/software-factory/ansible/group_vars/all.yaml'
+      fact_file = '/etc/ansible/facts.d/install-server.fact'
+
+      with open(group_var) as source, open(fact_file, 'w') as fact:
+          fact.write(json.dumps(yaml.load(source)))
+
+- name: Generate ansible json fact file
+  command: /usr/local/bin/gen_ansible_fact.py
+
 # TODO: remove the auto-creation of sfmanager.log and delete the task bellow
 # Remove sfmanager.log as it might be created before and owned by root
 - name: Remove previous sfmanager.log
