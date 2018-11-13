@@ -8,6 +8,11 @@
     - python2-storyboardclient
   become: yes
 
+- name: Ensure ansible hosts file is world readable
+  file:
+    path: /var/lib/software-factory/ansible/hosts
+    mode: 0644
+
 # TODO: remove the auto-creation of sfmanager.log and delete the task bellow
 # Remove sfmanager.log as it might be created before and owned by root
 - name: Remove previous sfmanager.log
