@@ -1,0 +1,19 @@
+# Local repository path
+local_repo_path: ""
+# Default test case
+func_test_case: "tests/functional"
+
+# workspace (use default(, true) to set default when env lookup return '')
+workspace: "./"
+sf_ci: "{{ workspace }}"
+sf_user: "centos"
+artifacts: "{{ workspace }}/artifacts"
+home: "/home/{{ sf_user }}"
+
+# sfconfig.yaml customization
+fqdn: "sftests.com"
+sf_domain: "sftests.com"
+
+sf_url: "https://softwarefactory-project.io/releases"
+stack_url: "{{ sf_url }}/sf-{{ sf_version }}/sf-{{ sf_version }}-{{ sf_arch }}{% if floatingip_id %}-fixed-ip{% endif %}.hot"
+image_url: "{{ sf_url }}/sf-{{ sf_version }}/sf-{{ sf_version }}.qcow2"

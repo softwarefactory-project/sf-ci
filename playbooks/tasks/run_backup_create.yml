@@ -1,4 +1,4 @@
-- include: update_bootstrap_mode.yml
+- include_tasks: update_bootstrap_mode.yml
 
 - name: Create backup
   command: ansible-playbook /var/lib/software-factory/ansible/sf_backup.yml
