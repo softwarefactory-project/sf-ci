@@ -1,6 +1,6 @@
 ---
 - name: "Reset config repos"
-  include: playbooks/config_reset.yaml
+  import_tasks: playbooks/config_reset.yaml
 
 - hosts: install-server
   remote_user: root
@@ -62,15 +62,15 @@
       register: nodepool_conf
 
     - name: Commit change
-      when: nodepool_conf|changed
+      when: nodepool_conf is changed
       command: chdir={{ config_path }} {{ item }}
       with_items:
         - 'git add -A'
         - 'git commit -m "Add openshift unprivileged configuration"'
 
 - name: "Submit config repos"
-  include: playbooks/config_submit_change.yaml
-  when: nodepool_conf|changed
+  import_tasks: playbooks/config_submit_change.yaml
+  when: nodepool_conf is changed
 
 - hosts: install-server
   remote_user: root
