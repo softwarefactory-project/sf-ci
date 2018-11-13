@@ -1,0 +1,8 @@
+---
+- fetch:
+    src: /var/lib/software-factory/ansible/group_vars/all.yaml
+    dest: install-server.yaml
+    flat: yes
+
+- include_vars:
+    file: install-server.yaml
