@@ -28,21 +28,21 @@
         state: absent
       become: yes
 
-    - include: tasks/install_sf_ci_repo.yml
-    - include: tasks/install_sf_ci_packages.yml
-    - include: tasks/yum_update.yml
-    - include: tasks/check_bubblewrap.yml
-    - include: tasks/run_sfconfig.yml change_fqdn=True
-    - include: tasks/run_sfconfig_update_fqdn.yml
-    - include: tasks/install_test_env.yml
-    - include: tasks/set_environment_facts.yml
-    - include: tasks/prevent_bwrap_issue.yml
-    - include: tasks/run_provisioner.yml
-    - include: tasks/run_backup_create.yml
-    - include: tasks/run_health-check.yml
-    - include: tasks/run_firehose_listener.yml
-    - include: tasks/run_functional_tests.yml
-    - include: tasks/check_firehose_events.yml
-    - include: tasks/run_erase.yml
-    - include: tasks/run_sfconfig_recover.yml
-    - include: tasks/run_checker.yml
+    - import_tasks: tasks/install_sf_ci_repo.yml
+    - import_tasks: tasks/install_sf_ci_packages.yml
+    - import_tasks: tasks/yum_update.yml
+    - import_tasks: tasks/check_bubblewrap.yml
+    - import_tasks: tasks/run_sfconfig.yml change_fqdn=True
+    - import_tasks: tasks/run_sfconfig_update_fqdn.yml
+    - import_tasks: tasks/install_test_env.yml
+    - import_tasks: tasks/set_environment_facts.yml
+    - import_tasks: tasks/prevent_bwrap_issue.yml
+    - import_tasks: tasks/run_provisioner.yml
+    - import_tasks: tasks/run_backup_create.yml
+    - import_tasks: tasks/run_health-check.yml
+    - import_tasks: tasks/run_firehose_listener.yml
+    - import_tasks: tasks/run_functional_tests.yml
+    - import_tasks: tasks/check_firehose_events.yml
+    - import_tasks: tasks/run_erase.yml
+    - import_tasks: tasks/run_sfconfig_recover.yml
+    - import_tasks: tasks/run_checker.yml

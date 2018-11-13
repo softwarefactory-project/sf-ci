@@ -1,3 +1,4 @@
+---
 - name: Execute health-check
   command: >
     ansible-playbook -i /var/lib/software-factory/ansible/hosts \
