@@ -1,0 +1,17 @@
+---
+- hosts: install-server
+  tasks:
+    - name: Create working directory and files
+      block:
+        - name: Ensure /etc/ansible dir exists
+          file:
+            path: /etc/ansible
+            state: directory
+
+        - name: Ensure /etc/ansible/hosts could be used for ci jobs
+          file:
+            src: /var/lib/software-factory/ansible/hosts
+            dest: /etc/ansible/hosts
+            state: link
+            force: yes
+      become: true
