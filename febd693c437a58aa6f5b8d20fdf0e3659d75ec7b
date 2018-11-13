@@ -22,6 +22,30 @@
       "revId": "febd693c437a58aa6f5b8d20fdf0e3659d75ec7b",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "40df8a1e_6e33c9f7",
+        "filename": "playbooks/tasks/install_sf_ci_repo.yml",
+        "patchSetId": 21
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2018-11-13T14:46:00Z",
+      "side": 0,
+      "message": "It present on https://softwarefactory-project.io/r/#/c/13838/25/playbooks/tasks/install_sf_ci_repo.yml@112",
+      "parentUuid": "a54a3c97_a11b8e3e",
+      "range": {
+        "startLine": 65,
+        "startChar": 0,
+        "endLine": 70,
+        "endChar": 36
+      },
+      "revId": "febd693c437a58aa6f5b8d20fdf0e3659d75ec7b",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
