@@ -1,0 +1,24 @@
+---
+- hosts: install-server
+  tasks:
+    - name: Create working directory and files
+      block:
+        - name: Ensure /var/lib/software-factory/ansible dir exists
+          file:
+            path: /var/lib/software-factory/ansible
+            state: directory
+            recurse: true
+            owner: zuul-worker
+
+        - name: Ensure /var/lib/software-factory/ansible/hosts exists
+          file:
+            path: /var/lib/software-factory/ansible/hosts
+            state: touch
+
+        - name: Ensure /etc/ansible/hosts could be used for ci jobs
+          file:
+            src: /var/lib/software-factory/ansible/hosts
+            dest: /etc/ansible/hosts
+            state: link
+            force: yes
+      become: true
