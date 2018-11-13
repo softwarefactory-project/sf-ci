@@ -1,0 +1,6 @@
+---
+- slurp:
+    src: /var/lib/software-factory/ansible/group_vars/all.yaml
+  register: ansible_variables
+
+- include_vars: "{{ ansible_variables['content'] | b64decode }}"
