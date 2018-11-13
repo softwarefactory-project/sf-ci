@@ -37,11 +37,11 @@
       os_image:
         name: "sf-{{ sf_version }}"
         state: absent
-      when: new_image|changed
+      when: new_image is changed
 
     - name: Convert image in raw
       shell: "qemu-img convert -f qcow2 -O raw {{ qcow2_image }} {{ raw_image }}"
-      when: new_image|changed
+      when: new_image is changed
 
     - name: Upload image
       os_image:

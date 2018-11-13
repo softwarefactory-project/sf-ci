@@ -244,8 +244,8 @@
         file: "{{ sf_ci }}/health-check/group_vars/all.yaml"
       no_log: True
 
-- include: "../health-check/nodepool3.yaml"
+- include_tasks: "../health-check/nodepool3.yaml"
   vars:
     os_slave_net: "{{ hostvars.get('localhost', {}).get('slave_net', 'default') }}"
 
-- include: "../health-check/zuul3.yaml"
+- include_tasks: "../health-check/zuul3.yaml"

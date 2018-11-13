@@ -1,6 +1,6 @@
 ---
 - name: "Reset config repos"
-  include: playbooks/config_reset.yaml
+  include_tasks: playbooks/config_reset.yaml
 
 - hosts: install-server
   remote_user: root
@@ -18,15 +18,15 @@
       register: zuul_conf
 
     - name: Update change
-      when: zuul_conf|changed
+      when: zuul_conf is changed
       command: chdir={{ config_path }}  {{ item }}
       with_items:
           - 'git add -A'
           - 'git commit -m "Add zuul health-check configuration"'
 
 - name: "Submit config repos"
-  include: playbooks/config_submit_change.yaml
-  when: zuul_conf|changed
+  include_tasks: playbooks/config_submit_change.yaml
+  when: zuul_conf is changed
 
 - hosts: zuul-executor
   tasks:
@@ -56,7 +56,7 @@
             - git add .zuul.yaml file.yaml
             - git commit -m "Test project"
             - /usr/share/sf-config/scripts/submit_and_wait.py --delay 1200 --failure
-          when: bad_project_status|changed
+          when: bad_project_status is changed
 
         - name: Fetch logs url
           uri:
@@ -93,7 +93,7 @@
             - /usr/share/sf-config/scripts/submit_and_wait.py --delay 1200 --approve
             - git fetch --all
           environment: {'EDITOR':'test'}
-          when: good_project_status|changed
+          when: good_project_status is changed
 
         - name: "Check change was merged"
           command: chdir=/var/lib/software-factory/health-check/python-readerlib/ git diff HEAD origin/master
