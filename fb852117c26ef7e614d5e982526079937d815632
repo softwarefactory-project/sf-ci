@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4e9363e8_0e74f381",
+        "filename": "playbooks/tasks/install_sf_ci_packages.yml",
+        "patchSetId": 26
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-11-13T14:56:17Z",
+      "side": 1,
+      "message": "I mean could we keep the minimal here, please remove useless deps here.",
+      "revId": "fb852117c26ef7e614d5e982526079937d815632",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "20718ced_747de49f",
+        "filename": "playbooks/tasks/install_sf_ci_repo.yml",
+        "patchSetId": 26
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-11-13T14:56:17Z",
+      "side": 1,
+      "message": "Why do it twice ?",
+      "range": {
+        "startLine": 120,
+        "startChar": 0,
+        "endLine": 125,
+        "endChar": 38
+      },
+      "revId": "fb852117c26ef7e614d5e982526079937d815632",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
