@@ -26,9 +26,9 @@
       args:
         chdir: /tmp/sf-heat-templates/
 
-    - include_tasks: tasks/deploy-heat/destroy_stack.yml
+    - import_tasks: tasks/deploy-heat/destroy_stack.yml
 
-    - include_tasks: tasks/deploy-heat/create_stack.yml
+    - import_tasks: tasks/deploy-heat/create_stack.yml
 
     - name: Get stack facts
       os_stack_get:
@@ -171,7 +171,7 @@
         flat: yes
       become: true
 
-    - include_tasks: tasks/customize_latest.yml
+    - import_tasks: tasks/customize_latest.yml
 
 - hosts: all
   remote_user: centos
@@ -244,8 +244,8 @@
         file: "{{ sf_ci }}/health-check/group_vars/all.yaml"
       no_log: True
 
-- include: "../health-check/nodepool3.yaml"
+- import_tasks: "../health-check/nodepool3.yaml"
   vars:
     os_slave_net: "{{ hostvars.get('localhost', {}).get('slave_net', 'default') }}"
 
-- include: "../health-check/zuul3.yaml"
+- import_tasks: "../health-check/zuul3.yaml"
