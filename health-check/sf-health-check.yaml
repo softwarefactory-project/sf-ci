@@ -1,7 +1,10 @@
 ---
-- name: Run health-check zuul
-  include: zuul.yaml
-  when: '"zuul" in roles'
+- hosts: all
+  tasks:
+    - name: Run health-check zuul
+      import_tasks: zuul.yaml
+      when: '"zuul" in roles'
 
-- include: gerritbot.yaml
-  when: '"gerritbot" in roles'
+    - name: Run health_check gerritbot
+      import_tasks: gerritbot.yaml
+      when: '"gerritbot" in roles'
