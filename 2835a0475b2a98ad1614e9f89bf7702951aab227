@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "426db122_c19fac0e",
+        "filename": "playbooks/tasks/install_sf_ci_packages.yml",
+        "patchSetId": 25
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2018-11-13T14:46:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "04a5532b_99260608",
+      "revId": "2835a0475b2a98ad1614e9f89bf7702951aab227",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "881cd528_7b2f6eda",
         "filename": "playbooks/tasks/install_sf_ci_repo.yml",
         "patchSetId": 25
@@ -30,6 +48,30 @@
       "writtenOn": "2018-11-12T08:25:47Z",
       "side": 1,
       "message": "Really I\u0027m not a big fan of that solution, but ok. Could you then add it in a block when (zuul_built_repo.stat.exists or sf_release_repo.stat.exists) as we don\u0027t need if we install the real sf-release package. + Add the explanation why are we doing that (for the record)",
+      "range": {
+        "startLine": 91,
+        "startChar": 0,
+        "endLine": 105,
+        "endChar": 46
+      },
+      "revId": "2835a0475b2a98ad1614e9f89bf7702951aab227",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "12eea747_dbeca178",
+        "filename": "playbooks/tasks/install_sf_ci_repo.yml",
+        "patchSetId": 25
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2018-11-13T14:46:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "881cd528_7b2f6eda",
       "range": {
         "startLine": 91,
         "startChar": 0,
