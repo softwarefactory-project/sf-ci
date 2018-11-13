@@ -2,12 +2,21 @@
 # * Reset {{ config_path }} checkout and update to origin/master
 - hosts: install-server
   remote_user: root
+  vars:
+    sf_user: "zuul-worker"
   tasks:
+    - include_tasks: tasks/update_bootstrap_mode.yml
+
     - name: Clone config repo
-      git: repo=http://{{ fqdn }}/r/config dest={{ config_path }} update=no
+      git:
+        repo: "http://{{ fqdn }}/r/config"
+        dest: "{{ config_path }}"
+        update: no
 
     - name: Reset config
-      command: chdir={{ config_path }} {{ item }}
+      command: "{{ item }}"
+      args:
+        chdir: "{{ config_path }}"
       with_items:
         - git fetch --all
         - git checkout master
