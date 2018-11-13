@@ -22,7 +22,7 @@
     name: sf-ci-functional-minimal
     description: The sf functional tests of the minimal architecture
     parent: sf-ci
-    run: playbooks/functional.yaml
+    run: functional.yaml
     vars:
       sf_arch: minimal
 
@@ -30,52 +30,52 @@
     name: sf-ci-functional-allinone
     description: The sf functional tests of the allinone architecture
     parent: sf-ci
-    run: playbooks/functional.yaml
+    run: functional.yaml
     vars:
       sf_arch: allinone
 
-- job:
-    name: sf-ci-upgrade-minimal
-    description: The sf upgrade tests of the minimal architecture
-    parent: sf-ci
-    run: playbooks/upgrade.yaml
-    vars:
-      sf_arch: minimal
-      sf_version: 3.1
-
-- job:
-    name: sf-ci-upgrade-allinone
-    description: The sf upgrade tests of the allinone architecture
-    parent: sf-ci
-    run: playbooks/upgrade.yaml
-    vars:
-      sf_arch: allinone
-      sf_version: 3.1
-
-- job:
-    name: sf-ci-openshift-integration
-    description: The sf openshift integration test
-    parent: sf-ci
-    run: playbooks/openshift-integration.yaml
-    vars:
-      sf_arch: minimal
-
-- job:
-    name: sf-deploy-stable
-    description: The sf deploy lastest stable
-    parent: sf-ci
-    run: playbooks/stable.yaml
-    vars:
-      sf_arch: allinone
-      sf_version: 3.1
-      centos_cr: false
-
-- job:
-    name: sf-deploy-stable-cr
-    description: The sf deploy lastest stable with CentOS CR
-    parent: sf-ci
-    run: playbooks/stable.yaml
-    vars:
-      sf_arch: allinone
-      sf_version: 3.1
-      centos_cr: true
+#- job:
+#    name: sf-ci-upgrade-minimal
+#    description: The sf upgrade tests of the minimal architecture
+#    parent: sf-ci
+#    run: upgrade.yaml
+#    vars:
+#      sf_arch: minimal
+#      sf_version: 3.1
+#
+#- job:
+#    name: sf-ci-upgrade-allinone
+#    description: The sf upgrade tests of the allinone architecture
+#    parent: sf-ci
+#    run: upgrade.yaml
+#    vars:
+#      sf_arch: allinone
+#      sf_version: 3.1
+#
+#- job:
+#    name: sf-ci-openshift-integration
+#    description: The sf openshift integration test
+#    parent: sf-ci
+#    run: playbooks/openshift-integration.yaml
+#    vars:
+#      sf_arch: minimal
+#
+#- job:
+#    name: sf-deploy-stable
+#    description: The sf deploy lastest stable
+#    parent: sf-ci
+#    run: playbooks/deploy_stable.yaml
+#    vars:
+#      sf_arch: allinone
+#      sf_version: 3.1
+#      centos_cr: false
+#
+#- job:
+#    name: sf-deploy-stable-cr
+#    description: The sf deploy lastest stable with CentOS CR
+#    parent: sf-ci
+#    run: playbooks/deploy_stable.yaml
+#    vars:
+#      sf_arch: allinone
+#      sf_version: 3.1
+#      centos_cr: true
