@@ -1,0 +1,16 @@
+---
+- hosts: install-server
+  tasks:
+    - name: Ensure /var/lib/software-factory/ansible/hosts exists
+      file:
+        path: /var/lib/software-factory/ansible/hosts
+        state: touch
+      become: true
+
+    - name: Ensure /etc/ansible/hosts could be used for ci jobs
+      file:
+        src: /var/lib/software-factory/ansible/hosts
+        dest: /etc/ansible/hosts
+        state: link
+        force: yes
+      become: true
