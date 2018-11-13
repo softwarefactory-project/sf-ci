@@ -3,6 +3,7 @@
     name: sf-ci
     parent: base
     description: The sf ci tests
+    # pre-run: playbooks/pre-ansible-setup.yaml
     post-run: playbooks/get-logs.yaml
     timeout: 7200
     required-projects:
@@ -22,7 +23,7 @@
     name: sf-ci-functional-minimal
     description: The sf functional tests of the minimal architecture
     parent: sf-ci
-    run: playbooks/functional.yaml
+    run: functional.yaml
     vars:
       sf_arch: minimal
 
@@ -30,7 +31,7 @@
     name: sf-ci-functional-allinone
     description: The sf functional tests of the allinone architecture
     parent: sf-ci
-    run: playbooks/functional.yaml
+    run: functional.yaml
     vars:
       sf_arch: allinone
 
@@ -38,7 +39,7 @@
     name: sf-ci-upgrade-minimal
     description: The sf upgrade tests of the minimal architecture
     parent: sf-ci
-    run: playbooks/upgrade.yaml
+    run: upgrade.yaml
     vars:
       sf_arch: minimal
       sf_version: 3.1
@@ -47,7 +48,7 @@
     name: sf-ci-upgrade-allinone
     description: The sf upgrade tests of the allinone architecture
     parent: sf-ci
-    run: playbooks/upgrade.yaml
+    run: upgrade.yaml
     vars:
       sf_arch: allinone
       sf_version: 3.1
@@ -64,7 +65,7 @@
     name: sf-deploy-stable
     description: The sf deploy lastest stable
     parent: sf-ci
-    run: playbooks/stable.yaml
+    run: playbooks/deploy_stable.yaml
     vars:
       sf_arch: allinone
       sf_version: 3.1
@@ -74,7 +75,7 @@
     name: sf-deploy-stable-cr
     description: The sf deploy lastest stable with CentOS CR
     parent: sf-ci
-    run: playbooks/stable.yaml
+    run: playbooks/deploy_stable.yaml
     vars:
       sf_arch: allinone
       sf_version: 3.1
