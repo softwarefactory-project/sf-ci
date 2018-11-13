@@ -1,8 +1,8 @@
 ---
 - hosts: install-server
   tasks:
-    - include: tasks/install_stable_repo.yml
-    - include: tasks/install_centos_cr_repo.yml
+    - import_tasks: tasks/install_stable_repo.yml
+    - import_tasks: tasks/install_centos_cr_repo.yml
     - name: Update all installed packages
       yum:
         name: '*'

@@ -8,6 +8,12 @@
     - python2-storyboardclient
   become: yes
 
+- name: Ensure ansible.cfg is available for all playbooks
+  copy:
+    src: /root/.ansible.cfg
+    dest: /etc/ansible/ansible.cfg
+    remote_src: yes
+
 # TODO: remove the auto-creation of sfmanager.log and delete the task bellow
 # Remove sfmanager.log as it might be created before and owned by root
 - name: Remove previous sfmanager.log
