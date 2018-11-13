@@ -1,18 +1,37 @@
-# Local repository path
-local_repo_path: ""
-# Default test case
-func_test_case: "tests/functional"
+---
+fqdn: "sftests.com"
+# Keep created ressources, otherwise test artifacts are deleted
+keep: true
+# Use dynamic suffix for project name to create temporary project
+suffix: "-{{ ansible_date_time.epoch }}"
+# Default project name
+project: "zuul-basic{{ suffix }}"
+# Default node label
+node: master
+# Zuul pipelines
+check: ["health-{{ project }}-unit-tests"]
+gate: ["health-{{ project }}-functional-tests", "health-{{ project }}-unit-tests"]
+jobs: ["health-{name}-functional-tests", "health-{name}-unit-tests"]
 
-# workspace (use default(, true) to set default when env lookup return '')
-workspace: "./"
-sf_ci: "{{ workspace }}"
-sf_user: "centos"
-artifacts: "{{ workspace }}/artifacts"
-home: "/home/{{ sf_user }}"
+# Where projects are checkout on install-server
+project_path: "/var/lib/software-factory/health-check/{{ project }}"
+config_path: "/var/lib/software-factory/health-check/config"
 
-# sfconfig.yaml customization
-sf_domain: "sftests.com"
+# Nodepool
+provider_name: default
+os_pool: external_network
+base_image_name: "CentOS 7 (1603) x86_64"
+image_name: sfcentos
 
-sf_url: "https://softwarefactory-project.io/releases"
-stack_url: "{{ sf_url }}/sf-{{ sf_version }}/sf-{{ sf_version }}-{{ sf_arch }}{% if floatingip_id %}-fixed-ip{% endif %}.hot"
-image_url: "{{ sf_url }}/sf-{{ sf_version }}/sf-{{ sf_version }}.qcow2"
+# Gerritbot
+bot_name: health-check-bot
+channel_name: "irc-channel-health-check{{ suffix }}"
+
+# Zuul3 config
+zuul_config:
+  - tenant:
+      name: 'local'
+      source:
+        gerrit:
+          untrusted-projects:
+            - tdpw/python-readerlib
