@@ -1,0 +1,33 @@
+---
+# * Reset {{ config_path }} checkout and update to origin/master
+- hosts: install-server
+  remote_user: root
+  vars:
+    sf_user: "zuul-worker"
+  tasks:
+    - include_tasks: tasks/update_bootstrap_mode.yml
+
+    - name: debug
+      command: find /var/lib/software-factory -type f -name '*yaml'
+      register: filenames
+
+    - debug:
+        var: filenames
+
+    - include_vars: /var/lib/software-factory/ansible/group_vars/all.yaml
+
+    - name: Clone config repo
+      git:
+        repo: "http://{{ fqdn }}/r/config"
+        dest: "{{ config_path }}"
+        update: no
+
+    - name: Reset config
+      command: "{{ item }}"
+      args:
+        chdir: "{{ config_path }}"
+      with_items:
+        - git fetch --all
+        - git checkout master
+        - git reset --hard origin/master --
+        - git clean -f -d
