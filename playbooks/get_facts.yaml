@@ -1,0 +1,7 @@
+---
+- hosts: install-server
+  tasks:
+    - setup:
+    - debug:
+        msg: 'zuul present'
+      when: '"zuul" in ansible_local["install-server"]["roles"]'
