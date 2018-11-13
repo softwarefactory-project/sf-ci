@@ -1,13 +1,13 @@
 ---
-- name: "Reset config repos"
-  include: playbooks/config_reset.yaml
+# * Reset config repos
+- include_tasks: playbooks/config_reset.yaml
 
 - hosts: install-server
   remote_user: root
   tasks:
     - name: Checkout tdpw/python-readerlib
       git:
-        repo: https://{{ fqdn }}/r/tdpw/python-readerlib
+        repo: "https://{{ fqdn }}/r/tdpw/python-readerlib"
         dest: /var/lib/software-factory/health-check/python-readerlib
         force: yes
 
@@ -18,15 +18,15 @@
       register: zuul_conf
 
     - name: Update change
-      when: zuul_conf|changed
+      when: zuul_conf is changed
       command: chdir={{ config_path }}  {{ item }}
       with_items:
           - 'git add -A'
           - 'git commit -m "Add zuul health-check configuration"'
 
-- name: "Submit config repos"
-  include: playbooks/config_submit_change.yaml
-  when: zuul_conf|changed
+# * Submit config repos
+- include_tasks: playbooks/config_submit_change.yaml
+  when: zuul_conf is changed
 
 - hosts: zuul-executor
   tasks:
