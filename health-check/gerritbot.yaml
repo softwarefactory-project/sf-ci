@@ -25,8 +25,8 @@
     - name: "Wait for gerritbot to connect to irc"
       wait_for: path=/var/log/gerritbot/gerritbot.log search_regex="INFO gerritbot{{':'}} Identified with IRC server."
 
-- name: "Reset config repos"
-  include: playbooks/config_reset.yaml
+# * Reset config repos
+- include_tasks: playbooks/config_reset.yaml
 
 - hosts: install-server
   tasks:
@@ -40,8 +40,7 @@
         - git review
 
 # * Check gerritbot send irc message
-- name: "Check for 'created' notification"
-  include: playbooks/gerritbot_fakeircd_check.yaml ircd_logs_pattern="PRIVMSG .irc-channel-health-check .*ed config.* Test gerritbot notif .*http"
+- include_tasks: playbooks/gerritbot_fakeircd_check.yaml ircd_logs_pattern="PRIVMSG .irc-channel-health-check .*ed config.* Test gerritbot notif .*http"
 
 # * Test gerritbot config-update
 - hosts: install-server
@@ -58,11 +57,11 @@
         - git add gerritbot/other-channels.yaml test_gerritbot_notif
         - git commit -m "Change gerritbot channel" -a
 
-- name: "Submit config repos"
-  include: playbooks/config_submit_change.yaml
+# * Submit config repos
+- include_tasks: playbooks/config_submit_change.yaml
 
-- name: "Check for 'merged' notification"
-  include: playbooks/gerritbot_fakeircd_check.yaml ircd_logs_pattern="PRIVMSG .irc-channel-health-check .Merged config.* Change gerritbot channel  http..."
+# * Check for 'merged' notification
+- include_tasks: playbooks/gerritbot_fakeircd_check.yaml ircd_logs_pattern="PRIVMSG .irc-channel-health-check .Merged config.* Change gerritbot channel  http..."
 
 - hosts: install-server
   tasks:
@@ -76,8 +75,7 @@
         - git review
 
 # * Check gerritbot send irc message to correct channel
-- name: "Check for 'created' notification on new channel"
-  include: playbooks/gerritbot_fakeircd_check.yaml ircd_logs_pattern="PRIVMSG .{{ channel_name }} .*ed config.* Create new fake config change .*http"
+- include_tasks: playbooks/gerritbot_fakeircd_check.yaml ircd_logs_pattern="PRIVMSG .{{ channel_name }} .*ed config.* Create new fake config change .*http"
 
 - hosts: gerritbot
   tasks:
