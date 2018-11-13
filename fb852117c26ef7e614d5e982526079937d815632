@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "6ed1a5e5_69993484",
+        "filename": "playbooks/tasks/install_sf_ci_packages.yml",
+        "patchSetId": 26
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2018-11-13T15:27:37Z",
+      "side": 1,
+      "message": "Ok, I will try to remove them, but it\u0027s a copy of what we use on dib-centos-7 image",
+      "parentUuid": "4e9363e8_0e74f381",
+      "revId": "fb852117c26ef7e614d5e982526079937d815632",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "20718ced_747de49f",
         "filename": "playbooks/tasks/install_sf_ci_repo.yml",
         "patchSetId": 26
@@ -30,6 +48,30 @@
       "writtenOn": "2018-11-13T14:56:17Z",
       "side": 1,
       "message": "Why do it twice ?",
+      "range": {
+        "startLine": 120,
+        "startChar": 0,
+        "endLine": 125,
+        "endChar": 38
+      },
+      "revId": "fb852117c26ef7e614d5e982526079937d815632",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a5fad293_7c6267b7",
+        "filename": "playbooks/tasks/install_sf_ci_repo.yml",
+        "patchSetId": 26
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2018-11-13T15:27:37Z",
+      "side": 1,
+      "message": "my mistake, sorry",
+      "parentUuid": "20718ced_747de49f",
       "range": {
         "startLine": 120,
         "startChar": 0,
