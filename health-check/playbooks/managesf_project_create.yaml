@@ -17,7 +17,7 @@
       when: p.stat.isdir is defined and p.stat.isdir == True
 
 - name: "Reset config repos"
-  include: config_reset.yaml
+  include_tasks: config_reset.yaml
   when: p.stat.isdir is not defined
 
 - hosts: install-server
@@ -36,7 +36,7 @@
       when: p.stat.isdir is not defined
 
 - name: "Submit config repos"
-  include: config_submit_change.yaml
+  include_tasks: config_submit_change.yaml
   when: p.stat.isdir is not defined
 
 - hosts: install-server
