@@ -1,7 +1,0 @@
----
-- name: Run health-check zuul
-  include: zuul.yaml
-  when: '"zuul" in roles'
-
-- include: gerritbot.yaml
-  when: '"gerritbot" in roles'
