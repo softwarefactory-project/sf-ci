@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e5320b3f_3250f040",
+        "filename": "playbooks/tasks/install_sf_ci_packages.yml",
+        "patchSetId": 27
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-11-14T11:26:43Z",
+      "side": 1,
+      "message": "I figured out that we already have a install_test_env.yaml",
+      "revId": "268bdfb12e418622a954540baae3ed8f1e210da2",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "37a6eecf_8776ce4e",
+        "filename": "playbooks/tasks/install_sf_ci_packages.yml",
+        "patchSetId": 27
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-11-14T11:26:43Z",
+      "side": 1,
+      "message": "rm",
+      "revId": "268bdfb12e418622a954540baae3ed8f1e210da2",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "aaf0de0d_60d4225b",
+        "filename": "playbooks/tasks/install_sf_ci_packages.yml",
+        "patchSetId": 27
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-11-14T11:26:43Z",
+      "side": 1,
+      "message": "But this is needed only by our build rpm system, like createrepo and like the mock group creation below. So I think we are doing something wrong here. Let manage to have the change on sfinfo merged first.",
+      "revId": "268bdfb12e418622a954540baae3ed8f1e210da2",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f3f69894_9e481983",
+        "filename": "playbooks/tasks/install_sf_ci_packages.yml",
+        "patchSetId": 27
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-11-14T11:26:43Z",
+      "side": 1,
+      "message": "rm",
+      "revId": "268bdfb12e418622a954540baae3ed8f1e210da2",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
