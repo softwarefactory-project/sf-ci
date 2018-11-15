@@ -22,6 +22,30 @@
       "revId": "b3f6f73ebff4bc99747ce1b0f6987a3d4cac7bd9",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3e08614f_f1e6cbde",
+        "filename": "health-check/zuul.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2018-11-15T12:54:22Z",
+      "side": 1,
+      "message": "Yes, not only this one \u003d)\n\nWith include_playbook statement, it\u0027s not possible to include a play within a play, so I\u0027m looking to refactor sf-ci playbooks fix that, thanks for your review\n\nFYI: https://docs.ansible.com/ansible/devel/modules/import_playbook_module.html",
+      "parentUuid": "49616500_bc876688",
+      "range": {
+        "startLine": 3,
+        "startChar": 2,
+        "endLine": 3,
+        "endChar": 14
+      },
+      "revId": "b3f6f73ebff4bc99747ce1b0f6987a3d4cac7bd9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
