@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f820d4e4_2fb2e69e",
+        "filename": "playbooks/tasks/install_sf_ci_repo.yml",
+        "patchSetId": 29
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2018-11-15T08:56:40Z",
+      "side": 1,
+      "message": "Could be remove as it is a dependency of centos-release-scl.And we keep the same deps as in the sf-release package.",
+      "range": {
+        "startLine": 106,
+        "startChar": 0,
+        "endLine": 106,
+        "endChar": 35
+      },
+      "revId": "fc0780e6657e20101de89d67ede2c9d99bff5d77",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
