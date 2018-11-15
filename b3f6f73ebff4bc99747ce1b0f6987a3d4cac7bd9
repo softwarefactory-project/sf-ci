@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "49616500_bc876688",
+        "filename": "health-check/zuul.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2018-11-15T04:13:55Z",
+      "side": 1,
+      "message": "this is a playbook, not a task.",
+      "range": {
+        "startLine": 3,
+        "startChar": 2,
+        "endLine": 3,
+        "endChar": 14
+      },
+      "revId": "b3f6f73ebff4bc99747ce1b0f6987a3d4cac7bd9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
