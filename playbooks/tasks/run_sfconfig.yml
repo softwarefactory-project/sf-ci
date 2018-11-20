@@ -27,13 +27,6 @@
     line: '      - hypervisor-oci'
   become: yes
 
-# Make sure /etc/nodepool doesn't exists
-- name: "Ensure /etc/nodepool doesn't exists"
-  file:
-    path: /etc/nodepool
-    state: absent
-  become: yes
-
 - name: Update fqdn in sfconfig.yaml
   lineinfile:
     path: /etc/software-factory/sfconfig.yaml
@@ -56,4 +49,4 @@
   shell: echo "# Deployed" >> /etc/software-factory/sfconfig.yaml
   become: yes
 
-- include: update_bootstrap_mode.yml
+- import_tasks: update_bootstrap_mode.yml
