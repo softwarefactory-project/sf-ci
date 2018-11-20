@@ -37,8 +37,8 @@
     state: absent
   become: yes
 
-- include: install_sf_ci_repo.yml
-- include: yum_update.yml
+- import_tasks: install_sf_ci_repo.yml
+- import_tasks: yum_update.yml
 
 - name: Set hostname
   hostname:
