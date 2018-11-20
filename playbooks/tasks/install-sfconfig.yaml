@@ -24,21 +24,8 @@
     chdir: "{{ sfnamespace_path }}"
   become: yes
 
-# TODO: remove this when image are rebuilt without sf-zuul-worker element
-- name: "Remove /var/lib/zuul"
-  file:
-    path: /var/lib/zuul
-    state: absent
-  become: yes
-
-- name: "Ensure /etc/nodepool doesn't exists"
-  file:
-    path: /etc/nodepool
-    state: absent
-  become: yes
-
-- include: install_sf_ci_repo.yml
-- include: yum_update.yml
+- import_tasks: install_sf_ci_repo.yml
+- import_tasks: yum_update.yml
 
 - name: Set hostname
   hostname:
