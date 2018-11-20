@@ -1,7 +1,8 @@
 ---
 - name: Run health-check zuul
-  include: zuul.yaml
+  import_playbook: zuul.yaml
   when: '"zuul" in roles'
 
-- include: gerritbot.yaml
+- name: Run health-check gerritbot
+  import_playbook: gerritbot.yaml
   when: '"gerritbot" in roles'

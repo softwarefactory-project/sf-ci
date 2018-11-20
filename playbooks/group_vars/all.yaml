@@ -14,5 +14,3 @@ home: "/home/{{ sf_user }}"
 sf_domain: "sftests.com"
 
 sf_url: "https://softwarefactory-project.io/releases"
-stack_url: "{{ sf_url }}/sf-{{ sf_version }}/sf-{{ sf_version }}-{{ sf_arch }}{% if floatingip_id %}-fixed-ip{% endif %}.hot"
-image_url: "{{ sf_url }}/sf-{{ sf_version }}/sf-{{ sf_version }}.qcow2"

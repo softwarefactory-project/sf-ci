@@ -37,7 +37,7 @@
       when: nodepool_builder_service.stdout.lower().find("fail") != -1
 
 - name: "Reset config repos"
-  include: playbooks/config_reset.yaml
+  import_playbook: playbooks/config_reset.yaml
 
 - hosts: install-server
   remote_user: root
@@ -56,7 +56,7 @@
       failed_when: changed.rc >= 2
 
 - name: "Submit config repos"
-  include: playbooks/config_submit_change.yaml
+  import_playbook: playbooks/config_submit_change.yaml
   when: changed.rc == 0
 
 - hosts: nodepool-builder
