@@ -14,4 +14,4 @@
   command: sfconfig --skip-install
   become: yes
 
-- include: update_bootstrap_mode.yml
+- import_tasks: update_bootstrap_mode.yml

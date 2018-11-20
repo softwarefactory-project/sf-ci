@@ -1,6 +1,13 @@
 ---
 # See https://github.com/projectatomic/bubblewrap/issues/273
 - name: Ensure /srv/host-rootfs is not double mounted
-  shell: while true; do umount -l /srv/host-rootfs || break; done; cat /proc/mounts; mount -a
-  ignore_errors: yes
+  block:
+    - name: Umount /srv/host-rootfs
+      shell: while true; do umount -l /srv/host-rootfs || break; done; cat /proc/mounts; mount -a
+      ignore_errors: yes
+
+    - name: Restart rh-python35-nodepool-launcher to mount /srv/host-rootfs
+      systemd:
+        name: rh-python35-nodepool-launcher
+        state: restarted
   become: yes
