@@ -1,6 +1,18 @@
 ---
 # See https://github.com/projectatomic/bubblewrap/issues/273
+- name: Get how many time /srv/host-rootfs is mounted
+  shell: mount | grep /srv/host-rootfs | wc -l
+  register: rootfs
+
 - name: Ensure /srv/host-rootfs is not double mounted
-  shell: while true; do umount -l /srv/host-rootfs || break; done; cat /proc/mounts; mount -a
-  ignore_errors: yes
-  become: yes
+  block:
+    - name: Umount /srv/host-rootfs
+      shell: while true; do umount -l /srv/host-rootfs || break; done; cat /proc/mounts; mount -a
+      ignore_errors: yes
+      become: yes
+
+    - name: Restart rh-python35-nodepool-launcher
+      systemd:
+        name: rh-python35-nodepool-launcher
+        state: restarted
+  when: rootfs.stdout != "1"
