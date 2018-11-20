@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "59d09396_21339d3a",
+        "filename": "playbooks/pre-ansible-setup.yaml",
+        "patchSetId": 56
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2018-11-20T06:05:14Z",
+      "side": 1,
+      "message": "Is this task used?",
+      "revId": "dded5832dce03cb030abc399c3c1555a24ceb53e",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a88af090_13d8b9d0",
+        "filename": "playbooks/tasks/install_test_env.yml",
+        "patchSetId": 56
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2018-11-20T06:05:14Z",
+      "side": 1,
+      "message": "These tasks change the behavior of zuul and nodepool because system facts (and secrets) are now in enabled in unprivileged playbooks. What is the purpose of these tasks?",
+      "revId": "dded5832dce03cb030abc399c3c1555a24ceb53e",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "529ed0ba_1c9ca1c0",
+        "filename": "to_refactor/heat_playbooks/deploy-heat.yml",
+        "patchSetId": 56
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2018-11-20T06:05:14Z",
+      "side": 1,
+      "message": "Why not just removing the playbook? They are still be avail in git log, no need to move them to a placeholder directory.",
+      "revId": "dded5832dce03cb030abc399c3c1555a24ceb53e",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c57c3cd1_25acaddb",
+        "filename": "upgrade.yaml",
+        "patchSetId": 56
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2018-11-20T06:05:14Z",
+      "side": 1,
+      "message": "why are the health-check disabled?",
+      "revId": "dded5832dce03cb030abc399c3c1555a24ceb53e",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
