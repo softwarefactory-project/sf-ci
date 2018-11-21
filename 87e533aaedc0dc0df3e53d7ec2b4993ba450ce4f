@@ -16,6 +16,24 @@
       "revId": "87e533aaedc0dc0df3e53d7ec2b4993ba450ce4f",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "28eb0a30_00741ee2",
+        "filename": "playbooks/tasks/prevent_bwrap_issue.yml",
+        "patchSetId": 8
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2018-11-21T18:54:57Z",
+      "side": 1,
+      "message": "Because it failed on this change, but when I compare a working job log with this one, /srv/host-rootfs is only mounted once on both:\n\nhttps://softwarefactory-project.io/logs/00/14300/2/check/sf-ci-functional-minimal/e7aeb83/job-output.txt.gz#_2018-11-21_16_18_04_323369\nhttps://softwarefactory-project.io/logs/84/14284/11/check/sf-ci-functional-minimal/03bc587/job-output.txt.gz#_2018-11-21_16_16_35_482811\n\nBut later, the job failed with \u0027stat /sbin/sshd: no such file or directory\u0027\n\nhttps://softwarefactory-project.io/logs/84/14284/11/check/sf-ci-functional-minimal/03bc587/logs/nodepool/log/nodepool/launcher.log\n\nOn the node on hold /srv/host-rootfs is not mounted:\n\n[root@managesf.sftests.com ~]# mount | grep host-rootfs\n[root@managesf.sftests.com ~]#\n\nSo I restarted nodepool-launcher to ensure /usr/lib/python3.5/site-packages/nodepool/driver/runc/playbooks/init.yml is applied",
+      "parentUuid": "13859029_390efe70",
+      "revId": "87e533aaedc0dc0df3e53d7ec2b4993ba450ce4f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
