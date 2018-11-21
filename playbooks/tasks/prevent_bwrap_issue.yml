@@ -1,6 +1,15 @@
 ---
 # See https://github.com/projectatomic/bubblewrap/issues/273
+- name: Show mounted devices
+  command: cat /proc/mounts
+
 - name: Ensure /srv/host-rootfs is not double mounted
   shell: while true; do umount -l /srv/host-rootfs || break; done; cat /proc/mounts; mount -a
   ignore_errors: yes
   become: yes
+
+- name: Show fstab content
+  command: cat /etc/fstab
+
+- name: Show mounted devices
+  command: cat /proc/mounts
