@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "13859029_390efe70",
+        "filename": "playbooks/tasks/prevent_bwrap_issue.yml",
+        "patchSetId": 8
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2018-11-21T04:10:16Z",
+      "side": 1,
+      "message": "why is this refactored and why nodepool-launcher is restarted?",
+      "revId": "87e533aaedc0dc0df3e53d7ec2b4993ba450ce4f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}

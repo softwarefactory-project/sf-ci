@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "75f6b7b1_cd76cd55",
+        "filename": "playbooks/stable.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2018-11-21T04:10:16Z",
+      "side": 0,
+      "message": "why do you remove this now?",
+      "revId": "80989c7a6bf6eb63c91047cb82cd5bf313f5d858",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
