@@ -19,5 +19,5 @@
 - hosts: zuul-server
   remote_user: root
   tasks:
-    - name: "Check configuration"
-      command: grep "{{ os_swifturl }}" /etc/zuul/zuul.conf
+    - name: Check configuration
+      command: "grep {{ os_swifturl }} /etc/zuul/zuul.conf"
