@@ -4,27 +4,20 @@
     - import_tasks: tasks/install_stable_repo.yml
     - import_tasks: tasks/install_centos_cr_repo.yml
 
-    - name: Update all installed packages
-      yum:
-        name: '*'
-        state: latest
-        update_cache: yes
-      become: yes
+    - name: Install and run sfconfig
+      block:
+        - name: Update all installed packages
+          yum:
+            name: '*'
+            state: latest
+            update_cache: yes
 
-    - name: Install sf-config package
-      yum:
-        name: sf-config
-        exclude: ansible
-        state: latest
-      become: yes
+        - name: Install sf-config package
+          yum:
+            name: sf-config
+            exclude: ansible
+            state: latest
 
-    # Make sure /etc/nodepool doesn't exists
-    - name: Ensure /etc/nodepool doesn't exists
-      file:
-        path: /etc/nodepool
-        state: absent
-      become: yes
-
-    - name: Run sfconfig
-      command: sfconfig --arch /usr/share/sf-config/refarch/{{ sf_arch }}.yaml
+        - name: Run sfconfig
+          command: "sfconfig --arch /usr/share/sf-config/refarch/{{ sf_arch }}.yaml"
       become: yes

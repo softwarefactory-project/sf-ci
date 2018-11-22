@@ -2,5 +2,5 @@
 - name: Run data provisionner
   command: python provisioner.py
   args:
-    chdir: "{{ sf_ci }}/tests/functional/provisioner/"
+    chdir: "{{ sf_ci }}/tests/functional/provisioner"
   become: yes
