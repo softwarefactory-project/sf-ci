@@ -1,5 +1,5 @@
 ---
-- name: "Reset config repos"
+- name: Reset config repos
   import_playbook: playbooks/config_reset.yaml
 
 - hosts: install-server
@@ -19,18 +19,20 @@
 
     - name: Update change
       when: zuul_conf|changed
-      command: chdir={{ config_path }}  {{ item }}
+      command: "{{ item }}"
+      args:
+        chdir: "{{ config_path }}"
       with_items:
           - 'git add -A'
           - 'git commit -m "Add zuul health-check configuration"'
 
-- name: "Submit config repos"
+- name: Submit config repos
   import_playbook: playbooks/config_submit_change.yaml
   when: zuul_conf|changed
 
 - hosts: zuul-executor
   tasks:
-    - name: "Set executor keep mode"
+    - name: Set executor keep mode
       command: >
         /opt/rh/rh-python35/root/bin/zuul-executor
             -c /etc/opt/rh/rh-python35/zuul/zuul.conf keep
@@ -95,13 +97,15 @@
           environment: {'EDITOR':'test'}
           when: good_project_status|changed
 
-        - name: "Check change was merged"
-          command: chdir=/var/lib/software-factory/health-check/python-readerlib/ git diff HEAD origin/master
+        - name: Check change was merged
+          command: git diff HEAD origin/master
+          args:
+            chdir: /var/lib/software-factory/health-check/python-readerlib
           register: diff
           failed_when: diff.stdout != ''
       always:
         # This test only works when executor is running on the install-server
-        - name: "Unset executor keep mode"
+        - name: Unset executor keep mode
           command: >
             /opt/rh/rh-python35/root/bin/zuul-executor
                 -c /etc/opt/rh/rh-python35/zuul/zuul.conf nokeep

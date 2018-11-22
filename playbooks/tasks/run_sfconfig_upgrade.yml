@@ -7,14 +7,14 @@
     update_cache: yes
   become: yes
 
-- name: "Run sfconfig --upgrade"
+- name: Run sfconfig --upgrade
   command: sfconfig --upgrade
   become: yes
 
-- name: "Collect package upgraded"
+- name: Collect packages upgraded
   shell: "rpm -qa | sort > package_upgraded"
 
-- name: "Package diff"
+- name: Get packages diff
   shell: "diff /var/lib/software-factory/package_installed package_upgraded  | tee {{ artifacts }}/package_upgrade.txt"
   register: package_diff
   failed_when: package_diff.rc not in [0, 1]

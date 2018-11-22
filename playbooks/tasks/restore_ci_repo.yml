@@ -1,8 +1,10 @@
+  #TODO: replace by synchronize or copy
 - name: Restore zuul-built.repo
   command: mv /root/zuul-built.repo /etc/yum.repos.d/
   when: zuul_built_repo.stat.exists
   become: yes
 
+  #TODO: replace by synchronize or copy
 - name: Restore local-built.repo
   command: mv /root/local-built.repo /etc/yum.repos.d/
   when: local_built_repo.stat.exists

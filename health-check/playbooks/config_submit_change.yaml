@@ -1,15 +1,17 @@
 ---
-# * Submit and wait config repo change
-# * Check for SUCCESS in config-update post job log
 - hosts: install-server
   remote_user: root
   tasks:
     - name: Submit and approve config change
-      command: chdir={{ config_path }} /usr/share/sf-config/scripts/submit_and_wait.py --approve
+      command: /usr/share/sf-config/scripts/submit_and_wait.py --approve
+      args:
+        chdir: "{{ config_path }}"
       register: submit_status
       ignore_errors: true
 
-    - command: chdir={{ config_path }} cat .git/refs/heads/master
+    - command: cat .git/refs/heads/master
+      args:
+        chdir: "{{ config_path }}"
       register: commitsha
 
     - name: Wait config-update result using zuul-web API
@@ -23,8 +25,10 @@
       retries: 300
       delay: 2
 
-    - debug: "msg={{ job }}"
+    - debug:
+        msg: "{{ job }}"
 
     - name: Abort if config-update job failed
-      fail: msg="Config-update job failed"
+      fail:
+        msg: Config-update job failed
       when: job.json[0]["result"] != "SUCCESS"
