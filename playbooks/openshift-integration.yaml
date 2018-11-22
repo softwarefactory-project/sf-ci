@@ -16,8 +16,8 @@
 
     - name: Execute health-check
       command: >
-        ansible-playbook -i /var/lib/software-factory/ansible/hosts \
-            -e @{{ sf_ci }}/health-check/group_vars/all.yaml \
+        ansible-playbook -i /var/lib/software-factory/ansible/hosts
+            -e @{{ sf_ci }}/health-check/group_vars/all.yaml
             {{ sf_ci }}/health-check/zuul-openshift.yaml
       become: yes
       ignore_errors: yes
@@ -25,14 +25,14 @@
 
     - name: Fetch job artifacts
       synchronize:
-        src: "/var/www/logs"
+        src: /var/www/logs
         dest: "{{ zuul.executor.log_root }}/job-logs"
         mode: pull
       no_log: True
 
     - name: Fetch nodepool launcher logs
       synchronize:
-        src: "/var/log/nodepool"
+        src: /var/log/nodepool
         dest: "{{ zuul.executor.log_root }}/nodepool"
         mode: pull
       no_log: True
@@ -40,5 +40,5 @@
 
     - name: Fail if health-check failed
       fail:
-        msg: "Health check failed"
+        msg: Health check failed
       when: health_check is failed
