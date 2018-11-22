@@ -34,6 +34,24 @@
       "revId": "80989c7a6bf6eb63c91047cb82cd5bf313f5d858",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1849f48a_bce32882",
+        "filename": "playbooks/stable.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2018-11-22T01:45:47Z",
+      "side": 0,
+      "message": "ok, so this is not related to this story. Please use follow-up when possible.",
+      "parentUuid": "4986332a_3bdf273b",
+      "revId": "80989c7a6bf6eb63c91047cb82cd5bf313f5d858",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }

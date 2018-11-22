@@ -34,6 +34,24 @@
       "revId": "87e533aaedc0dc0df3e53d7ec2b4993ba450ce4f",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "38b90266_fa94d08b",
+        "filename": "playbooks/tasks/prevent_bwrap_issue.yml",
+        "patchSetId": 8
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2018-11-22T01:45:47Z",
+      "side": 1,
+      "message": "It\u0027s weird this is failing only now. It seems like this code is not needed since the 3.1, so i\u0027ll try to remove the task in next PS instead.",
+      "parentUuid": "28eb0a30_00741ee2",
+      "revId": "87e533aaedc0dc0df3e53d7ec2b4993ba450ce4f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
