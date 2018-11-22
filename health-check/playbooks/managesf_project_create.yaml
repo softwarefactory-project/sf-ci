@@ -1,22 +1,25 @@
 ---
-# * Create project and checkout or update local clone
 - hosts: install-server
   remote_user: root
   tasks:
-    - debug: msg="Create or reset project {{ project }} to {{ project_path }}"
+    - name: Create project and checkout or update local clone
+      block:
+        - debug:
+            msg: "Create or reset project {{ project }} to {{ project_path }}"
 
-    - name: Check if project exists
-      stat: path={{ project_path }}
-      register: p
+        - name: Check if project exists
+          stat:
+            path: "{{ project_path }}"
+          register: p
 
-    - name: Reset project
-      command: chdir={{ project_path }} {{ item }}
-      with_items:
-        - "git fetch --all"
-        - "git reset --hard origin/master --"
-      when: p.stat.isdir is defined and p.stat.isdir == True
+        - name: Reset project
+          command: chdir={{ project_path }} {{ item }}
+          with_items:
+            - "git fetch --all"
+            - "git reset --hard origin/master --"
+          when: p.stat.isdir is defined and p.stat.isdir == True
 
-- name: "Reset config repos"
+- name: Reset config repos
   import_playbook: config_reset.yaml
   when: p.stat.isdir is not defined
 
@@ -24,18 +27,22 @@
   remote_user: root
   tasks:
     - name: Create project with the resources backend
-      template: src=../templates/project-resource.yaml.j2 dest={{ config_path }}/resources/project-resource-{{ project }}.yaml
+      template:
+        src: ../templates/project-resource.yaml.j2
+        dest: "{{ config_path }}/resources/project-resource-{{ project }}.yaml"
       when: p.stat.isdir is not defined
 
     - name: Commit change
-      command: chdir={{ config_path }}  {{ item }}
+      command: "{{ item }}"
+      args:
+        chdir: "{{ config_path }}"
       with_items:
           - 'git add resources/project-resource-{{ project }}.yaml'
           - 'git commit -a -m "Add {{ project }} to resources"'
       environment: {'EDITOR':'test'}
       when: p.stat.isdir is not defined
 
-- name: "Submit config repos"
+- name: Submit config repos
   import_playbook: config_submit_change.yaml
   when: p.stat.isdir is not defined
 
@@ -43,5 +50,7 @@
   remote_user: root
   tasks:
     - name: Checkout project
-      git: repo=http://{{ fqdn }}/r/{{ project }} dest={{ project_path }}
+      git:
+        repo: "http://{{ fqdn }}/r/{{ project }}"
+        dest: "{{ project_path }}"
       when: p.stat.isdir is not defined

@@ -11,6 +11,7 @@
 
     - name: Remove empty directories
       command: "find {{ artifacts }} -type d -empty -delete"
+
     - name: Fetch artifacts
       synchronize:
         src: "{{ artifacts }}/"
