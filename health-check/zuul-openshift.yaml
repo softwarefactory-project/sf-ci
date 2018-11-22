@@ -1,5 +1,5 @@
 ---
-- name: "Reset config repos"
+- name: Reset config repos
   import_playbook: playbooks/config_reset.yaml
 
 - hosts: install-server
@@ -14,7 +14,7 @@
         - policy add-role-to-user admin --serviceaccount=nodepool-sa
 
     - name: Read service account token
-      command: "oc sa get-token nodepool-sa"
+      command: oc sa get-token nodepool-sa
       register: _sa_token
 
     - name: Add unprivileged openshift provider to sfconfig
@@ -32,7 +32,7 @@
 
 - hosts: zuul-executor
   tasks:
-    - name: "Set executor keep/verbose mode"
+    - name: Set executor keep/verbose mode
       command: "/opt/rh/rh-python35/root/bin/zuul-executor {{ item }}"
       with_items:
         - keep
@@ -68,7 +68,7 @@
         - 'git add -A'
         - 'git commit -m "Add openshift unprivileged configuration"'
 
-- name: "Submit config repos"
+- name: Submit config repos
   include: playbooks/config_submit_change.yaml
   when: nodepool_conf|changed
 
@@ -150,7 +150,9 @@
         - git fetch --all
       environment: {'EDITOR':'test'}
 
-    - name: "Check change was merged"
-      command: chdir=/root/demo-project git diff HEAD origin/master
+    - name: Check change was merged
+      command: git diff HEAD origin/master
+      args:
+        chdir: /root/demo-project
       register: diff
       failed_when: diff.stdout != ''

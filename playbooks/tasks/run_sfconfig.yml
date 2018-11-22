@@ -1,59 +1,42 @@
-- name: Install sf-config package
-  yum:
-    name: sf-config
-    exclude: ansible
-    state: latest
-  become: yes
+- name: Install and run sfconfig
+  block:
+    - name: Install sf-config package
+      yum:
+        name: sf-config
+        exclude: ansible
+        state: latest
 
-- name: Install SF architecture file {{ sf_arch }}.yaml
-  copy:
-    src: "/usr/share/sf-config/refarch/{{ sf_arch }}.yaml"
-    dest: /etc/software-factory/arch.yaml
-    remote_src: true
-  become: yes
+    - name: Install SF architecture file {{ sf_arch }}.yaml
+      copy:
+        src: "/usr/share/sf-config/refarch/{{ sf_arch }}.yaml"
+        dest: /etc/software-factory/arch.yaml
+        remote_src: true
 
-- name: Install extra custom-vars for mirrors
-  copy:
-    src: "{{ sf_ci }}/patches/custom-vars.yaml"
-    dest: /etc/software-factory/custom-vars.yaml
-    remote_src: true
-  become: yes
+    - name: Install extra custom-vars for mirrors
+      copy:
+        src: "{{ sf_ci }}/patches/custom-vars.yaml"
+        dest: /etc/software-factory/custom-vars.yaml
+        remote_src: true
 
-# Since 2.7 the hypervisor-oci role must be activated in the CI
-- name: Activate hypervisor-oci role in the arch.yaml file
-  lineinfile:
-    path: /etc/software-factory/arch.yaml
-    insertafter: '      - nodepool-launcher'
-    line: '      - hypervisor-oci'
-  become: yes
+    - name: Activate hypervisor-oci role in the arch.yaml file
+      lineinfile:
+        path: /etc/software-factory/arch.yaml
+        insertafter: '      - nodepool-launcher'
+        line: '      - hypervisor-oci'
 
-# Make sure /etc/nodepool doesn't exists
-- name: "Ensure /etc/nodepool doesn't exists"
-  file:
-    path: /etc/nodepool
-    state: absent
-  become: yes
+    - name: Update fqdn in sfconfig.yaml
+      lineinfile:
+        path: /etc/software-factory/sfconfig.yaml
+        regexp: '^fqdn:'
+        line: 'fqdn: sfdomain.com'
+      when: change_fqdn is defined
 
-- name: Update fqdn in sfconfig.yaml
-  lineinfile:
-    path: /etc/software-factory/sfconfig.yaml
-    regexp: '^fqdn:'
-    line: 'fqdn: sfdomain.com'
-  when: change_fqdn is defined
-  become: yes
+    - name: Update hostname
+      hostname:
+        name: "{% if change_fqdn is defined %}managesf.sfdomain.com{% else %}managesf.sftests.com{% endif %}"
 
-- name: Update hostname
-  hostname:
-    name: "{% if change_fqdn is defined %}managesf.sfdomain.com{% else %}managesf.sftests.com{% endif %}"
-  become: yes
-
-- name: Run sfconfig
-  command: sfconfig
-  become: yes
-
-# TODO: remove this after 3.1 is released since the admin_password is auto-generated
-- name: Taint sfconfig.yaml to prevent auto update of the file
-  shell: echo "# Deployed" >> /etc/software-factory/sfconfig.yaml
+    - name: Run sfconfig
+      command: sfconfig
   become: yes
 
 - include: update_bootstrap_mode.yml
