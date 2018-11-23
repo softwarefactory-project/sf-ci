@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 set -Ex
 
 # TODO: remove when dib-centos-7 is build with sf-2.7
