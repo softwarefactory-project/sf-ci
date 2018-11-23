@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a1770ba2_4561563b",
+        "filename": "health-check/nodepool.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2018-11-23T05:14:07Z",
+      "side": 1,
+      "message": "this fact should be removed since we don\u0027t support zuul2 anymore",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 65
+      },
+      "revId": "0f37c022bdcb1b10db0e735e100154b47cc206a4",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2e1024d8_5c8cbe4a",
+        "filename": "health-check/playbooks/sfconfig_logs_setup.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2018-11-23T05:14:07Z",
+      "side": 1,
+      "message": "why is this using \"? In another change you remove the \" from command.",
+      "range": {
+        "startLine": 23,
+        "startChar": 15,
+        "endLine": 23,
+        "endChar": 16
+      },
+      "revId": "0f37c022bdcb1b10db0e735e100154b47cc206a4",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2a3ca7d2_f01b350a",
+        "filename": "playbooks/tasks/install_test_env.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2018-11-23T05:14:07Z",
+      "side": 1,
+      "message": "add a # TODO: check if this is still needed and why",
+      "range": {
+        "startLine": 7,
+        "startChar": 5,
+        "endLine": 7,
+        "endChar": 32
+      },
+      "revId": "0f37c022bdcb1b10db0e735e100154b47cc206a4",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bb5d1a76_62c149e3",
+        "filename": "playbooks/tasks/run_functional_tests.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2018-11-23T05:14:07Z",
+      "side": 1,
+      "message": "this shouldn\u0027t need \u0027\\\u0027",
+      "revId": "0f37c022bdcb1b10db0e735e100154b47cc206a4",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
