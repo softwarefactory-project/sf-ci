@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1b60ccba_f4038d2e",
+        "filename": "playbooks/get-logs.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 277
+      },
+      "writtenOn": "2018-12-05T19:26:13Z",
+      "side": 1,
+      "message": "The database for sfconfig is in /var/lib/software-factory/ansible/ara/ansible.sqlite",
+      "range": {
+        "startLine": 23,
+        "startChar": 15,
+        "endLine": 23,
+        "endChar": 42
+      },
+      "revId": "a23b4eaf3241078234f5a9053a58f8386a0d97f2",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
