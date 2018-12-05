@@ -2,12 +2,6 @@
 
 set -Ex
 
-# TODO: remove when dib-centos-7 is build with sf-2.7
-PIKE="http://cbs.centos.org/repos/cloud7-openstack-pike-release/x86_64/os/"
-SF="https://softwarefactory-project.io/kojifiles/repos/sf-2.7-el7-release/"
-sudo yum install -y "${PIKE}/Packages/python2-subunit-1.2.0-14.el7.noarch.rpm"
-sudo yum install -y "${SF}/Mash/ara-0.14.4-1.el7.noarch.rpm"
-
 # Remove ZUUL_* environment variables. We do not need them to be present
 # after that statement.
 while read var; do
