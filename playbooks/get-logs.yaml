@@ -11,6 +11,27 @@
 
     - name: Remove empty directories
       command: "find {{ artifacts }} -type d -empty -delete"
+
+    - name: Check that the ARA database exists
+      become: yes
+      stat:
+        path: /var/lib/software-factory/ansible/ara/ansible.sqlite
+      register: ara_db
+
+    - when: ara_db.stat.exists
+      block:
+        - name: Create ara-report directory
+          file:
+            path: "{{ artifacts }}/ara-report"
+            state: directory
+
+        - name: Copy the ARA database
+          become: yes
+          copy:
+            src: "{{ ara_db.stat.path }}"
+            dest: "{{ artifacts }}/ara-report/ansible.sqlite"
+            remote_src: true
+
     - name: Fetch artifacts
       synchronize:
         src: "{{ artifacts }}/"

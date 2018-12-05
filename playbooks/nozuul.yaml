@@ -1,0 +1,47 @@
+---
+- hosts: install-server
+  tasks:
+    - when: zuul is undefined
+      block:
+        - name: Set up variables
+          set_fact:
+            sfinfo_path: /opt/sfinfo
+            sfci_path: /opt/sfci
+            sf_user: zuul-worker
+
+        - name: Retrieve sfinfo
+          become: yes
+          git:
+            repo: https://softwarefactory-project.io/r/software-factory/sfinfo
+            dest: "{{ sfinfo_path }}"
+
+        # git rev-parse --show-toplevel returns the root git directory
+#        - name: Copy sfci to persistent location
+#          become: yes
+#          synchronize:
+#            src: "{{ lookup('pipe', 'git rev-parse --show-toplevel') }}"
+#            dest: "{{ sfci_path }}"
+#            delete: yes
+
+        - name: Install sfinfo repo
+          become: yes
+          command: >
+            {{ sfinfo_path }}/zuul_rpm_setup.py \
+              --distro-info {{ sfinfo_path }}/sfinfo/sf-master.yaml
+
+    - import_tasks: tasks/install_sf_ci_repo.yml
+    - import_tasks: tasks/yum_update.yml
+    - import_tasks: tasks/check_bubblewrap.yml
+    - import_tasks: tasks/run_sfconfig.yml change_fqdn=True
+    - import_tasks: tasks/run_sfconfig_update_fqdn.yml
+    - import_tasks: tasks/install_test_env.yml
+    - import_tasks: tasks/set_environment_facts.yml
+    - import_tasks: tasks/run_provisioner.yml
+    - import_tasks: tasks/run_backup_create.yml
+    - import_tasks: tasks/run_health-check.yml
+    - import_tasks: tasks/run_firehose_listener.yml
+    - import_tasks: tasks/run_functional_tests.yml
+    - import_tasks: tasks/check_firehose_events.yml
+    - import_tasks: tasks/run_erase.yml
+    - import_tasks: tasks/run_sfconfig_recover.yml
+    - import_tasks: tasks/run_checker.yml
