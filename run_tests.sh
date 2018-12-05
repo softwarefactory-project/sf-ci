@@ -26,11 +26,8 @@ LOCAL_REPO_PATH="${LOCAL_REPO_PATH:-}"
 rm -Rf ~/.ara/ ${ARTIFACTS}/
 
 export ARA_LOG_FILE=
-export ara_location=$(
-    python -c "import os,ara; print(os.path.dirname(ara.__file__))")
-export ANSIBLE_CALLBACK_PLUGINS=$ara_location/plugins/callbacks
-export ANSIBLE_ACTION_PLUGINS=$ara_location/plugins/actions
-export ANSIBLE_LIBRARY=$ara_location/plugins/modules
+export ANSIBLE_CALLBACK_PLUGINS=$(python -m ara.setup.callback_plugins)
+export ANSIBLE_ACTION_PLUGINS=$(python -m ara.setup.action_plugins)
 
 function terminate {
     if which ara &> /dev/null; then
