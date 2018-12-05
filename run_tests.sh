@@ -45,8 +45,7 @@ function terminate {
 }
 
 trap 'terminate' ERR
-ansible-playbook -M modules/                             \
-                 -e @playbooks/group_vars/all.yaml       \
+ansible-playbook -e @playbooks/group_vars/all.yaml       \
                  -e sf_user=${USER}                      \
                  -e workspace=${WORKSPACE}               \
                  -e local_repo_path=${LOCAL_REPO_PATH}   \
