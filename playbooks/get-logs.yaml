@@ -17,3 +17,19 @@
         dest: "{{ zuul.executor.log_root }}/logs"
         mode: pull
       no_log: True
+
+    - name: Check that the ARA database exists
+      stat:
+        path: "{{ ansible_user_dir }}/.ara"
+      register: ara_db
+
+    - when: ara_db.stat.exists
+      block:
+        - name: Fetch artifacts
+          synchronize:
+            src: "{{ansible_user_dir }}/.ara/ansible.sqlite"
+            dest: "{{ zuul.executor.log_root }}/logs/ara-report/"
+            mode: pull
+          # no_log: False
+          ignore_errors: yes
+
