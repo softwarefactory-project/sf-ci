@@ -12,6 +12,7 @@
     sfinfo_setup_args: "{% if buildset_artifacts_url %}--testing-repo {{ buildset_artifacts_url }}{% endif %}"
     sf_user: "zuul-worker"
   tasks:
+    - import_tasks: tasks/disable_ipv6.yml
     - name: "Install sfinfo repo"
       command: >
         ./software-factory/sfinfo/zuul_rpm_setup.py \

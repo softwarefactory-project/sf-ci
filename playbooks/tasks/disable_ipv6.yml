@@ -1,0 +1,7 @@
+- name: Disable IPv6
+  command: "{{ item }}"
+  with_items:
+    - "sysctl net.ipv6.conf.all.disable_ipv6=1"
+    - "sysctl net.ipv6.conf.default.disable_ipv6=1"
+    - "sysctl -p"
+  become: yes

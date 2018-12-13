@@ -3,6 +3,7 @@
   become_method: sudo
   tasks:
     - block:
+      - import_tasks: tasks/disable_ipv6.yml
       - import_tasks: tasks/prepare_test_env.yml
       - import_tasks: tasks/install_sf_ci_repo.yml
       - import_tasks: tasks/yum_update.yml
