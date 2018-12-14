@@ -3,6 +3,10 @@
   vars:
     sf_user: "zuul-worker"
   tasks:
+    - name: Check yum.repos.d content
+      shell: "more /etc/yum.repos.d/* | cat"
+      become: yes
+
     - name: Check mount points
       command: cat /proc/mounts
 
