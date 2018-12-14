@@ -1,0 +1,4 @@
+- hosts: all
+  roles:
+    - role: configure-mirrors
+      mirror_fqdn: "mirror.regionone.rdo-cloud.rdoproject.org"
