@@ -22,6 +22,7 @@
       become: yes
 
     - import_tasks: tasks/install_stable_repo.yml
+    - import_tasks: tasks/mirror_centos_workaround.yaml
     - import_tasks: tasks/yum_update.yml
     - import_tasks: tasks/check_bubblewrap.yml
     - import_tasks: tasks/run_sfconfig.yml

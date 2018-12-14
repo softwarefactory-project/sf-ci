@@ -1,0 +1,20 @@
+- name: Use alternate mirror for scl repo
+  replace:
+    path: /etc/yum.repos.d/CentOS-SCLo-scl-rh.repo
+    regexp: "^baseurl=http://mirror.centos.org.*$"
+    replace: "baseurl=http://centos.mirror.vexxhost.com/7/sclo/$basearch/rh/"
+  become: yes
+
+- name: Use alternate mirror for Ceph Luminous repo
+  replace:
+    path: /etc/yum.repos.d/CentOS-Ceph-Luminous.repo
+    regexp: "^baseurl=http://mirror.centos.org.*$"
+    replace: "baseurl=http://mirror.regionone.rdo-cloud.rdoproject.org/centos/7/storage/$basearch/ceph-luminous/"
+  become: yes
+
+- name: Use alternate mirror for OS Queens repo
+  replace:
+    path: /etc/yum.repos.d/CentOS-OpenStack-queens.repo
+    regexp: "^baseurl=http://mirror.centos.org.*$"
+    replace: "baseurl=http://mirror.regionone.rdo-cloud.rdoproject.org/centos/7/cloud/$basearch/openstack-queens/"
+  become: yes
