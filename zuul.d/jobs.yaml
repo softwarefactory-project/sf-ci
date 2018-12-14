@@ -3,6 +3,7 @@
     name: sf-ci
     parent: base
     description: The sf ci tests
+    pre-run: playbooks/configure-mirror.yaml
     post-run: playbooks/get-logs.yaml
     timeout: 7200
     required-projects:
