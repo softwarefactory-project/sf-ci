@@ -5,6 +5,8 @@
     state: latest
   become: yes
 
+- import_tasks: tasks/mirror_centos_workaround.yaml
+
 - name: Install SF architecture file {{ sf_arch }}.yaml
   copy:
     src: "/usr/share/sf-config/refarch/{{ sf_arch }}.yaml"

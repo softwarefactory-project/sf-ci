@@ -22,12 +22,14 @@
       become: yes
 
     - import_tasks: tasks/install_stable_repo.yml
+    - import_tasks: tasks/mirror_centos_workaround.yaml
     - import_tasks: tasks/yum_update.yml
     - import_tasks: tasks/check_bubblewrap.yml
     - import_tasks: tasks/run_sfconfig.yml
     - import_tasks: tasks/install_test_env.yml
     - import_tasks: tasks/restore_ci_repo.yml
     - import_tasks: tasks/install_sf_ci_repo.yml
+    - import_tasks: tasks/mirror_centos_workaround.yaml
     - import_tasks: tasks/set_environment_facts.yml
     - import_tasks: tasks/run_provisioner.yml
     - import_tasks: tasks/run_sfconfig_upgrade.yml
