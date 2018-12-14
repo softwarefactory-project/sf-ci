@@ -21,6 +21,7 @@
         chdir: "{{ sfnamespace_path }}"
       become: yes
 
+    - import_tasks: tasks/disable_ipv6.yml
     - import_tasks: tasks/install_stable_repo.yml
     - import_tasks: tasks/yum_update.yml
     - import_tasks: tasks/check_bubblewrap.yml
