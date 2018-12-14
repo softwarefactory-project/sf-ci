@@ -1,0 +1,36 @@
+- hosts: all
+  roles:
+    - role: configure-mirrors
+      mirror_fqdn: "mirror.regionone.rdo-cloud.rdoproject.org"
+  tasks:
+    - name: Set gai.conf ipv4 precedence
+      copy:
+        content: |
+          label       ::1/128        0
+          label       ::/0           1
+          label       2002::/16      2
+          label       ::/96          3
+          label       ::ffff:0:0/96  4
+          precedence  ::1/128        50
+          precedence  ::/0           40
+          precedence  2002::/16      30
+          precedence  ::/96          20
+          precedence  ::ffff:0:0/96  100
+        dest: /etc/gai.conf
+      become: yes
+
+    - name: Disable ipv6 sysctl
+      sysctl:
+        name: "{{ item }}"
+        value: "0"
+      with_items:
+        - net.ipv6.conf.all.disable_ipv6
+        - net.ipv6.conf.default.disable_ipv6
+      become: yes
+
+    - name: Ensure ip_resolve=4 in yum.conf
+      lineinfile:
+        path: /etc/yum.conf
+        regexp: "^ip_resolve=.*"
+        line: "ip_resolve=4"
+      become: yes
