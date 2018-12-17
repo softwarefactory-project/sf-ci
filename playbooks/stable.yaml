@@ -1,6 +1,7 @@
 ---
 - hosts: install-server
   tasks:
+    - import_tasks: tasks/yum_set_repos.yml
     - import_tasks: tasks/install_stable_repo.yml
     - import_tasks: tasks/install_centos_cr_repo.yml
 

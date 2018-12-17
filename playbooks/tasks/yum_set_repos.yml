@@ -1,0 +1,5 @@
+- name: Set base CentOS repos
+  file:
+    src: files/CentOS-Base.repo
+    dest: /etc/yum.repos.d/CentOS-Base.repo
+  become: yes
