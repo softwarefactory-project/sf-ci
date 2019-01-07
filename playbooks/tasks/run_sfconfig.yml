@@ -24,6 +24,14 @@
         insertafter: '      - nodepool-launcher'
         line: '      - hypervisor-oci'
 
+    - name: Ensure dlrn is not present on arch when os is RHEL
+      lineinfile:
+        path: /etc/software-factory/arch.yaml
+        line: '      - dlrn'
+        state: absent
+      when: ansible_distribution == "RedHat"
+      become: yes
+
     - name: Update fqdn in sfconfig.yaml
       lineinfile:
         path: /etc/software-factory/sfconfig.yaml
