@@ -18,7 +18,7 @@
       register: zuul_conf
 
     - name: Update change
-      when: zuul_conf|changed
+      when: zuul_conf is changed
       command: "{{ item }}"
       args:
         chdir: "{{ config_path }}"
@@ -28,7 +28,7 @@
 
 - name: Submit config repos
   import_playbook: playbooks/config_submit_change.yaml
-  when: zuul_conf|changed
+  when: zuul_conf is changed
 
 - hosts: zuul-executor
   tasks:
@@ -58,7 +58,7 @@
             - git add .zuul.yaml file.yaml
             - git commit -m "Test project"
             - /usr/share/sf-config/scripts/submit_and_wait.py --delay 1200 --failure
-          when: bad_project_status|changed
+          when: bad_project_status is changed
 
         - name: Fetch logs url
           uri:
@@ -95,7 +95,7 @@
             - /usr/share/sf-config/scripts/submit_and_wait.py --delay 1200 --approve
             - git fetch --all
           environment: {'EDITOR':'test'}
-          when: good_project_status|changed
+          when: good_project_status is changed
 
         - name: Check change was merged
           command: git diff HEAD origin/master

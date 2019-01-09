@@ -62,7 +62,7 @@
       register: nodepool_conf
 
     - name: Commit change
-      when: nodepool_conf|changed
+      when: nodepool_conf is changed
       command: chdir={{ config_path }} {{ item }}
       with_items:
         - 'git add -A'
@@ -70,7 +70,7 @@
 
 - name: Submit config repos
   include: playbooks/config_submit_change.yaml
-  when: nodepool_conf|changed
+  when: nodepool_conf is changed
 
 - hosts: install-server
   remote_user: root
