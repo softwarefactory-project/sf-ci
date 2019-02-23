@@ -5,10 +5,15 @@
     state: present
   become: yes
 
+- name: Check /var/tmp/ permission
+  command: ls -laR /var/tmp
+  become: yes
+  ignore_errors: yes
+
 - name: Check bwrap works
   command: >-
     bwrap --dir /tmp --tmpfs /tmp --chdir /tmp/ --dir /var
-          --dir /var/tmp --dir /run/user/974 --ro-bind /usr /usr
+          --bind /var/tmp /var/tmp --dir /run/user/974 --ro-bind /usr /usr
           --ro-bind /lib /lib  --ro-bind /lib64 /lib64 --ro-bind /bin /bin
           --ro-bind /sbin /sbin --ro-bind /etc/resolv.conf /etc/resolv.conf
           --ro-bind /etc/hosts /etc/hosts  --proc /proc --dev /dev
