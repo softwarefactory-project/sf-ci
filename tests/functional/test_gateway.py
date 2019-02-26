@@ -60,7 +60,7 @@ class TestGateway(Base):
         if "lodgeit" in services:
             subpaths.append("/paste/")
         if "kibana" in services:
-            subpaths.append("/app/kibana")
+            subpaths.append("/kibana")
         if "repoxplorer" in services:
             subpaths.append("/repoxplorer/")
         if "storyboard" in services:
