@@ -12,10 +12,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import os
-import shutil
 import config
+import os
 import requests
+import shutil
+import unittest
 
 from utils import Base
 from utils import set_private_key
@@ -25,7 +26,7 @@ from utils import create_random_str
 from utils import JobUtils
 from utils import get_gerrit_utils
 
-
+@unittest.skip("Disabled until repoxplorer supports elk 5.x/6.x")
 class TestRepoxplorer(Base):
 
     def setUp(self):
