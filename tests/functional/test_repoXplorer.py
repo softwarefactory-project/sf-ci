@@ -12,10 +12,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import os
-import shutil
 import config
+import os
 import requests
+import shutil
+import unittest
 
 from utils import Base
 from utils import set_private_key
