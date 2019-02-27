@@ -12,9 +12,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import shlex
-
 import config
+import json
+import shlex
+import urllib
+
 from utils import Base
 from utils import skipIfServiceMissing
 from utils import services
@@ -60,7 +62,12 @@ class TestGateway(Base):
         if "lodgeit" in services:
             subpaths.append("/paste/")
         if "kibana" in services:
-            subpaths.append("/app/kibana")
+            elastic_url = '%s/elasticsearch' % config.GATEWAY_URL
+            data = json.loads(urllib.urlopen(elastic_url).read())
+            if data['version']['number'] == '2.4.6':
+                subpaths.append("/app/kibana")
+            else:
+                subpaths.append("/analytics")
         if "repoxplorer" in services:
             subpaths.append("/repoxplorer/")
         if "storyboard" in services:
@@ -175,7 +182,12 @@ class TestGateway(Base):
     def test_kibana_accessible(self):
         """ Test if Kibana is accessible on gateway host
         """
-        url = config.GATEWAY_URL + "/app/kibana"
+        elastic_url = '%s/elasticsearch' % config.GATEWAY_URL
+        data = json.loads(urllib.urlopen(elastic_url).read())
+        if data['version']['number'] == '2.4.6':
+            url = config.GATEWAY_URL + "/app/kibana"
+        else:
+            url = config.GATEWAY_URL + "/analytics/app/kibana"
 
         # Without SSO cookie. Note that auth is no longer enforced
 
