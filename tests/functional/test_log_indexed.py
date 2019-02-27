@@ -13,12 +13,13 @@
 # under the License.
 
 import config
+import datetime
+import json
 import random
 import string
-import json
-import datetime
-import time
 import subprocess
+import time
+import urllib
 
 from utils import Base, skipIfServiceMissing
 from utils import set_private_key
@@ -38,9 +39,14 @@ class TestLogExportedInElasticSearch(Base):
 
     def copy_request_script(self, index, newhash):
         newhash = newhash.rstrip()
+        elastic_url = '%s/elasticsearch' % config.GATEWAY_URL
+        data = json.loads(urllib.urlopen(elastic_url).read())
+        if data['version']['number'] == '2.4.6':
+            extra_headers = " -H 'kbn-version:4.5.4'"
+        else:
+            extra_headers = " -H 'Content-Type: application/json'"
         content = """
-curl -s -XPOST -H 'kbn-version:4.5.4' \
-    '%s/elasticsearch/%s/_search?pretty&size=1' -d '{
+curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
       "query": {
           "bool": {
               "must": [
@@ -52,7 +58,7 @@ curl -s -XPOST -H 'kbn-version:4.5.4' \
 }'
 """
         with open('/tmp/test_request.sh', 'w') as fd:
-            fd.write(content % (config.GATEWAY_URL, index, newhash))
+            fd.write(content % (elastic_url, index, extra_headers, newhash))
 
     def find_index(self):
         subcmd = ["curl", "-s",
