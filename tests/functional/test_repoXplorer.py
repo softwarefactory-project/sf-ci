@@ -157,8 +157,18 @@ class TestRepoxplorer(Base):
 
         self.assertIn(tmpl_keys['gname'], groups.keys())
         self.assertIn(tmpl_keys['pname'], projects['projects'].keys())
-        project_repos = [r['name'] for r in
-                         projects['projects'][tmpl_keys['pname']]['repos']]
+
+        try:
+            # Could be removed after this patch merge. 'repos' has been
+            # replaced by 'refs' in last repoxplorer version.
+            project_repos = [r['name'] for r in
+                             projects['projects'][
+                                 tmpl_keys['pname']]['repos']]
+        except KeyError:
+            project_repos = [r['name'] for r in
+                             projects['projects'][
+                                 tmpl_keys['pname']]['refs']]
+
         self.assertIn(tmpl_keys['pname'] + '/' + tmpl_keys['rname'],
                       project_repos)
 
