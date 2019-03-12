@@ -79,7 +79,8 @@
                 - name: nodepool
                   labels:
                     - name: linter-pod
-                      image: docker.io/fedora:28
+                      image: docker.io/fedora:29
+                      python-path: /usr/bin/python3
         dest: "{{ config_path }}/nodepool/openshift.yaml"
       register: nodepool_conf
 
