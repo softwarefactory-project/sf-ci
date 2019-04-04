@@ -6,8 +6,10 @@
     - name: Check mount points
       command: cat /proc/mounts
 
-    - import_tasks: tasks/set_environment_facts.yml
-    - import_tasks: tasks/finish_test.yml
+    - include_role:
+        name: set-environment-facts
+    - include_role:
+        name: finish-test
 
     - name: Remove empty directories
       command: "find {{ artifacts }} -type d -empty -delete"
