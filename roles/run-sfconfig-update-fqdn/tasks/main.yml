@@ -1,0 +1,6 @@
+- name: Run sfconfig to update fqdn
+  command: sfconfig --skip-install
+  become: yes
+
+- include_role:
+    name: update-bootstrap-mode
