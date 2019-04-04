@@ -1,0 +1,36 @@
+---
+# TODO: remove this when image are rebuilt without sf-zuul-worker element
+- name: Remove unused directory
+  file:
+    path: 
+    state: absent
+  loop:
+    - /var/lib/zuul
+    - /etc/nodepool
+  become: yes
+
+# TODO: to delete, should be define in playbooks
+- include_role:
+    name: install-sf-ci-repo
+
+# TODO: to delete, should be define in playbooks
+- include_role:
+    name: yum-update
+
+- name: Set hostname
+  hostname:
+    name: managesf.sftests.com
+  become: yes
+
+- name: Install sf-config package
+  yum:
+    name: sf-config
+    state: latest
+  become: yes
+
+- name: Install extra custom-vars for ci tunning
+  copy:
+    src: "{{ sf_ci }}/patches/custom-vars.yaml"
+    dest: /etc/software-factory/custom-vars.yaml
+    remote_src: true
+  become: yes
