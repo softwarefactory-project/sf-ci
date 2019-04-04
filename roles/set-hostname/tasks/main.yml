@@ -1,0 +1,13 @@
+---
+- name: Configure hostname
+  block:
+    - name: Update fqdn in sfconfig.yaml
+      lineinfile:
+        path: /etc/software-factory/sfconfig.yaml
+        regexp: '^fqdn:'
+        line: 'fqdn: {{ domain }}'
+
+    - name: Set hostname
+      hostname:
+        name: 'managesf.{{ domain }}'
+  become: yes
