@@ -1,21 +1,10 @@
-- name: Install and run sfconfig
+---
+- name: Configure sfconfig.yaml, arch.yaml and set hostname
   block:
-    - name: Install sf-config package
-      yum:
-        name: sf-config
-        exclude: ansible
-        state: latest
-
     - name: Install SF architecture file {{ sf_arch }}.yaml
       copy:
         src: "/usr/share/sf-config/refarch/{{ sf_arch }}.yaml"
         dest: /etc/software-factory/arch.yaml
-        remote_src: true
-
-    - name: Install extra custom-vars for mirrors
-      copy:
-        src: "{{ sf_ci }}/patches/custom-vars.yaml"
-        dest: /etc/software-factory/custom-vars.yaml
         remote_src: true
 
     - name: Activate hypervisor-oci role in the arch.yaml file
@@ -24,6 +13,20 @@
         insertafter: '      - nodepool-launcher'
         line: '      - hypervisor-oci'
 
+    - name: Add extra components in arch.yaml
+      lineinfile:
+        path: /etc/software-factory/arch.yaml
+        insertafter: '      - {{ item.insertafter }}'
+        line: '      - {{ item.component }}'
+      loop: '{{ add_component }}'
+      when: add_component != []
+
+    - name: Install extra custom-vars for ci tunning
+      copy:
+        src: custom-vars.yaml
+        dest: /etc/software-factory/custom-vars.yaml
+        remote_src: true
+
     - name: Update fqdn in sfconfig.yaml
       lineinfile:
         path: /etc/software-factory/sfconfig.yaml
@@ -31,12 +34,7 @@
         line: 'fqdn: sfdomain.com'
       when: change_fqdn is defined
 
-    - name: Update hostname
+    - name: Set hostname
       hostname:
         name: "{% if change_fqdn is defined %}managesf.sfdomain.com{% else %}managesf.sftests.com{% endif %}"
-
-    - name: Run sfconfig
-      command: sfconfig
   become: yes
-
-- include: update_bootstrap_mode.yml
