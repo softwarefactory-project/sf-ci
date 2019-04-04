@@ -1,23 +1,12 @@
 ---
 - hosts: install-server
   tasks:
-    - import_tasks: tasks/install_stable_repo.yml
-    - import_tasks: tasks/install_centos_cr_repo.yml
-
-    - name: Install and run sfconfig
-      block:
-        - name: Update all installed packages
-          yum:
-            name: '*'
-            state: latest
-            update_cache: yes
-
-        - name: Install sf-config package
-          yum:
-            name: sf-config
-            exclude: ansible
-            state: latest
-
-        - name: Run sfconfig
-          command: "sfconfig --arch /usr/share/sf-config/refarch/{{ sf_arch }}.yaml"
-      become: yes
+    - name: Deploy stable sf instance
+      include_role:
+        name: '{{ item }}'
+      loop:
+        - install-mirror
+        - update-system
+        - install-sfconfig
+        - configure-sfconfig
+        - run-sfconfig

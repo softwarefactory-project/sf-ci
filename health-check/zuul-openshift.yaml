@@ -1,7 +1,4 @@
 ---
-- name: Reset config repos
-  import_playbook: playbooks/config_reset.yaml
-
 - hosts: install-server
   remote_user: root
   tasks:
@@ -52,6 +49,8 @@
     - name: Re-run sfconfig
       command: sfconfig --skip-install
 
+    - command: exit 1
+
 - hosts: zuul-executor
   tasks:
     - name: Set executor keep/verbose mode
@@ -59,6 +58,9 @@
       with_items:
         - keep
         - verbose
+
+- name: Reset config repos
+  import_playbook: playbooks/config_reset.yaml
 
 - hosts: install-server
   remote_user: root
@@ -92,7 +94,7 @@
         - 'git commit -m "Add openshift unprivileged configuration"'
 
 - name: Submit config repos
-  include: playbooks/config_submit_change.yaml
+  import_playbook: playbooks/config_submit_change.yaml
   when: nodepool_conf is changed
 
 - hosts: install-server
