@@ -1,27 +1,39 @@
 ---
 - hosts: install-server
   tasks:
-    - import_tasks: tasks/install-sfconfig.yaml
+    - name: Prepare instance
+      include_role:
+        name: '{{ item }}'
+      loop:
+        - prepare-test-env
+        - install-mirrors
+        - update-system
+        - install-sfconfig
 
-    - name: Activate hypervisor-openshift role in the arch.yaml file
-      lineinfile:
-        path: /etc/software-factory/arch.yaml
-        insertafter: '      - nodepool-launcher'
-        line: '      - hypervisor-openshift'
-      become: yes
+    - name: Configure sfconfig
+      include_role:
+        name: configure-sfconfig
+      vars:
+        add_component:
+          - component: hypervisor-openshift
+            insertafter: nodepool-launcher
 
-    - name: Run sfconfig
-      command: sfconfig --provision-demo
-      become: yes
+    - name: Configure hostname and fqdn
+      include_role:
+        name: configure-fqdn
 
-    - name: Execute health-check
-      command: >
-        ansible-playbook -i /var/lib/software-factory/ansible/hosts
-            -e @{{ sf_ci }}/health-check/group_vars/all.yaml
-            {{ sf_ci }}/health-check/zuul-openshift.yaml
-      become: yes
+    - name: Run sfconfig with provision-demo
+      include_role:
+        name: run-sfconfig
+      vars:
+        sfconfig_args: --provision-demo
+
+    - name: Run health-check
+      include_role:
+        name: run-health-check
       ignore_errors: yes
-      register: health_check
+      vars:
+        health_check_name: zuul-openshift
 
     - name: Fetch job artifacts
       synchronize:
@@ -29,6 +41,7 @@
         dest: "{{ zuul.executor.log_root }}/job-logs"
         mode: pull
       no_log: True
+      become: yes
 
     - name: Fetch nodepool launcher logs
       synchronize:
@@ -37,8 +50,3 @@
         mode: pull
       no_log: True
       become: yes
-
-    - name: Fail if health-check failed
-      fail:
-        msg: Health check failed
-      when: health_check is failed

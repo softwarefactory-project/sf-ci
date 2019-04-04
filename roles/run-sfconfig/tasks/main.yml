@@ -1,0 +1,22 @@
+- name: Restore the arch.yaml and sfconfig.yaml files from the backup
+  copy:
+    src: '/var/lib/software-factory/backup/install-server/etc/software-factory/{{ item }}'
+    dest: '/etc/software-factory/{{ item }}'
+    remote_src: true
+  become: yes
+  loop:
+    - arch.yaml
+    - sfconfig.yaml
+  when:  sfconfig_args == '--recover'
+
+- name: Run sfconfig
+  command: 'sfconfig {{ sfconfig_args }}'
+  become: yes
+
+- name: Collect packages list
+  include_tasks: collect_packages_list.yml
+  when:  sfconfig_args == '--upgrade'
+
+- name: Allow users to have access to generated files
+  include_role:
+    name: update-bootstrap-mode
