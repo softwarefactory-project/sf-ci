@@ -8,6 +8,7 @@
       command: ansible-playbook /var/lib/software-factory/ansible/get_logs.yml
       become: yes
 
+    # TODO replace with synchronize
     - name: Copy sf-logs
       command: "rsync -a --chmod=Duog+rx,Fuog+r --no-links /root/sf-logs/ {{ artifacts }}/"
       become: yes
