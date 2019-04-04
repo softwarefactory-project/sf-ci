@@ -1,0 +1,17 @@
+---
+- name: Ensure no zuul and nodepool working directories exist
+  file:
+    path: '{{ item }}'
+    state: absent
+  loop:
+    - /var/lib/zuul
+    - /etc/nodepool
+  become: yes
+
+- name: Install sf-config package
+  yum:
+    name: sf-config
+    state: latest
+    exclude: ansible
+    update_cache: yes
+  become: yes
