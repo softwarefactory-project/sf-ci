@@ -1,0 +1,19 @@
+---
+# TODO: remove this when image are rebuilt without sf-zuul-worker element
+#       (dib is used for rhel image)
+- name: Remove unused directories created by DIB
+  file:
+    path: '{{ item }}'
+    state: absent
+  loop:
+    - /var/lib/zuul
+    - /etc/nodepool
+  become: yes
+
+- name: Install sf-config package
+  yum:
+    name: sf-config
+    state: latest
+    exclude: ansible
+    update_cache: yes
+  become: yes

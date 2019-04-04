@@ -1,8 +1,9 @@
 ---
 - hosts: install-server
+  roles:
+    - install-sf-ci-repo
+    - install-sfconfig
   tasks:
-    - import_tasks: tasks/install-sfconfig.yaml
-
     - name: Activate hypervisor-openshift role in the arch.yaml file
       lineinfile:
         path: /etc/software-factory/arch.yaml
