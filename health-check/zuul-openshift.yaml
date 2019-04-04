@@ -92,7 +92,7 @@
         - 'git commit -m "Add openshift unprivileged configuration"'
 
 - name: Submit config repos
-  include: playbooks/config_submit_change.yaml
+  import_playbook: playbooks/config_submit_change.yaml
   when: nodepool_conf is changed
 
 - hosts: install-server
