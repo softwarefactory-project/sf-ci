@@ -1,5 +1,8 @@
 - name: Prepare yum repositories
   block:
+  - name: Install CentOS CR repository
+    command: yum-config-manager --enable cr
+
   - name: Setup /etc/sf-release file
     copy:
       content: "{{ sf_version }}"
