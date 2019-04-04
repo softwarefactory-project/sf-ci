@@ -1,4 +1,0 @@
-- name: "Create artifact directory"
-  file:
-    path: "{{ artifacts }}"
-    state: directory

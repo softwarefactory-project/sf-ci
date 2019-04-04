@@ -1,20 +1,6 @@
 ---
 - hosts: install-server
-  vars:
-    sf_user: "zuul-worker"
-  tasks:
-    - name: Check mount points
-      command: cat /proc/mounts
-
-    - import_tasks: tasks/set_environment_facts.yml
-    - import_tasks: tasks/finish_test.yml
-
-    - name: Remove empty directories
-      command: "find {{ artifacts }} -type d -empty -delete"
-
-    - name: Fetch artifacts
-      synchronize:
-        src: "{{ artifacts }}/"
-        dest: "{{ zuul.executor.log_root }}/logs"
-        mode: pull
-      no_log: True
+  roles:
+    - fetch-instance-status
+    - finish-test
+    - fetch-artifacts

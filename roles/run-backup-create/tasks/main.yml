@@ -1,0 +1,6 @@
+- include_role:
+    name: update-bootstrap-mode
+
+- name: Create backup
+  command: ansible-playbook /var/lib/software-factory/ansible/sf_backup.yml
+  become: yes
