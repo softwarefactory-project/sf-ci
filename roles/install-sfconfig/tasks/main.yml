@@ -1,0 +1,8 @@
+---
+- name: Install sf-config package
+  yum:
+    name: sf-config
+    state: latest
+    exclude: ansible
+    update_cache: yes
+  become: yes
