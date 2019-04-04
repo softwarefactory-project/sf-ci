@@ -1,0 +1,27 @@
+- name: Ensure latest sf-config package is installed
+  yum:
+    name: sf-config
+    state: latest
+    exclude: ansible
+    update_cache: yes
+  become: yes
+
+- name: Restore the arch.yaml file from the backup if --recover
+  copy:
+    src: /var/lib/software-factory/backup/install-server/etc/software-factory/arch.yaml
+    dest: /etc/software-factory/arch.yaml
+    remote_src: true
+  become: yes
+  when:  sfconfig_args == '--recover'
+
+- name: Run sfconfig
+  command: 'sfconfig {{ sfconfig_args }}'
+  become: yes
+
+- name: Collect packages list
+  include_tasks: collect_packages_list.yml
+  when:  sfconfig_args == '--upgrade'
+
+- name: Allow ci to have access to files
+  include_role:
+    name: update-bootstrap-mode
