@@ -1,0 +1,25 @@
+---
+- name: Remove empty directories
+  command: "find {{ artifacts }} -type d -empty -delete"
+
+- name: Fetch artifacts
+  synchronize:
+    src: "{{ artifacts }}/"
+    dest: "{{ zuul.executor.log_root }}/logs"
+    mode: pull
+  become: yes
+
+- name: Fetch job artifacts
+  synchronize:
+    src: /var/www/logs
+    dest: "{{ zuul.executor.log_root }}/job-logs"
+    mode: pull
+  no_log: True
+
+- name: Fetch nodepool launcher logs
+  synchronize:
+    src: /var/log/nodepool
+    dest: "{{ zuul.executor.log_root }}/nodepool"
+    mode: pull
+  no_log: True
+  become: yes
