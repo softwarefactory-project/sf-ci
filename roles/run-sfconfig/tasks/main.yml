@@ -39,4 +39,4 @@
       command: sfconfig
   become: yes
 
-- include: update_bootstrap_mode.yml
+- include_role: update_bootstrap_mode.yml

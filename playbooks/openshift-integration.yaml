@@ -1,7 +1,7 @@
 ---
 - hosts: install-server
   tasks:
-    - import_tasks: tasks/install-sfconfig.yaml
+    - include_role: tasks/install-sfconfig.yaml
 
     - name: Activate hypervisor-openshift role in the arch.yaml file
       lineinfile:
