@@ -1,0 +1,21 @@
+---
+- name: Check for firehose role
+  command: grep -q firehose /etc/software-factory/arch.yaml
+  failed_when: false
+  register: _firehose_in_arch
+  become: true
+
+- name: Set sf_firehose_enabled
+  set_fact:
+    sf_firehose_enabled: "{{ _firehose_in_arch.rc == 0 }}"
+
+- name: Set artifacts
+  set_fact:
+    artifacts: "{{ ansible_env.HOME }}/artifacts"
+
+- name: Ensure artifacts directory exists
+  file:
+    path: "{{ artifacts }}"
+    state: directory
+    owner: "{{ sf_user }}"
+  become: yes
