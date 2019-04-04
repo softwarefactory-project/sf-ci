@@ -1,0 +1,6 @@
+---
+- name: Install sf-config package
+  yum:
+    name: sf-config
+    state: latest
+  become: yes
