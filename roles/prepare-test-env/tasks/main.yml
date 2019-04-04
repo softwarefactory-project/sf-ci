@@ -1,0 +1,20 @@
+---
+- name: Ensure no zuul and nodepool working directories exist
+  file:
+    path: '{{ item }}'
+    state: absent
+  loop:
+    - /var/lib/zuul
+    - /etc/nodepool
+  become: yes
+
+- name: Set artifacts
+  set_fact:
+    artifacts: "{{ ansible_env.HOME }}/artifacts"
+
+- name: Ensure artifacts directory exists
+  file:
+    path: "{{ artifacts }}"
+    state: directory
+    owner: "{{ sf_user }}"
+  become: yes
