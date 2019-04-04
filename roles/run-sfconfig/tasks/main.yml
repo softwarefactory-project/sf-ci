@@ -1,0 +1,6 @@
+- name: Run sfconfig
+  command: sfconfig
+  become: yes
+
+- include_role:
+    name: update-bootstrap-mode
