@@ -1,0 +1,19 @@
+- name: Run sfconfig
+  command: 'sfconfig {{ sfconfig_args }}'
+  become: yes
+
+- name: Collect upgraded packages list
+  block:
+    - name: Collect packages upgraded
+      shell: "rpm -qa | sort > package_upgraded"
+
+    - name: Get packages diff
+      shell: "diff /var/lib/software-factory/package_installed package_upgraded  | tee {{ artifacts }}/package_upgrade.txt"
+      register: package_diff
+      failed_when: package_diff.rc not in [0, 1]
+  become: yes
+  when:  sfconfig_args == '--upgrade'
+
+- name: Allow ci to have access to files
+  include_role:
+    name: update-bootstrap-mode
