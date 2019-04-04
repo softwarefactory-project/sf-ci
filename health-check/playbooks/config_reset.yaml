@@ -4,6 +4,16 @@
   tasks:
     - name: Reset  config_path checkout and update to origin/master
       block:
+        - name: Get config repo state
+          command: git status -s
+          args:
+            chdir: "{{ config_path }}"
+          register: git_status
+
+        - name: Print config repo git status
+          debug:
+            msg: '{{ ### DEBUG ### git status stdout: git_status.stdout }}'
+
         - name: Clone config repo
           git:
             repo: "http://{{ fqdn }}/r/config"
