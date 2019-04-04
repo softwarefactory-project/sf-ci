@@ -2,6 +2,10 @@
 - project:
     templates:
       - sf-ci-jobs
+    check:
+        - sf-deploy-stable:
+            branches: master
+        - sf-ci-openshift-integration
     periodic:
       jobs:
         - sf-deploy-stable:
