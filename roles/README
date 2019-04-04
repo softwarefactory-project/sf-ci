@@ -1,0 +1,89 @@
+This is a collection of roles to install and validate software-factory.
+
+check-bubblewrap
+----------------
+Install and check Bubblewrap.
+
+check-firehose-events
+---------------------
+When firehose is enabled, check if data are present in log files.
+
+configure-fqdn
+--------------
+Set fqdn in sfconfig.yaml and configure instance hostname.
+
+configure-sfconfig
+------------------
+Configure arch.yaml and sfconfig.yaml.
+
+fetch-artifacts
+---------------
+Collect job artifacts.
+
+fetch-instance-status
+---------------------
+Get instance data (mount point).
+
+finish-test
+-----------
+Collect log files and ara data.
+
+install-mirrors
+---------------
+Install yum repositories (stable and master) and local build mirrors.
+
+install-sfconfig
+----------------
+Install and update sf-config package.
+
+prepare-test-env
+----------------
+Remove unused directories created by DIB, create artifacts directory and set artifacts variable.
+
+restore-ci-repo
+---------------
+Restore build repo files and force sf-release to to master.
+
+run-backup-create
+-----------------
+Create backup.
+
+run-checker
+-----------
+Run checker.py.
+
+run-erase
+---------
+Erase sf deployment.
+
+run-firehose-listener
+---------------------
+Install and run mosquitto if firehose in arch.yaml.
+
+run-functional-tests
+--------------------
+Run functional tests.
+
+run-health-check
+----------------
+Run health-check playbook.
+
+run-provisioner
+---------------
+Run data provisionner.
+
+run-sfconfig
+------------
+Run sfconfig.
+
+setup-test-env
+--------------
+Install python-nose packages.
+
+update-bootstrap-mode
+---------------------
+Allow sf_user to access to software factory data (etc, var).
+
+update-system
+-------------
+Update all packages on the instance.
