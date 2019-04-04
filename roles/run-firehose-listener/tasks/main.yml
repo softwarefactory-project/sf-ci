@@ -1,0 +1,24 @@
+- name: Check for firehose role
+  command: grep -q firehose /etc/software-factory/arch.yaml
+  failed_when: false
+  register: _firehose_in_arch
+  become: true
+
+- name: Set sf_firehose_enabled
+  set_fact:
+    sf_firehose_enabled: "{{ _firehose_in_arch.rc == 0 }}"
+
+- block:
+    - name: Install mosquitto_sub service
+      copy:
+        src: mosquitto-client-tests.service
+        dest: /lib/systemd/system/mosquitto-client-tests.service
+        mode: 0640
+
+    - name: Start mosquitto_sub service
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: mosquitto-client-tests
+  become: yes
+  when: sf_firehose_enabled
