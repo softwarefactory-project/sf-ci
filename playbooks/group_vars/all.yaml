@@ -12,5 +12,3 @@ home: "/home/{{ sf_user }}"
 
 # sfconfig.yaml customization
 sf_domain: "sftests.com"
-
-sf_url: "https://softwarefactory-project.io/releases"

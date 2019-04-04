@@ -21,7 +21,10 @@
         chdir: "{{ sfnamespace_path }}"
       become: yes
 
-    - import_tasks: tasks/install_sf_ci_repo.yml
+    #- import_tasks: tasks/install_sf_ci_repo.yml
+    - name: Install sf-ci yum repositories
+      include_role:
+        name: sf_ci_repo
     - import_tasks: tasks/yum_update.yml
     - import_tasks: tasks/check_bubblewrap.yml
     - import_tasks: tasks/run_sfconfig.yml change_fqdn=True
