@@ -1,19 +1,17 @@
 ---
 - hosts: install-server
+  roles:
+    - install-mirrors
+    - update-system
+    - install-sfconfig
+    - role: configure-sfconfig
+      add_component:
+        - component: hypervisor-openshift
+          insertafter: nodepool-launcher
+    - set-hostname
+    - role: run-sfconfig
+      sfconfig_args: --provision-demo
   tasks:
-    - import_tasks: tasks/install-sfconfig.yaml
-
-    - name: Activate hypervisor-openshift role in the arch.yaml file
-      lineinfile:
-        path: /etc/software-factory/arch.yaml
-        insertafter: '      - nodepool-launcher'
-        line: '      - hypervisor-openshift'
-      become: yes
-
-    - name: Run sfconfig
-      command: sfconfig --provision-demo
-      become: yes
-
     - name: Execute health-check
       command: >
         ansible-playbook -i /var/lib/software-factory/ansible/hosts
