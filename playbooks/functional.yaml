@@ -12,16 +12,19 @@
     sfinfo_setup_args: "{% if buildset_artifacts_url %}--testing-repo {{ buildset_artifacts_url }}{% endif %}"
     sf_user: "zuul-worker"
   tasks:
-    - name: Install sfinfo repo
-      command: >
-        ./software-factory/sfinfo/zuul_rpm_setup.py
-            --distro-info ./software-factory/sfinfo/sf-{{ zuul.branch }}.yaml
-            {{ sfinfo_setup_args }}
-      args:
-        chdir: "{{ sfnamespace_path }}"
-      become: yes
+    # - name: Install sfinfo repo
+    #   command: >
+    #     ./software-factory/sfinfo/zuul_rpm_setup.py
+    #         --distro-info ./software-factory/sfinfo/sf-{{ zuul.branch }}.yaml
+    #         {{ sfinfo_setup_args }}
+    #   args:
+    #     chdir: "{{ sfnamespace_path }}"
+    #   become: yes
 
-    - import_tasks: tasks/install_sf_ci_repo.yml
+    #- import_tasks: tasks/install_sf_ci_repo.yml
+    - name: Setup yum repositories
+      include_role:
+        name: yum-repositories
     - import_tasks: tasks/yum_update.yml
     - import_tasks: tasks/check_bubblewrap.yml
     - import_tasks: tasks/run_sfconfig.yml change_fqdn=True
