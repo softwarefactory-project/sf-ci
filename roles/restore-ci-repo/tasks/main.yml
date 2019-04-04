@@ -1,0 +1,25 @@
+- name: Restore repositories files, force sf_version to master
+  block:
+    - name: Check if backup repo files exist
+      stat:
+        path: '/root/{{ item }}'
+      loop:
+        - zuul-built.repo
+        - local-built.repo
+      register: repo_files
+
+    - name: Restore repo files
+      copy:
+        src: '/root/{{ item.item }}'
+        dest: '/etc/yum.repos.d/{{ item.item }}'
+        remote_src: yes
+      when: item.stat.exists
+      loop: '{{ repo_files.results }}'
+
+    # TODO: this need to be dynamic if we want to test N-2 upgrade to N-1
+    # Right now, upgrade job only run for master branch and it test N-1 to master
+    - name: Force version to master
+      copy:
+        content: "master"
+        dest: /etc/sf-release
+  become: yes
