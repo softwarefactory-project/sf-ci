@@ -1,3 +1,4 @@
+# move this in main.yml
 - name: Check for zuul-built.repo
   stat:
     path: /etc/yum.repos.d/zuul-built.repo
@@ -19,6 +20,7 @@
   command: mv /etc/yum.repos.d/local-built.repo /root
   when: local_built_repo.stat.exists
   become: yes
+# until here
 
 - name: Install stable repo
   yum:
@@ -26,3 +28,8 @@
     validate_certs: no
     state: present
   become: yes
+
+- name: Install CentOS CR repository
+  command: yum-config-manager --enable cr
+  become: yes
+  when: centos_cr is defined and centos_cr
