@@ -1,0 +1,6 @@
+---
+- name: Collect packages installed
+  shell: "rpm -qa | sort > /var/lib/software-factory/package_installed"
+  args:
+    create: /var/lib/software-factory/package_installed
+  become: yes
