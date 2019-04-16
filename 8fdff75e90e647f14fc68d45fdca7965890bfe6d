@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "40e9f0e1_c9de7ca9",
+        "filename": "playbooks/openshift-integration.yaml",
+        "patchSetId": 54
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-04-16T07:16:16Z",
+      "side": 1,
+      "message": "well done!",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 42
+      },
+      "revId": "8fdff75e90e647f14fc68d45fdca7965890bfe6d",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7d09a3ca_8236ca56",
+        "filename": "roles/configure-sfconfig/tasks/main.yml",
+        "patchSetId": 54
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-04-16T07:16:16Z",
+      "side": 1,
+      "message": "\"when: add_component\" should be enough",
+      "range": {
+        "startLine": 22,
+        "startChar": 6,
+        "endLine": 22,
+        "endChar": 31
+      },
+      "revId": "8fdff75e90e647f14fc68d45fdca7965890bfe6d",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
