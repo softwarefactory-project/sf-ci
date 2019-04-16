@@ -25,6 +25,12 @@
     - import_tasks: tasks/yum_update.yml
     - import_tasks: tasks/check_bubblewrap.yml
     - import_tasks: tasks/run_sfconfig.yml
+    - name: Store installed package list
+      shell: 'rpm -qa | sort > /var/lib/software-factory/package_installed'
+      args:
+        warn: no
+      changed_when: false
+      become: yes
     - import_tasks: tasks/install_test_env.yml
     - import_tasks: tasks/restore_ci_repo.yml
     - import_tasks: tasks/install_sf_ci_repo.yml
