@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b9c721b3_f2c78c9b",
+        "filename": "playbooks/openshift-integration.yaml",
+        "patchSetId": 56
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-04-17T07:54:29Z",
+      "side": 1,
+      "message": "Actually this is incorrect, this test uses another health-check playbooks and it collects jobs at the end. Next PS fixes that.",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 26
+      },
+      "revId": "08f8b5efedd1090ec22ff23746d18390688fdf14",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
