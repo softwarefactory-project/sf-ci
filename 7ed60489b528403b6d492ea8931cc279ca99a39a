@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0e05dda7_8b531bcb",
+        "filename": "roles/fetch-artifacts/tasks/main.yml",
+        "patchSetId": 58
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2019-04-17T08:53:33Z",
+      "side": 1,
+      "message": "We should put that in sf-config roles instead. But could be done as followup.",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 13
+      },
+      "revId": "7ed60489b528403b6d492ea8931cc279ca99a39a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bc181801_f768d573",
+        "filename": "roles/finish-test/tasks/main.yml",
+        "patchSetId": 58
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2019-04-17T08:53:33Z",
+      "side": 1,
+      "message": "Maybe get_logs could sync log in {{ artifacts }}/ directly ?",
+      "range": {
+        "startLine": 13,
+        "startChar": 6,
+        "endLine": 13,
+        "endChar": 91
+      },
+      "revId": "7ed60489b528403b6d492ea8931cc279ca99a39a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0252a44a_b2112142",
+        "filename": "roles/install-mirrors/tasks/install_master_mirror.yml",
+        "patchSetId": 58
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2019-04-17T08:53:33Z",
+      "side": 1,
+      "message": "Do we want to check master SF on CR instead of the stable CentOS ?",
+      "range": {
+        "startLine": 3,
+        "startChar": 0,
+        "endLine": 4,
+        "endChar": 43
+      },
+      "revId": "7ed60489b528403b6d492ea8931cc279ca99a39a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
