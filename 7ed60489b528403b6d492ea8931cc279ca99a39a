@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "bb6eebbb_acb66f9f",
+        "filename": "roles/fetch-artifacts/tasks/main.yml",
+        "patchSetId": 58
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-04-17T09:21:31Z",
+      "side": 1,
+      "message": "This could use a \u0027no_log: true\u0027",
+      "revId": "7ed60489b528403b6d492ea8931cc279ca99a39a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0e05dda7_8b531bcb",
         "filename": "roles/fetch-artifacts/tasks/main.yml",
         "patchSetId": 58
@@ -13,6 +30,30 @@
       "writtenOn": "2019-04-17T08:53:33Z",
       "side": 1,
       "message": "We should put that in sf-config roles instead. But could be done as followup.",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 13
+      },
+      "revId": "7ed60489b528403b6d492ea8931cc279ca99a39a",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "280b4cb7_c97dbb3c",
+        "filename": "roles/fetch-artifacts/tasks/main.yml",
+        "patchSetId": 58
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-04-17T09:21:31Z",
+      "side": 1,
+      "message": "Actually, this is only needed for the openshift integration test. We should remove those from that role.",
+      "parentUuid": "0e05dda7_8b531bcb",
       "range": {
         "startLine": 12,
         "startChar": 0,
