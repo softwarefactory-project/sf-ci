@@ -1,0 +1,25 @@
+- name: Configure tenant
+  block:
+    - name: Remove default values in sfconfig.yaml
+      lineinfile:
+        path: sfconfig.yaml
+        regexp: '^{{ item }}:.*'
+        line: '{{ item }}:'
+      loop:
+        - tenant-deployment
+        - static_hostnames
+
+    - name: Add tenant configuration in sfconfig
+      blockinfile:
+        path: /etc/software-factory/sfconfig.yaml
+        insertafter: 'static_hostnames:'
+        block: |2
+            - "{{ master_ip }} sftests.com"
+
+    - name: Add static master host
+      blockinfile:
+        path: /etc/software-factory/sfconfig.yaml
+        insertafter: 'tenant-deployment:'
+        block: |2
+            name: tenant
+            master-sf: sftests.com
