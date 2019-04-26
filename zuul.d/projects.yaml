@@ -10,6 +10,7 @@
             branches: master
     experimental:
       jobs:
+        - sf-tenants
         - sf-rpm-build
         - sf-ci-openshift-integration:
             dependencies:
