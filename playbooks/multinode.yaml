@@ -1,0 +1,26 @@
+---
+- hosts: master
+  tasks:
+    - name: Prepare instance
+      include_role:
+        name: '{{ item }}'
+      loop:
+        - prepare-test-env
+        - install-mirrors
+        - update-system
+        - install-sfconfig
+        - configure-sfconfig
+        - run-sfconfig
+
+- hosts: tenant
+  tasks:
+    - name: Prepare instance
+      include_role:
+        name: '{{ item }}'
+      loop:
+        - prepare-test-env
+        - install-mirrors
+        - update-system
+        - install-sfconfig
+        - configure-sfconfig
+        - run-sfconfig
