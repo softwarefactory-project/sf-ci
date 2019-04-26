@@ -1,0 +1,57 @@
+---
+- hosts: master
+  tasks:
+    - name: Prepare instance
+      include_role:
+        name: '{{ item }}'
+      loop:
+        - prepare-test-env
+        - install-mirrors
+        - update-system
+        - install-sfconfig
+        - configure-sfconfig
+        - run-sfconfig
+
+- hosts: tenant
+  tasks:
+    - name: Get pem from master
+      synchronize:
+        src: /etc/pki/ca-trust/source/anchors/localCA.pem
+        dest: /etc/pki/ca-trust/source/anchors/master.pem
+      delegate_to: master
+      become: yes
+
+    - name: Update ca trust
+      command: update-ca-trust
+      become: yes
+
+    - name: Prepare instance
+      include_role:
+        name: '{{ item }}'
+      loop:
+        - prepare-test-env
+        - install-mirrors
+        - update-system
+        - install-sfconfig
+
+    - name: Configure hostname and fqdn
+      include_role:
+        name: configure-fqdn
+      vars:
+        domain: tenant.sftests.com
+
+    - name: Configure sfconfig
+      include_role:
+        name: configure-sfconfig
+      vars:
+        sf_arch: tenant-minimal
+        add_component:
+          - component: gerrit
+            insertafter: logserver
+          - component: gitweb
+            insertafter: gerrit
+        sf_tenant: true
+
+    - name: Run sfconfig
+      include_role:
+        name: run-sfconfig
