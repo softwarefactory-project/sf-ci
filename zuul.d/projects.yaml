@@ -1,16 +1,20 @@
 ---
 - project:
-    templates:
-      - sf-ci-jobs
-    periodic:
+    check:
       jobs:
-        - sf-deploy-stable:
-            branches: master
-        - sf-deploy-stable-cr:
-            branches: master
-    experimental:
-      jobs:
-        - sf-rpm-build
-        - sf-ci-openshift-integration:
-            dependencies:
-              - sf-rpm-build
+        - sf-tenants
+    # templates:
+    #   - sf-ci-jobs
+    # periodic:
+    #   jobs:
+    #     - sf-deploy-stable:
+    #         branches: master
+    #     - sf-deploy-stable-cr:
+    #         branches: master
+    # experimental:
+    #   jobs:
+    #     - sf-tenants
+    #     - sf-rpm-build
+    #     - sf-ci-openshift-integration:
+    #         dependencies:
+    #           - sf-rpm-build
