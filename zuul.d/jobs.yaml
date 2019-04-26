@@ -53,6 +53,23 @@
       sf_version: 3.2
 
 - job:
+    name: multinode
+    parent: multinode
+    run: playbooks/multinode.yaml
+    nodeset:
+        nodes:
+          - name: master
+            label: cloud-centos-7
+          - name: tenant
+            label: cloud-centos-7
+        groups:
+          - name: switch
+            nodes:
+              - master
+          - name: peers
+            nodes:
+              - slave
+- job:
     name: sf-ci-openshift-integration
     description: The sf openshift integration test
     parent: sf-ci
