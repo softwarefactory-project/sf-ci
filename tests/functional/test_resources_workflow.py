@@ -16,7 +16,9 @@ import os
 import re
 import config
 import shutil
+import shlex
 import requests
+import yaml
 
 from utils import Base
 from utils import set_private_key
@@ -26,6 +28,7 @@ from utils import create_random_str
 from utils import skipIfServiceMissing
 from utils import get_gerrit_utils
 from utils import SFStoryboard
+from utils import ssh_run_cmd
 
 
 class TestResourcesWorkflow(Base):
@@ -127,11 +130,12 @@ class TestResourcesWorkflow(Base):
                                                mode='add',
                                                expected_note=-1)
 
-    def test_validate_correct_resource_workflow(self):
+    def test_validate_correct_resource_workflow(self, new_resource_name=None):
         """ Check resources - good model is detected by config-check """
         # This resource is correct
-        fpath = "resources/%s.yaml" % create_random_str()
-        name = create_random_str()
+        if new_resource_name is None:
+            new_resource_name = create_random_str()
+        fpath = "resources/%s.yaml" % new_resource_name
         resources = """resources:
   groups:
     %s:
@@ -140,10 +144,24 @@ class TestResourcesWorkflow(Base):
         - user2@sftests.com
 """
         # Add the resource file with review then check CI
-        resources = resources % name
+        resources = resources % new_resource_name
         self.propose_resources_change_check_ci(fpath,
                                                resources=resources,
                                                mode='add')
+
+    def test_validate_cauth_groups(self):
+        """Validate that cauth_groups are updated when a group is created """
+        """or modified"""
+        new_group = create_random_str()
+        self.test_validate_correct_resource_workflow(new_group)
+        # get cauth groups file
+        cauth_groups = ssh_run_cmd(config.SERVICE_PRIV_KEY_PATH,
+                                   "root", "cauth." + config.GATEWAY_HOST,
+                                   shlex.split("cat /etc/cauth/groups.yaml"))
+        groups = yaml.safe_load(cauth_groups)
+        self.assertTrue(new_group in groups['groups'], groups)
+        self.assertTrue('user2@sftests.com' in
+                        groups['groups'][new_group]['members'], groups)
 
     def test_validate_resources_deletion(self):
         """ Check resources - deletions detected and authorized via flag """
