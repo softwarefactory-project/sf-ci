@@ -25,4 +25,7 @@
       copy:
         src: custom-vars.yaml
         dest: /etc/software-factory/custom-vars.yaml
+
+    - include_tasks: configure-tenant.yml
+      when: sf_tenant
   become: yes
