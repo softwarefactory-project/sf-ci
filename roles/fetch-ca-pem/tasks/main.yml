@@ -1,0 +1,10 @@
+- name: Get pem from tenant instance
+  synchronize:
+    src: /etc/pki/ca-trust/source/anchors/localCA.pem
+    dest: '/etc/pki/ca-trust/source/anchors/{{ instance }}.pem'
+  delegate_to: '{{ instance }}'
+  become: yes
+
+- name: Update ca trust
+  command: update-ca-trust
+  become: yes
