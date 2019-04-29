@@ -12,6 +12,7 @@
         path: /etc/software-factory/arch.yaml
         insertafter: '      - nodepool-launcher'
         line: '      - hypervisor-oci'
+      when: add_runc_hypervisor
 
     - name: Add extra components in arch.yaml
       lineinfile:
@@ -25,4 +26,16 @@
       copy:
         src: custom-vars.yaml
         dest: /etc/software-factory/custom-vars.yaml
+
+    - include_tasks: configure-static-hostname.yml
+      when:
+        - static_hostname_ip
+        - static_hostname_fqdn
+
+    - include_tasks: configure-main-instance.yml
+      when: sf_main_instance
+
+    - include_tasks: configure-tenant-instance.yml
+      when: sf_tenant_instance
+
   become: yes

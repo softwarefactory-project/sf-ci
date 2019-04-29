@@ -1,0 +1,8 @@
+- name: Add tenant configuration in sfconfig
+  blockinfile:
+    path: /etc/software-factory/sfconfig.yaml
+    insertafter: '^tenant-deployment:$'
+    marker: "# {mark} ANSIBLE MANAGED BLOCK tenant"
+    block: |2
+        name: slave-tenant
+        master-sf: https://sftests.com
