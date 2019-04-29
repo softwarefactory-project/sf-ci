@@ -1,0 +1,19 @@
+- name: Configure slave instance
+  block:
+    - name: Remove default value for gerrit_connections in sfconfig.yaml
+      lineinfile:
+        path: /etc/software-factory/sfconfig.yaml
+        regexp: '^  gerrit_connections:.*'
+        line: '  gerrit_connections:'
+
+    - name: Add slave gerrit connection
+      blockinfile:
+        path: /etc/software-factory/sfconfig.yaml
+        insertafter: '^  gerrit_connections:$'
+        marker: "# {mark} ANSIBLE MANAGED BLOCK gerrit connection"
+        block: |2
+            - name: slave
+              hostname: slave.sftests.com
+              port: 29418
+              puburl: https://slave.sftests.com/r/
+              username: zuul

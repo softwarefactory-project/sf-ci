@@ -1,0 +1,131 @@
+---
+- hosts: master
+  tasks:
+    - name: Get slave ip in /etc/hosts files (configured by multinode parent)
+      command: awk '/slave/ {print $1}' /etc/hosts
+      register: host_slave_ip
+
+    - set_fact:
+        slave_ip: '{{ host_slave_ip.stdout }}'
+
+- hosts: slave
+  tasks:
+    - name: Get master ip in /etc/hosts files (configured by multinode parent)
+      command: awk '/master/ {print $1}' /etc/hosts
+      register: host_master_ip
+
+    - set_fact:
+        master_ip: '{{ host_master_ip.stdout }}'
+
+- hosts: all
+  tasks:
+    - name: Prepare instance
+      include_role:
+        name: '{{ item }}'
+      loop:
+        - prepare-test-env
+        - install-mirrors
+        - update-system
+        - install-sfconfig
+        - configure-sfconfig
+
+- hosts: master
+  tasks:
+    - name: Run sfconfig
+      include_role:
+        name: run-sfconfig
+
+- hosts: slave
+  tasks:
+    - name: Fetch master CA pem file
+      include_role:
+        name: fetch-ca-pem
+      vars:
+        instance: master
+
+    - name: Configure hostname and fqdn
+      include_role:
+        name: configure-fqdn
+      vars:
+        domain: slave.sftests.com
+
+    - name: Configure sfconfig
+      include_role:
+        name: configure-sfconfig
+      vars:
+        sf_arch: tenant-minimal
+        add_runc_hypervisor: false
+        add_component:
+          - component: gerrit
+            insertafter: cauth
+          - component: gitweb
+            insertafter: gerrit
+        sf_tenant_instance: true
+        static_hostname_ip: '{{ master_ip }}'
+        static_hostname_fqdn: sftests.com
+
+    - name: Run sfconfig
+      include_role:
+        name: run-sfconfig
+
+- hosts: master
+  tasks:
+    - name: Fetch master CA pem file
+      include_role:
+        name: fetch-ca-pem
+      vars:
+        instance: slave
+
+    - name: Add gerrit connection in sfconfig.yaml
+      include_role:
+        name: configure-sfconfig
+      vars:
+        sf_main_instance: true
+        static_hostname_ip: '{{ slave_ip }}'
+        static_hostname_fqdn: slave.sftests.com
+
+    - name: Run sfconfig to apply configuration
+      include_role:
+        name: run-sfconfig
+      vars:
+        sfconfig_args: --skip-install
+
+    - name: Exit for debug
+      command: exit 1
+
+    - name: Add resources in the config repo
+      include_role:
+        name: configure-resource
+
+- hosts: slave
+  tasks:
+    - name: Run sfconfig to finalize configuration
+      include_role:
+        name: run-sfconfig
+      vars:
+        sfconfig_args: --skip-install
+
+- hosts: master
+  tasks:
+    - name: Restart zuul-scheduler
+      systemd:
+        name: rh-python35-zuul-scheduler
+        state: restarted
+      become: true
+
+- hosts: slave
+  tasks:
+    - name: Run sfconfig with provision-demo
+      include_role:
+        name: run-sfconfig
+      vars:
+        sfconfig_args: --skip-install --provision-demo
+
+    - name: Wait for demo project creation
+      uri:
+        url: https://sftests.com/manage/v2/resources
+        return_content: yes
+      register: result
+      until: result.content.find("demo-project") != -1
+      retries: 60
+      delay: 10
