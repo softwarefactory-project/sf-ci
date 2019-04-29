@@ -1,0 +1,32 @@
+- name: Add slave resource
+  block:
+    - name: Add slave gerrit connection
+      blockinfile:
+        path: /root/config/resources/slave.sftests.com.yaml
+        create: yes
+        block: |
+          resources:
+            tenants:
+              slave:
+                description: "The new tenant"
+                url: "https://slave.sftests.com/manage"
+                default-connection: slave
+
+    - name: Push resources configuration
+      command: '{{ item }}'
+      args:
+        chdir: /root/config
+      loop:
+        - git add resources/slave.sftests.com.yaml
+        - git commit -m 'Create slave resource'
+        - git push git+ssh://gerrit/config master
+  become: true
+
+- name: Wait for slave resource creation
+  uri:
+    url: https://sftests.com/manage/v2/resources
+    return_content: yes
+  register: result
+  until: result.content.find("slave.sftests.com") != -1
+  retries: 60
+  delay: 10
