@@ -1,1 +1,7 @@
 add_component: []
+add_runc_hypervisor: true
+static_hostname_ip:
+static_hostname_fqdn:
+# these parameters are used for multitenants deployment
+sf_main_instance: false
+sf_tenant_instance: false
