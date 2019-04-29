@@ -1,1 +1,4 @@
 add_component: []
+sf_tenant_instance: false
+sf_main_instance: false
+add_runc_hypervisor: true

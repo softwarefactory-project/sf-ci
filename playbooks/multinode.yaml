@@ -1,0 +1,79 @@
+---
+- hosts: tenant
+  tasks:
+    #TODO: find a better solution to get this ip, I didn't find it in inventory
+    - name: Get master ip in /etc/hosts files (configured by multinode parent)
+      command: awk '/master/ {print $1}' /etc/hosts
+      register: host_master_ip
+
+    - set_fact:
+        master_ip: '{{ host_master_ip.stdout }}'
+
+- hosts: all
+  tasks:
+    - name: Prepare instance
+      include_role:
+        name: '{{ item }}'
+      loop: - prepare-test-env
+        - install-mirrors
+        - update-system
+        - install-sfconfig
+        - configure-sfconfig
+
+- hosts: master
+  tasks:
+    - name: Run sfconfig
+      include_role:
+        name: run-sfconfig
+
+- hosts: tenant
+  tasks:
+    - name: Fetch master CA pem file
+      include_role:
+        name: fetch-ca-pem
+      vars:
+        instance: master
+
+    - name: Configure hostname and fqdn
+      include_role:
+        name: configure-fqdn
+      vars:
+        domain: tenant.sftests.com
+
+    - name: Configure sfconfig
+      include_role:
+        name: configure-sfconfig
+      vars:
+        sf_arch: tenant-minimal
+        add_runc_hypervisor: false
+        add_component:
+          - component: gerrit
+            insertafter: cauth
+          - component: gitweb
+            insertafter: gerrit
+        sf_tenant_instance: true
+
+    - name: Run sfconfig
+      include_role:
+        name: run-sfconfig
+
+- hosts: master
+  tasks:
+    - name: Fetch master CA pem file
+      include_role:
+        name: fetch-ca-pem
+      vars:
+        instance: tenant
+
+    - name: Add gerrit connection in sfconfig.yaml
+      include_role:
+        name: configure-sfconfig
+      vars:
+        sf_arch: tenant-minimal
+        sf_main_instance: true
+
+    - name: Run sfconfig to add gerrit connection
+      include_role:
+        name: run-sfconfig
+      vars:
+        sfconfig_args: --skip-install

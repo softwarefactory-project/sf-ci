@@ -1,0 +1,19 @@
+- name: Configure tenant instance
+  block:
+    - name: Remove default value for gerrit_connections in sfconfig.yaml
+      lineinfile:
+        path: /etc/software-factory/sfconfig.yaml
+        regexp: '^gerrit_connections:.*'
+        line: 'gerrit_connections:'
+
+    - name: Add tenant gerrit connection
+      blockinfile:
+        path: /etc/software-factory/sfconfig.yaml
+        insertafter: '^gerrit_connections:$'
+        marker: "# {mark} ANSIBLE MANAGED BLOCK gerrit connection"
+        block: |2
+            - name: tenant-sftests.com
+              hostname: tenant.sftests.com
+              port: 29418
+              puburl: https://tenant.sftests.com/r/
+              username: zuul
