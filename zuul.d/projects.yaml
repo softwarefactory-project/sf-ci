@@ -8,9 +8,13 @@
             branches: master
         - sf-deploy-stable-cr:
             branches: master
+        - sf-tenants
     experimental:
       jobs:
         - sf-rpm-build
+        - sf-tenants:
+            dependencies:
+              - sf-rpm-build
         - sf-ci-openshift-integration:
             dependencies:
               - sf-rpm-build
