@@ -1,0 +1,13 @@
+- name: Remove default value for static_hostnames in sfconfig.yaml
+  lineinfile:
+    path: /etc/software-factory/sfconfig.yaml
+    regexp: '^  static_hostnames:.*'
+    line: '  static_hostnames:'
+
+- name: Add static hostname
+  blockinfile:
+    path: /etc/software-factory/sfconfig.yaml
+    insertafter: '^  static_hostnames:$'
+    marker: "# {mark} ANSIBLE MANAGED BLOCK static hostname"
+    block: |2
+        - "{{ static_hostname_ip }} {{ static_hostname_fqdn }}"
