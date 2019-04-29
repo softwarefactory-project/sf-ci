@@ -1,0 +1,23 @@
+- name: Add tenant resource
+  block:
+    - name: Add tenant gerrit connection
+      blockinfile:
+        path: /root/config/resources/tenant.sftests.com.yaml
+        create: yes
+        block: |
+          resources:
+            tenants:
+              tenant.sftests.com:
+                description: "The new tenant"
+                url: "https://tenant.sftests.com/manage"
+                default-connection: tenant.sftests.com
+
+    - name: Push resources configuration
+      command: '{{ item }}'
+      args:
+        chdir: /root/config
+      loop:
+        - git add resources/tenant.sftests.com.yaml
+        - git commit -m 'Create tenant resource'
+        - git push git+ssh://gerrit/config master
+  become: true
