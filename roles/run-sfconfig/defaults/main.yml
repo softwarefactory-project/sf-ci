@@ -1,1 +1,2 @@
 sfconfig_args: ''
+wait_for_config_update: true

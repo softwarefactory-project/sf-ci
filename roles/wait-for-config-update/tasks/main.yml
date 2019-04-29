@@ -1,0 +1,17 @@
+---
+- name: Get newrev on config repo
+  command: git rev-parse HEAD
+  args:
+    chdir: /root/config
+  register: _rev
+  become: yes
+
+- name: Wait for config-update
+  uri:
+    url: "https://sftests.com/zuul/api/tenant/local/builds?job_name=config-update&newrev={{ _rev.stdout }}"
+    return_content: yes
+    body_format: json
+  register: _result
+  until: _result.json != [] and _result.json[0]["result"] == 'SUCCESS'
+  retries: 180
+  delay: 30
