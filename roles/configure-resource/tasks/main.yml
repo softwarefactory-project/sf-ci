@@ -1,0 +1,35 @@
+- name: Add slave resource
+  block:
+    - name: Add slave gerrit connection
+      blockinfile:
+        path: /root/config/resources/slave.sftests.com.yaml
+        create: yes
+        block: |
+          resources:
+            tenants:
+              slave:
+                description: "The new tenant"
+                url: "https://slave.sftests.com/manage"
+                default-connection: slave
+
+    - name: Push resources configuration
+      command: '{{ item }}'
+      args:
+        chdir: /root/config
+      loop:
+        - git add resources/slave.sftests.com.yaml
+        - git commit -m 'Create slave resource'
+        - git push git+ssh://gerrit/config master
+
+    - name: Clean configrepo_update.log
+      command:
+        path: /var/log/software-factory/configrepo_update.log
+        state: absent
+
+    - name: Wait for config update
+      wait_for:
+        path: /var/log/software-factory/configrepo_update.log
+        search_regex: 'PLAY RECAP'
+        timeout: 600
+        sleep: 30
+  become: true
