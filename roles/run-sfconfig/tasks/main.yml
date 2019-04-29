@@ -13,6 +13,11 @@
   command: 'sfconfig {{ sfconfig_args }}'
   become: yes
 
+- name: Wait for config update
+  include_role:
+    name: wait-for-config-update
+  when: wait_for_config_update
+
 - name: Collect packages list
   include_tasks: collect_packages_list.yml
   when:  sfconfig_args == '--upgrade'

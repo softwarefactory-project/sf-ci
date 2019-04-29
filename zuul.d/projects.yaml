@@ -1,16 +1,37 @@
 ---
+# TODO: after getting +2 from core reviewers, remove check pipeline and
+# uncomment templates, periodic and experimental.
 - project:
-    templates:
-      - sf-ci-jobs
-    periodic:
-      jobs:
-        - sf-deploy-stable:
-            branches: master
-        - sf-deploy-stable-cr:
-            branches: master
-    experimental:
+    check:
       jobs:
         - sf-rpm-build
-        - sf-ci-openshift-integration:
+        - sf-tenants:
             dependencies:
               - sf-rpm-build
+        - sf-ci-functional-minimal:
+            dependencies:
+              - sf-rpm-build
+        - sf-ci-upgrade-minimal:
+            dependencies:
+              - sf-rpm-build
+        - sf-ci-functional-allinone:
+            dependencies:
+              - sf-rpm-build
+        - sf-ci-upgrade-allinone:
+            dependencies:
+              - sf-rpm-build
+    # templates:
+    #   - sf-ci-jobs
+    # periodic:
+    #   jobs:
+    #     - sf-deploy-stable:
+    #         branches: master
+    #     - sf-deploy-stable-cr:
+    #         branches: master
+    #     - sf-tenants
+    # experimental:
+    #   jobs:
+    #     - sf-rpm-build
+    #     - sf-ci-openshift-integration:
+    #         dependencies:
+    #           - sf-rpm-build
