@@ -1,1 +1,5 @@
 add_component: []
+sf_main_instance: true
+add_runc_hypervisor: true
+static_hostname_ip:
+static_hostname_fqdn:
