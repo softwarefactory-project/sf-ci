@@ -1,0 +1,136 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ef8fc777_d4f8e2c8",
+        "filename": "playbooks/multinode.yaml",
+        "patchSetId": 40
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2019-05-06T15:15:47Z",
+      "side": 1,
+      "message": "I think you have them in the inventory.yaml",
+      "range": {
+        "startLine": 2,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 48
+      },
+      "revId": "8df40af19e84e4980db133d85e72f7bc31a0f5b2",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c10a435c_5c5958a5",
+        "filename": "playbooks/multinode.yaml",
+        "patchSetId": 40
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2019-05-06T15:15:47Z",
+      "side": 1,
+      "message": "Is it normal to do it twice for the slave ?",
+      "range": {
+        "startLine": 30,
+        "startChar": 8,
+        "endLine": 30,
+        "endChar": 28
+      },
+      "revId": "8df40af19e84e4980db133d85e72f7bc31a0f5b2",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a732589_5b83ece4",
+        "filename": "playbooks/multinode.yaml",
+        "patchSetId": 40
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2019-05-06T15:15:47Z",
+      "side": 1,
+      "message": "Looks like there is an issue if we need to restart the scheduler.",
+      "range": {
+        "startLine": 105,
+        "startChar": 0,
+        "endLine": 111,
+        "endChar": 18
+      },
+      "revId": "8df40af19e84e4980db133d85e72f7bc31a0f5b2",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6a309b61_d51fc563",
+        "filename": "playbooks/multinode.yaml",
+        "patchSetId": 40
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2019-05-06T15:15:47Z",
+      "side": 1,
+      "message": "Awesome !",
+      "range": {
+        "startLine": 122,
+        "startChar": 0,
+        "endLine": 128,
+        "endChar": 20
+      },
+      "revId": "8df40af19e84e4980db133d85e72f7bc31a0f5b2",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0233e175_777dfc18",
+        "filename": "roles/configure-sfconfig/tasks/configure-main-instance.yml",
+        "patchSetId": 40
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2019-05-06T15:15:47Z",
+      "side": 1,
+      "message": "Why do you remove the local gerrit connection ? and in that case why not using zuul-minimal.yaml arch.\n\nAlso I feel better to do that in python :)",
+      "range": {
+        "startLine": 3,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 28
+      },
+      "revId": "8df40af19e84e4980db133d85e72f7bc31a0f5b2",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fe58e1e1_e58e113a",
+        "filename": "zuul.d/jobs.yaml",
+        "patchSetId": 40
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2019-05-06T15:15:47Z",
+      "side": 1,
+      "message": "Why is it needed ?",
+      "revId": "8df40af19e84e4980db133d85e72f7bc31a0f5b2",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
