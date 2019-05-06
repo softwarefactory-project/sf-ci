@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "b0c80889_7ae4134b",
+        "filename": "playbooks/multinode.yaml",
+        "patchSetId": 40
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2019-05-06T15:34:12Z",
+      "side": 1,
+      "message": "yes, there are present on the inventory.yaml but I was not able to get them for they are not on the vars part of this file. I will be happy if you have the trick to get these values \u003d)",
+      "parentUuid": "ef8fc777_d4f8e2c8",
+      "range": {
+        "startLine": 2,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 48
+      },
+      "revId": "8df40af19e84e4980db133d85e72f7bc31a0f5b2",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c10a435c_5c5958a5",
         "filename": "playbooks/multinode.yaml",
         "patchSetId": 40
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "6d5799e6_076874ab",
+        "filename": "playbooks/multinode.yaml",
+        "patchSetId": 40
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2019-05-06T15:34:12Z",
+      "side": 1,
+      "message": "I will move it on \u0027-hosts: master\u0027 before the run-sfconfig role",
+      "parentUuid": "c10a435c_5c5958a5",
+      "range": {
+        "startLine": 30,
+        "startChar": 8,
+        "endLine": 30,
+        "endChar": 28
+      },
+      "revId": "8df40af19e84e4980db133d85e72f7bc31a0f5b2",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a732589_5b83ece4",
         "filename": "playbooks/multinode.yaml",
         "patchSetId": 40
@@ -59,6 +107,30 @@
       "writtenOn": "2019-05-06T15:15:47Z",
       "side": 1,
       "message": "Looks like there is an issue if we need to restart the scheduler.",
+      "range": {
+        "startLine": 105,
+        "startChar": 0,
+        "endLine": 111,
+        "endChar": 18
+      },
+      "revId": "8df40af19e84e4980db133d85e72f7bc31a0f5b2",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4d8ccfe6_1fe59446",
+        "filename": "playbooks/multinode.yaml",
+        "patchSetId": 40
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2019-05-06T15:34:12Z",
+      "side": 1,
+      "message": "I will propose a new review to get the nodes on hold, we can debug the issue",
+      "parentUuid": "9a732589_5b83ece4",
       "range": {
         "startLine": 105,
         "startChar": 0,
@@ -117,6 +189,30 @@
     },
     {
       "key": {
+        "uuid": "ddec9390_1903697b",
+        "filename": "roles/configure-sfconfig/tasks/configure-main-instance.yml",
+        "patchSetId": 40
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2019-05-06T15:34:12Z",
+      "side": 1,
+      "message": "the default value is \u0027gerrit_connections: []\u0027, I didn\u0027t find a way to remove [] and add the block in the same ansible task\n\nI can edit sfconfig in python, but the 2 tasks do the job \u003d)",
+      "parentUuid": "0233e175_777dfc18",
+      "range": {
+        "startLine": 3,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 28
+      },
+      "revId": "8df40af19e84e4980db133d85e72f7bc31a0f5b2",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fe58e1e1_e58e113a",
         "filename": "zuul.d/jobs.yaml",
         "patchSetId": 40
@@ -128,6 +224,24 @@
       "writtenOn": "2019-05-06T15:15:47Z",
       "side": 1,
       "message": "Why is it needed ?",
+      "revId": "8df40af19e84e4980db133d85e72f7bc31a0f5b2",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4c5553c0_b9bb5531",
+        "filename": "zuul.d/jobs.yaml",
+        "patchSetId": 40
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2019-05-06T15:34:12Z",
+      "side": 1,
+      "message": "it\u0027s how the multinode parent job works https://opendev.org/zuul/zuul-jobs/src/branch/master/playbooks/multinode/pre.yaml",
+      "parentUuid": "fe58e1e1_e58e113a",
       "revId": "8df40af19e84e4980db133d85e72f7bc31a0f5b2",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
