@@ -16,6 +16,24 @@
       "revId": "e335d7953f25880536964ae7f5a023b8b0fb9b41",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f2fbaf14_cd8f7504",
+        "filename": "playbooks/multinode.yaml",
+        "patchSetId": 55
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2019-05-10T13:19:15Z",
+      "side": 1,
+      "message": "Yes, there is another task for this story to validate users ops. I will convert needed playbooks on sf-ci/health-check to be able to reuse them on the slave instance. Thanks for the review \u003d)",
+      "parentUuid": "44c34ca2_e97d0d53",
+      "revId": "e335d7953f25880536964ae7f5a023b8b0fb9b41",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
