@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "44c34ca2_e97d0d53",
+        "filename": "playbooks/multinode.yaml",
+        "patchSetId": 55
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-05-10T00:50:17Z",
+      "side": 1,
+      "message": "That\u0027s a clever way to test the workflow. Though we might want to follow-up with a proper health-check to validate common user operation works too (e.g. add resources in tenant config repo, use git-review, wait for config-check, approve, wait for resources to be created).",
+      "revId": "e335d7953f25880536964ae7f5a023b8b0fb9b41",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
