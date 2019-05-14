@@ -1,12 +1,17 @@
 ---
 - hosts: install-server
   tasks:
+    - name: Install mirrors to use rc repo
+      include_role:
+        name: install-mirrors
+      vars:
+        configure_rc_repo: True
+
     - name: Prepare instance
       include_role:
         name: '{{ item }}'
       loop:
         - prepare-test-env
-        - install-mirrors
         - check-bubblewrap
         - install-sfconfig
         - configure-sfconfig
