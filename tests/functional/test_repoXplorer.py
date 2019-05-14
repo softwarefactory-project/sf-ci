@@ -142,11 +142,12 @@ class TestRepoxplorer(Base):
     %(gname)s:
       description: test for functional test
       members:
-        - user2@sftests.com
+        - %(user2)s
 """
         tmpl_keys = {'pname': create_random_str(),
                      'rname': create_random_str(),
-                     'gname': create_random_str()}
+                     'gname': create_random_str(),
+                     'user2': config.USERS['user2']['email']}
 
         resources = resources % tmpl_keys
         self.set_resources_then_direct_push(fpath,
