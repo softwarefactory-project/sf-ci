@@ -79,3 +79,13 @@
       sf_arch: allinone
       sf_version: 3.2
       centos_cr: true
+
+- job:
+    name: stable-to-rc-upgrade-allinone
+    description: The sf upgrade tests from stable to rc of the allinone architecture
+    parent: sf-ci
+    run: playbooks/stable-to-rc-upgrade.yaml
+    vars:
+      sf_arch: allinone
+      sf_version: 3.2
+      rc_version: 3.3
