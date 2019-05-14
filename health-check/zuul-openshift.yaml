@@ -141,6 +141,18 @@
       copy:
         content: |
           ---
+          - hosts: localhost
+            tasks:
+              - name: Fetch pods list from pre run
+                include_vars:
+                  file: "{{'{{'}} zuul.executor.work_root {{'}}'}}/pods.yaml"
+
+              - add_host:
+                  name: "{{'{{'}} item.pod {{'}}'}}"
+                  group: "{{'{{'}} item.name {{'}}'}}"
+                  ansible_connection: kubectl
+                with_items: "{{'{{'}} pods {{'}}'}}"
+
           - hosts: demo-project
             tasks:
               - command: ls
