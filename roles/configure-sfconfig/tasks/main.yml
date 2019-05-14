@@ -17,7 +17,7 @@
     - name: Add extra components in arch.yaml
       lineinfile:
         path: /etc/software-factory/arch.yaml
-        insertafter: '      - {{ item.insertafter }}'
+        insertafter: '      - {{ item.insertafter | default(omit) }}'
         line: '      - {{ item.component }}'
       loop: '{{ add_component }}'
       when: add_component
@@ -37,5 +37,4 @@
 
     - include_tasks: configure-tenant-instance.yml
       when: sf_tenant_instance
-
   become: yes

@@ -32,6 +32,11 @@
     - name: Configure sfconfig
       include_role:
         name: configure-sfconfig
+      vars:
+        add_component:
+          - component: elasticsearch
+          - component: repoxplorer
+          - component: hound
 
     - name: Run sfconfig
       include_role:
@@ -61,7 +66,9 @@
           - component: gerrit
             insertafter: cauth
           - component: gitweb
-            insertafter: gerrit
+          - component: elasticsearch
+          - component: repoxplorer
+          - component: hound
         sf_tenant_instance: true
         static_hostname_ip: '{{ master_ip }}'
         static_hostname_fqdn: sftests.com
@@ -117,16 +124,16 @@
 
 - hosts: slave
   tasks:
-    - name: Run sfconfig with provision-demo
+    - name: Add tenant resources
       include_role:
-        name: run-sfconfig
+        name: health-check/add_resources
       vars:
-        sfconfig_args: --skip-install --provision-demo
+        tenant_deployment: True
+        fqdn: slave.sftests.com
 
-- hosts: master
-  tasks:
-    - name: Ensure demo-project is present on zuul main.yml
-      wait_for:
-        path: /etc/zuul/main.yaml
-        search_regex: 'demo-project'
-        timeout: 600
+    - name: Create job in project
+      include_role:
+        name: health-check/create_zuul_project
+
+    # exit for debug
+    - command: exit 1
