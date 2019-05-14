@@ -131,3 +131,17 @@
         path: /etc/zuul/main.yaml
         search_regex: 'demo-project'
         timeout: 600
+
+- hosts: slave
+  tasks:
+    - name: Run functional tests and health-check
+      include_role:
+        name: '{{ item }}'
+      loop:
+        - setup-test-env
+        - run-provisioner
+        - run-backup-create
+        - run-health-check
+        - run-firehose-listener
+        - run-functional-tests
+        - check-firehose-events
