@@ -1,0 +1,7 @@
+- project:
+    check:
+      jobs:
+        - unit-tests
+    gate:
+      jobs:
+        - unit-tests

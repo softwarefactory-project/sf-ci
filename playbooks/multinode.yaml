@@ -32,6 +32,11 @@
     - name: Configure sfconfig
       include_role:
         name: configure-sfconfig
+      vars:
+        add_component:
+          - component: elasticsearch
+          - component: repoxplorer
+          - component: hound
 
     - name: Run sfconfig
       include_role:
@@ -61,7 +66,9 @@
           - component: gerrit
             insertafter: cauth
           - component: gitweb
-            insertafter: gerrit
+          - component: elasticsearch
+          - component: repoxplorer
+          - component: hound
         sf_tenant_instance: true
         static_hostname_ip: '{{ master_ip }}'
         static_hostname_fqdn: sftests.com
@@ -117,16 +124,29 @@
 
 - hosts: slave
   tasks:
-    - name: Run sfconfig with provision-demo
+    - name: Add resources in tenant
       include_role:
-        name: run-sfconfig
+        name: health-check/add_resources
       vars:
-        sfconfig_args: --skip-install --provision-demo
+        fqdn: slave.sftests.com
+        resource_file: ichiban.yaml
 
-- hosts: master
-  tasks:
-    - name: Ensure demo-project is present on zuul main.yml
-      wait_for:
-        path: /etc/zuul/main.yaml
-        search_regex: 'demo-project'
-        timeout: 600
+    - name: Add zuul job in project
+      include_role:
+        name: health-check/create_zuul_project
+      vars:
+        fqdn: slave.sftests.com
+        project: ichiban-compute
+
+    - name: Validate project data are present on CodeSearch
+      include_role:
+        name: health-check/validate_project
+      vars:
+        service_uri: 'http://managesf.slave.sftests.com:6080/api/v1/search?q=TestHello&i=nope&files=&repos=ichiban-compute'
+        service_until_condition: _result.json['Results']['ichiban-compute']['FilesWithMatch'] == 1
+
+    - name: Validate project is present on RepoXplorer
+      include_role:
+        name: health-check/validate_project
+      vars:
+        service_uri: 'http://repoxplorer.slave.sftests.com:20002/api/v1/commits/commits?pid=ichiban-cloud'
