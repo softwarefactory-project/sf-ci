@@ -1,3 +1,5 @@
 sfnamespace_path: ''
 buildset_artifacts_url: ''
 update_mirrors: False
+rc_version: False
+configure_rc_repo: False
