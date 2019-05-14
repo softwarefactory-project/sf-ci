@@ -1,20 +1,7 @@
 ---
 - project:
-    templates:
-      - sf-ci-jobs
-    periodic:
+    check:
       jobs:
-        - sf-deploy-stable:
-            branches: master
-        - sf-deploy-stable-cr:
-            branches: master
         - sf-tenants
-    experimental:
-      jobs:
-        - sf-rpm-build
-        - sf-ci-openshift-integration:
-            dependencies:
-              - sf-rpm-build
-        - sf-tenants:
-            dependencies:
-              - sf-rpm-build
+        - sf-ci-rc-functional-allinone
+        - sf-ci-rc-upgrade-allinone
