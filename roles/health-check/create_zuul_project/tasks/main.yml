@@ -1,0 +1,25 @@
+- name: Clone repository
+  git:
+    repo: https://slave.sftests.com/r/ichiban-compute
+    dest: /tmp/ichiban-compute
+
+- name: Install project files
+  synchronize:
+    src: ichiban-compute/
+    dest: /tmp/ichiban-compute/
+
+- name: Add project files
+  command: '{{ item }}'
+  with_items:
+    - git config --add gitreview.username admin
+    - cat .git/config
+    - git review -s
+    - git add -A .
+    - git commit -m 'add zuul configuration'
+  args:
+    chdir: /tmp/ichiban-compute/
+
+- name: Submit review
+  command: /usr/share/sf-config/scripts/submit_and_wait.py --approve --delay 1200
+  args:
+    chdir: /tmp/ichiban-compute/
