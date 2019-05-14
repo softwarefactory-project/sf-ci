@@ -114,3 +114,22 @@
       sf_arch: allinone
       sf_version: 3.2
       centos_cr: true
+
+- job:
+    name: sf-ci-rc-functional-allinone
+    description: The sf functional tests on rc of the allinone architecture
+    parent: sf-ci
+    run: playbooks/sf-ci-rc-functional-allinone.yaml
+    vars:
+      sf_arch: allinone
+      sf_version: 3.2
+      rc_version: 3.3
+
+- job:
+    name: sf-ci-rc-upgrade-allinone
+    description: The sf upgrade tests from stable to rc of the allinone architecture
+    parent: sf-ci
+    run: playbooks/sf-ci-rc-upgrade-allinone.yaml
+    vars:
+      sf_arch: allinone
+      rc_version: 3.3
