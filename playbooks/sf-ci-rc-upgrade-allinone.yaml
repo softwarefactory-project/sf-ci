@@ -1,0 +1,57 @@
+---
+- hosts: install-server
+  tasks:
+    - name: Prepare instance
+      include_role:
+        name: '{{ item }}'
+      loop:
+        - prepare-test-env
+        - install-mirrors
+        - update-system
+        - check-bubblewrap
+        - install-sfconfig
+        - configure-sfconfig
+        - configure-fqdn
+
+    - name: Deploy sf and setup test env
+      include_role:
+        name: '{{ item }}'
+      loop:
+        - run-sfconfig
+        - setup-test-env
+        - restore-ci-repo
+
+    - name: Update mirrors to use rc repo
+      include_role:
+        name: install-mirrors
+      vars:
+        configure_rc_repo: True
+
+    - name: Run provisioner
+      include_role:
+        name: run-provisioner
+
+    - name: Update sfconfig package
+      include_role:
+        name: install-sfconfig
+
+    - name: Ensure sf-release package won't be updated during sf-config --upgrade
+      command: "{{ item }} /usr/share/sf-config/ansible/roles/sf-upgrade/tasks/main.yml"
+      loop:
+        - sed -i 's/sf_version != "master"/False/'
+        - sed -i '/- sf_version != sf_previous_version/d'
+      become: true
+
+    - name: Run sfconfig upgrade
+      include_role:
+        name: run-sfconfig
+      vars:
+        sfconfig_args: --upgrade
+
+    - name: Run functional tests and health-check
+      include_role:
+        name: '{{ item }}'
+      loop:
+         - run-checker
+         - run-health-check
+         - run-functional-tests
