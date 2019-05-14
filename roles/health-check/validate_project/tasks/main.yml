@@ -1,0 +1,9 @@
+- name: Get data using service api
+  uri:
+    url: "{{ service_uri }}"
+    return_content: yes
+    body_format: json
+  register: _result
+  until: service_until_condition | default('_result.json != []')
+  retries: 180
+  delay: 30
