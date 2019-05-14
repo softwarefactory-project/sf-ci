@@ -24,8 +24,8 @@ if [ "$1" == "stop" ]; then
 fi
 
 # Authorize gerrit reindex from local-test netns
-mysql -e "$(grep gerrit.*sftests.com \
-    /var/lib/software-factory/sql/databases.sql | \
-    sed 's/managesf.sftests.com/192.168.42.2/g')"
+sql_file='/var/lib/software-factory/sql/databases.sql'
+sql_command=$(grep gerrit.*sftests.com $sql_file | sed -e "s/\(gerrit'@'\).*sftests.com/\1192.168.42.2/g")
+mysql -e "$sql_command"
 
 ip netns exec local-test sudo -E -u $SUDO_USER "$@"
