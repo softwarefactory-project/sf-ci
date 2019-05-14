@@ -1,0 +1,20 @@
+- name: Clone repository
+  git:
+    repo: https://slave.sftests.com/r/ichiban-compute
+    dest: /tmp/ichiban-compute
+
+- name: Setup git review
+  command: git review -s
+  args:
+    chdir: /tmp/ichiban-compute
+  ignore_errors: true
+
+- name: Install project files
+  synchronize:
+    src: ichiban-compute/
+    dest: /tmp/ichiban-compute/
+
+- name: Submit review
+  command: /usr/share/sf-config/scripts/submit_and_wait.py --approve --delay 300
+  args:
+    chdir: /tmp/ichiban-compute
