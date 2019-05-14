@@ -1,0 +1,6 @@
+---
+- name: Install rc repo
+  template:
+    src: sf-release.repo.j2
+    dest: /etc/yum.repos.d/sf-release.repo
+  become: yes
