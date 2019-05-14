@@ -6,6 +6,7 @@
   args:
     chdir: "{{ sfnamespace_path }}"
   become: yes
+  when: not rc_version
 
 - name: Install sf-master repositories
   include_tasks: install_master_mirror.yml
@@ -14,3 +15,7 @@
 - name: Install sf-stable repositories
   include_tasks: install_stable_mirror.yml
   when: sf_version != 'master'
+
+- name: Install sf-rc repositories
+  include_tasks: install_rc_mirror.yml
+  when: rc_version and configure_rc_repo
