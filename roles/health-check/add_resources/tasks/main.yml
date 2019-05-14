@@ -1,0 +1,26 @@
+- name: Check if config update
+  include_role:
+    name: wait_for_config_update
+
+- name: Add resource file
+  copy:
+    src: ichiban.yaml
+    dest: /root/config/resources/ichiban.yaml
+
+- name: Add resources in config repo
+  command: '{{ item }}'
+  args:
+    chdir: /root/config
+  loop:
+    - git add resources/ichiban.yaml
+    - git commit -m 'Create ichiban.yaml resource'
+
+- name: Submit and approve change
+  command: /usr/share/sf-config/scripts/submit_and_wait.py --approve
+  args:
+    chdir: /root/config
+  ignore_errors: true
+
+- name: wait for job result
+  include_role:
+    name: wait_for_config_update
