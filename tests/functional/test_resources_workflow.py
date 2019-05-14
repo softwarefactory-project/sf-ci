@@ -127,7 +127,7 @@ class TestResourcesWorkflow(Base):
                                                mode='add',
                                                expected_note=-1)
 
-    def test_validate_correct_resource_workflow(self):
+    def test_validate_correct_resource_workflow():
         """ Check resources - good model is detected by config-check """
         # This resource is correct
         fpath = "resources/%s.yaml" % create_random_str()
@@ -137,10 +137,10 @@ class TestResourcesWorkflow(Base):
     %s:
       description: test for functional test
       members:
-        - user2@sftests.com
+        - %s
 """
         # Add the resource file with review then check CI
-        resources = resources % name
+        resources = resources % (name, config.USERS['user2']['email'])
         self.propose_resources_change_check_ci(fpath,
                                                resources=resources,
                                                mode='add')
@@ -271,38 +271,40 @@ class TestResourcesWorkflow(Base):
     %s:
       description: test for functional test
       members:
-        - user2@sftests.com
-        - user3@sftests.com
+        - %s
+        - %s
 """
         # Add the resources file w/o review
-        resources = resources % name
+        resources = resources % (name, config.USERS['user2']['email'],
+                                 config.USERS['user3']['email'])
         self.set_resources_then_direct_push(fpath,
                                             resources=resources,
                                             mode='add')
         # Check members on Gerrit
         gid = self.gu.get_group_id(name)
         members = [m['email'] for m in self.gu.get_group_members(gid)]
-        self.assertIn("user2@sftests.com", members)
-        self.assertIn("user3@sftests.com", members)
+        self.assertIn(config.USERS['user2']['email'], members)
+        self.assertIn(config.USERS['user3']['email'], members)
         # Modify resources Add/Remove members w/o review
         resources = """resources:
   groups:
     %s:
       description: test for functional test
       members:
-        - user4@sftests.com
-        - user2@sftests.com
+        - %s
+        - %s
 """
-        resources = resources % name
+        resources = resources % (name, config.USERS['user4']['email'],
+                                 config.USERS['user2']['email'])
         self.set_resources_then_direct_push(fpath,
                                             resources=resources,
                                             mode='add')
         # Check members on Gerrit
         gid = self.gu.get_group_id(name)
         members = [m['email'] for m in self.gu.get_group_members(gid)]
-        self.assertIn("user4@sftests.com", members)
-        self.assertIn("user2@sftests.com", members)
-        self.assertNotIn("user3@sftests.com", members)
+        self.assertIn(config.USERS['user4']['email'], members)
+        self.assertIn(config.USERS['user2']['email'], members)
+        self.assertNotIn(config.USERS['user3']['email'], members)
         # Del the resources file w/o review
         self.set_resources_then_direct_push(fpath,
                                             mode='del')
@@ -358,7 +360,10 @@ class TestResourcesWorkflow(Base):
                      'r2name': create_random_str(),
                      'aname': create_random_str(),
                      'g1name': create_random_str(),
-                     'g2name': create_random_str()}
+                     'g2name': create_random_str(),
+                     'user2': config.USERS['user2']['email'],
+                     'user3': config.USERS['user3']['email'],
+                     'user4': config.USERS['user4']['email']}
         resources = """resources:
   projects:
     %(pname)s:
@@ -405,11 +410,11 @@ class TestResourcesWorkflow(Base):
   groups:
     %(pname)s/%(g1name)s:
       members:
-        - user2@sftests.com
+        - %(user2)s
     %(pname)s/%(g2name)s:
       members:
-        - user3@sftests.com
-        - user4@sftests.com
+        - %(user3)s
+        - %(user4)s
 """
         # Add the resources file w/o review
         resources = resources % tmpl_keys
@@ -427,13 +432,13 @@ class TestResourcesWorkflow(Base):
                                                 tmpl_keys['g1name']))
         members = [m['email'] for m in self.gu.get_group_members(gid)]
         self.assertEqual(len(members), 1)
-        self.assertIn("user2@sftests.com", members)
+        self.assertIn(tmpl_keys['user2'], members)
         gid2 = self.gu.get_group_id(os.path.join(tmpl_keys['pname'],
                                                  tmpl_keys['g2name']))
         members = [m['email'] for m in self.gu.get_group_members(gid2)]
         self.assertEqual(len(members), 2)
-        self.assertIn("user3@sftests.com", members)
-        self.assertIn("user4@sftests.com", members)
+        self.assertIn(tmpl_keys['user3'], members)
+        self.assertIn(tmpl_keys['user4'], members)
         # Verify ACLs have been written for both repo
         for r in ('r1name', 'r2name'):
             rname = os.path.join(tmpl_keys['pname'], tmpl_keys[r])

@@ -20,6 +20,7 @@ if "REQUESTS_CA_BUNDLE" not in os.environ and os.path.isfile(requests_ca):
 groupvars = yaml.safe_load(open(SF_GROUPVARS))
 
 GATEWAY_HOST = groupvars['fqdn']
+DOMAIN = GATEWAY_HOST
 
 GATEWAY_URL = 'https://%s' % GATEWAY_HOST
 MANAGESF_API = GATEWAY_URL + "/manage/"
@@ -172,39 +173,39 @@ USER_6_PRIV_KEY = USER_4_PRIV_KEY
 
 USERS = {
     USER_1: {"password": ADMIN_PASSWORD,
-             "email": "admin@sftests.com",
+             "email": "admin@%s" % DOMAIN,
              "pubkey": file(ADMIN_PUB_KEY_PATH).read(),
              "privkey": file(ADMIN_PRIV_KEY_PATH).read(),
              "auth_cookie": "",
              "api_key": groupvars.get("gerrit_admin_password"),
              },
     USER_2: {"password": ADMIN_PASSWORD,
-             "email": "user2@sftests.com",
+             "email": "user2@%s" % DOMAIN,
              "pubkey": USER_2_PUB_KEY,
              "privkey": USER_2_PRIV_KEY,
              "auth_cookie": "",
              },
     USER_3: {"password": ADMIN_PASSWORD,
-             "email": "user3@sftests.com",
+             "email": "user3@%s" % DOMAIN,
              "pubkey": USER_3_PUB_KEY,
              "privkey": USER_3_PRIV_KEY,
              "auth_cookie": "",
              },
     USER_4: {"password": ADMIN_PASSWORD,
-             "email": "user4@sftests.com",
+             "email": "user4@%s" % DOMAIN,
              "pubkey": USER_4_PUB_KEY,
              "privkey": USER_4_PRIV_KEY,
              "auth_cookie": "",
              },
     USER_5: {"password": ADMIN_PASSWORD,
-             "email": "user5@sftests.com",
+             "email": "user5@%s" % DOMAIN,
              "pubkey": USER_5_PUB_KEY,
              "privkey": USER_5_PRIV_KEY,
              "auth_cookie": "",
              "lastname": "Demo user5",
              },
     USER_6: {"password": ADMIN_PASSWORD,
-             "email": "user6@sftests.com",
+             "email": "user6@%s" % DOMAIN,
              "pubkey": USER_6_PUB_KEY,
              "privkey": USER_6_PRIV_KEY,
              "auth_cookie": "",
