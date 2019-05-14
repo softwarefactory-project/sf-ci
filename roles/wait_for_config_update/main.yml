@@ -1,13 +1,5 @@
 - name: Wait for config update
   block:
-    - set_fact:
-        zuul_api_url: 'https://{{ fqdn }}/zuul/api/tenant/local'
-      when: not tenant_deployment
-
-    - set_fact:
-        zuul_api_url: 'https://{{ fqdn }}/zuul/api'
-      when: tenant_deployment
-
     - name: Ensure config repo is sync
       command: git pull
       args:
@@ -19,14 +11,13 @@
         chdir: /root/config
       register: _rev
 
-    - name: Wait for job result
+    - name: Wait for config-update
       uri:
-        url: "{{ zuul_api_url }}/builds?job_name=config-update&newrev={{ _rev.stdout }}"
+        url: "https://{{ fqdn }}/zuul/api/tenant/local/builds?job_name=config-update&newrev={{ _rev.stdout }}"
         return_content: yes
         body_format: json
       register: _result
       until: _result.json != [] and _result.json[0]["result"] == 'SUCCESS'
       retries: 180
       delay: 30
-
   become: true
