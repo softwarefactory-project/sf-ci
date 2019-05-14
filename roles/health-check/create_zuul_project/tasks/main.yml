@@ -1,0 +1,36 @@
+- name: Clone repository
+  git:
+    repo: https://slave.sftests.com/r/ichiban-compute
+    dest: /tmp/ichiban-compute
+
+- name: Setup git review
+  command: git review -s
+  args:
+    chdir: /tmp/ichiban-compute
+
+- name: Create working directories
+  file:
+    path: '/tmp/ichiban-compute/{{ item }}'
+    recurse: true
+  loop:
+    - playbooks
+    - zuul.d
+
+- name: Install project files
+  copy:
+    src: '{{ item.src }}'
+    dest: '/tmp/ichiban-compute/{{ item.dest | default(None) }}/{{ item.src }}'
+  loop:
+    - {src: 'hello.py'}
+    - {src: 'unittests.yaml', dest: 'playbooks'}
+    - {src: 'jobs.yaml', dest: 'zuul.d'}
+    - {src: 'projects.yaml', dest: 'zuul.d'}
+
+- name: Propose a review with the created files
+  command: '{{ item }}'
+  args:
+    chdir: /tmp/ichiban-compute
+  loop:
+    - git add -A .
+    - git commit -m 'add zuul job'
+    - /usr/share/sf-config/scripts/submit_and_wait.py

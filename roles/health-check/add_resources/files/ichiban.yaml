@@ -1,0 +1,61 @@
+resources:
+  projects:
+    ichiban-cloud:
+      tenant: slave
+      description: The best cloud platform engine
+      contacts:
+        - contacts@ichiban-cloud.io
+      source-repositories:
+        - ichiban-config:
+            zuul/config-project: True
+        - ichiban-compute
+        - ichiban-storage
+      website: http://ichiban-cloud.io
+      documentation: http://ichiban-cloud.io/docs
+      issue-tracker-url: http://ichiban-cloud.bugtrackers.io
+  repos:
+    ichiban-config:
+      description: The config project of ichiban-cloud
+      acl: ichiban-dev-acl
+    ichiban-compute:
+      description: The compute manager of ichiban-cloud
+      acl: ichiban-dev-acl
+    ichiban-storage:
+      description: The storage manager of ichiban-cloud
+      acl: ichiban-dev-acl
+  acls:
+    ichiban-dev-acl:
+      file: |
+        [access "refs/*"]
+          read = group ichiban-core
+          owner = group ichiban-ptl
+        [access "refs/heads/*"]
+          label-Code-Review = -2..+2 group ichiban-core
+          label-Code-Review = -2..+2 group ichiban-ptl
+          label-Verified = -2..+2 group ichiban-ptl
+          label-Workflow = -1..+1 group ichiban-core
+          label-Workflow = -1..+1 group ichiban-ptl
+          label-Workflow = -1..+0 group Registered Users
+          submit = group ichiban-ptl
+          read = group ichiban-core
+          read = group Registered Users
+        [access "refs/meta/config"]
+          read = group ichiban-core
+          read = group Registered Users
+        [receive]
+          requireChangeId = true
+        [submit]
+          mergeContent = false
+          action = fast forward only
+      groups:
+        - ichiban-ptl
+        - ichiban-core
+  groups:
+    ichiban-ptl:
+      members:
+        - admin@slave.sftests.com
+      description: Project Techincal Leaders of ichiban-cloud
+    ichiban-core:
+      members:
+        - admin@slave.sftests.com
+      description: Project Core of ichiban-cloud
