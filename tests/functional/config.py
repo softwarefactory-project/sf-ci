@@ -24,6 +24,7 @@ DOMAIN = GATEWAY_HOST
 
 GATEWAY_URL = 'https://%s' % GATEWAY_HOST
 MANAGESF_API = GATEWAY_URL + "/manage/"
+TENANT_ZUUL_API = groupvars['tenant_zuul_api']
 
 GERRIT_USER = 'gerrit'
 GERRIT_SERVICE_PRIV_KEY_PATH = '%s/ssh_keys/gerrit_service_rsa' \
