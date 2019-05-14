@@ -1,0 +1,12 @@
+---
+- name: Install sf-release rc package
+  yum:
+    name: 'http://koji.softwarefactory-project.io/kojifiles/repos/sf-3.3-el7-candidate/Mash/sf-release-3.3.0-1.el7.noarch.rpm'
+
+- name: use -candidate instead -release target and disable gpg
+  command: '{{ item }} /etc/yum.repos.d/sf-release.repo'
+  loop:
+    - sed -i 's/-release/-candidate/'
+    - sed -i 's/gpgcheck=1/gpgcheck=0/'
+  args:
+    warn: false
