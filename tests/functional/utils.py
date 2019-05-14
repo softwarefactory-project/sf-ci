@@ -592,11 +592,7 @@ class JobUtils(Tool):
                                                   config.USER_1_PASSWORD)}
 
     def wait_for_config_update(self, revision, return_result=False):
-        base_url = "%s/zuul/api/tenant/local/builds" % config.GATEWAY_URL
-        # Remove this when 3.0 is updated with last zuul package
-        r = requests.get(base_url)
-        if r.status_code == 404:
-            base_url = "%s/zuul/local/builds" % config.GATEWAY_URL
+        base_url = "%s/builds" % config.TENANT_ZUUL_API
         job_url = "?job_name=config-update&newrev=%s" % revision
         logger.debug(
             "Waiting for config-update using %s" % (base_url + job_url))
@@ -688,10 +684,15 @@ class ResourcesUtils():
         self.ggu.add_commit_for_all_new_additions(cdir, msg)
         change_sha = self.ggu.direct_push_branch(cdir, 'master')
         config_update_log = self.ju.wait_for_config_update(change_sha)
+        # when tenant_deployment, config_update_log contains 2 entries
+        # in c2 for findall
+        host = 1
+        if config.TENANT_DEPLOYMENT:
+            host = 2
         c1 = "SUCCESS" in config_update_log
         c2 = len(
             re.findall(
-                'managesf\..*failed=0', config_update_log)) == 1
+                'managesf\..*failed=0', config_update_log)) == host
         assert c1 or c2
 
     def create_resources(self, name, data):
