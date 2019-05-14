@@ -118,16 +118,10 @@
 
 - hosts: slave
   tasks:
-    - name: Run sfconfig with provision-demo
+    - name: Run functional tests and health-check
       include_role:
-        name: run-sfconfig
-      vars:
-        sfconfig_args: --skip-install --provision-demo
-
-- hosts: master
-  tasks:
-    - name: Ensure demo-project is present on zuul main.yml
-      wait_for:
-        path: /etc/zuul/main.yaml
-        search_regex: 'demo-project'
-        timeout: 600
+        name: '{{ item }}'
+      loop:
+        - setup-test-env
+        - run-provisioner
+        - run-functional-tests
