@@ -1,0 +1,7 @@
+---
+- name: Install rc repo
+  block:
+    - name: Install sf-release rc package
+      yum:
+        name: https://softwarefactory-project.io/repos/sf-release-3.3.rpm
+  become: yes
