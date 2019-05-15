@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a0c4145_e8dd4488",
+        "filename": "roles/configure-sfconfig/tasks/configure-main-instance.yml",
+        "patchSetId": 61
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2019-05-15T08:39:32Z",
+      "side": 1,
+      "message": "Could you add the change on the doc as depends-on ?",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 38
+      },
+      "revId": "3d509d8ddd8d68e08439265ac0081db8e1c14a36",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
