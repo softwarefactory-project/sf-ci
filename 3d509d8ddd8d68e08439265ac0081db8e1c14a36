@@ -22,6 +22,30 @@
       "revId": "3d509d8ddd8d68e08439265ac0081db8e1c14a36",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0f6486fc_9b36575a",
+        "filename": "roles/configure-sfconfig/tasks/configure-main-instance.yml",
+        "patchSetId": 61
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2019-05-15T14:19:05Z",
+      "side": 1,
+      "message": "Yes, I forgot that, thanks for the review",
+      "parentUuid": "9a0c4145_e8dd4488",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 38
+      },
+      "revId": "3d509d8ddd8d68e08439265ac0081db8e1c14a36",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
