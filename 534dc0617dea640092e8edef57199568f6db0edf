@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4b39aa6e_ffa311ff",
+        "filename": "tests/functional/utils.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 695,
+      "author": {
+        "id": 22
+      },
+      "writtenOn": "2019-05-16T21:47:11Z",
+      "side": 1,
+      "message": "Should I refactor this ? is grep failed\u003d0 sufficient ?",
+      "range": {
+        "startLine": 693,
+        "startChar": 8,
+        "endLine": 695,
+        "endChar": 59
+      },
+      "revId": "534dc0617dea640092e8edef57199568f6db0edf",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
