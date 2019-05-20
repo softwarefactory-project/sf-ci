@@ -13,6 +13,9 @@
   command: 'sfconfig {{ sfconfig_args }}'
   become: yes
 
+- name: Store package list
+  include_tasks: store_packages_list.yml
+
 - name: Collect packages list
   include_tasks: collect_packages_list.yml
   when:  sfconfig_args == '--upgrade'
