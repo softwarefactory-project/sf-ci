@@ -16,7 +16,9 @@ import os
 import re
 import config
 import shutil
+import shlex
 import requests
+import yaml
 
 from utils import Base
 from utils import set_private_key
@@ -26,6 +28,7 @@ from utils import create_random_str
 from utils import skipIfServiceMissing
 from utils import get_gerrit_utils
 from utils import SFStoryboard
+from utils import ssh_run_cmd
 
 
 class TestResourcesWorkflow(Base):
@@ -285,6 +288,22 @@ class TestResourcesWorkflow(Base):
         members = [m['email'] for m in self.gu.get_group_members(gid)]
         self.assertIn(config.USERS['user2']['email'], members)
         self.assertIn(config.USERS['user3']['email'], members)
+        # check cauth groups
+
+        def _get_cauth_groups():
+            out, err = ssh_run_cmd(
+                config.SERVICE_PRIV_KEY_PATH,
+                "root", config.GATEWAY_HOST,
+                shlex.split("cat /etc/cauth/groups.yaml"))
+            return yaml.safe_load(out)
+
+        groups = _get_cauth_groups()
+        self.assertTrue(name in groups['groups'], groups)
+        self.assertTrue(config.USERS['user2']['email'] in
+                        groups['groups'][name]['members'], groups)
+        self.assertTrue(config.USERS['user3']['email'] in
+                        groups['groups'][name]['members'], groups)
+
         # Modify resources Add/Remove members w/o review
         resources = """resources:
   groups:
@@ -305,12 +324,25 @@ class TestResourcesWorkflow(Base):
         self.assertIn(config.USERS['user4']['email'], members)
         self.assertIn(config.USERS['user2']['email'], members)
         self.assertNotIn(config.USERS['user3']['email'], members)
+        # check cauth groups
+        groups = _get_cauth_groups()
+        self.assertTrue(name in groups['groups'], groups)
+        self.assertTrue(config.USERS['user2']['email'] in
+                        groups['groups'][name]['members'], groups)
+        self.assertTrue(config.USERS['user4']['email'] in
+                        groups['groups'][name]['members'], groups)
+        self.assertTrue(config.USERS['user3']['email'] not in
+                        groups['groups'][name]['members'], groups)
+
         # Del the resources file w/o review
         self.set_resources_then_direct_push(fpath,
                                             mode='del')
         # Check the group has been deleted
         self.assertFalse(
             self.gu.get_group_id(name))
+        # check cauth groups
+        groups = _get_cauth_groups()
+        self.assertTrue(name not in groups['groups'], groups)
 
     def test_CD_repo(self):
         """ Check resources - ops on git repositories work as expected """
