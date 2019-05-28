@@ -25,7 +25,6 @@
       loop:
         - prepare-test-env
         - install-mirrors
-        - update-system
         - install-sfconfig
 
 - hosts: master

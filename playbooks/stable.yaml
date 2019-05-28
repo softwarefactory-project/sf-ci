@@ -6,7 +6,6 @@
         name: '{{ item }}'
       loop:
         - install-mirrors
-        - update-system
         - install-sfconfig
         - configure-sfconfig
         - run-sfconfig
