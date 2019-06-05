@@ -29,8 +29,8 @@
 
     - include_tasks: configure-static-hostname.yml
       when:
-        - static_hostname_ip
-        - static_hostname_fqdn
+        - static_hostname_ip is defined
+        - static_hostname_fqdn is defined
 
     - include_tasks: configure-main-instance.yml
       when: sf_main_instance
