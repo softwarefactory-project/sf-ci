@@ -1,4 +1,5 @@
 ---
+# Will be reverted after sf-cores reviews
 - project:
     templates:
       - sf-ci-jobs
@@ -8,7 +9,8 @@
             branches: master
         - sf-deploy-stable-cr:
             branches: master
-        - sf-tenants
+        - sf-tenants:
+            branches: master
     experimental:
       jobs:
         - sf-rpm-build
