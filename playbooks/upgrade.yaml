@@ -7,7 +7,6 @@
       loop:
         - prepare-test-env
         - install-mirrors
-        - update-system
         - check-bubblewrap
         - install-sfconfig
         - configure-sfconfig
