@@ -1,0 +1,25 @@
+- name: Add resource in config repo
+  block:
+    - name: Add resource file
+      copy:
+        src: '{{ resource_file }}'
+        dest: '/root/config/resources/{{ resource_file }}'
+
+    - name: Add resources in config repo
+      command: '{{ item }}'
+      args:
+        chdir: /root/config
+      loop:
+        - 'git add resources/{{ resource_file }}'
+        - 'git commit -m "Create {{ resource_file }}" resource'
+
+    - name: Submit and approve change
+      command: /usr/share/sf-config/scripts/submit_and_wait.py --approve --delay 1200
+      args:
+        chdir: /root/config
+
+    - name: wait for job result
+      include_role:
+        name: wait_for_config_update
+  when: resource_file is defined
+  become: yes

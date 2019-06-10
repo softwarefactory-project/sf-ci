@@ -1,0 +1,4 @@
+- job:
+    name: unit-tests
+    description: Run unittest
+    run: playbooks/unittests.yaml

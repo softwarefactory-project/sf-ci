@@ -1,0 +1,25 @@
+- name: Create zuul project
+  block:
+    - name: Clone repository
+      git:
+        repo: 'https://{{ fqdn }}/r/{{ project }}'
+        dest: '/tmp/{{ project }}'
+
+    - name: Install project files
+      synchronize:
+        src: '{{ project }}/'
+        dest: '/tmp/{{ project }}/'
+
+    - name: Add project files
+      command: '{{ item }}'
+      with_items:
+        - git add -A .
+        - git commit -m 'add zuul configuration'
+      args:
+        chdir: '/tmp/{{ project }}/'
+
+    - name: Submit review
+      command: /usr/share/sf-config/scripts/submit_and_wait.py --approve --delay 1200
+      args:
+        chdir: '/tmp/{{ project }}/'
+  become: yes
