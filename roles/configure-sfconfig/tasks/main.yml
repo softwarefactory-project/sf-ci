@@ -22,6 +22,14 @@
       loop: '{{ add_component }}'
       when: add_component
 
+    - name: Remove unsupported components
+      lineinfile:
+        path: /etc/software-factory/arch.yaml
+        line: '      - {{ item }}'
+        state: absent
+      loop: '{{ unsupported_components }}'
+      when: unsupported_components
+
     - name: Install extra custom-vars for ci tunning
       copy:
         src: custom-vars.yaml
