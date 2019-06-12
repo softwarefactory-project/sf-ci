@@ -27,6 +27,22 @@
         src: custom-vars.yaml
         dest: /etc/software-factory/custom-vars.yaml
 
+    - name: Remove unsupported components
+      block:
+        - name: Remove from arch.yaml
+          lineinfile:
+            path: /etc/software-factory/arch.yaml
+            line: '      - {{ item }}'
+            state: absent
+          loop: '{{ unsupported_components }}'
+
+        - debug:
+            msg:
+              - 'WARNING: {{ item }} will be removed from arch for'
+              - unsupported_components variable was added in the job definition.
+          loop: '{{ unsupported_components }}'
+      when: unsupported_components
+
     - include_tasks: configure-static-hostname.yml
       when:
         - static_hostname_ip is defined

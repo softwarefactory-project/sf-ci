@@ -1,4 +1,5 @@
 add_component: []
+unsupported_components: []
 add_runc_hypervisor: true
 static_hostname_ip:
 static_hostname_fqdn:
