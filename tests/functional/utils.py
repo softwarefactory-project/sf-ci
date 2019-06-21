@@ -626,9 +626,10 @@ class JobUtils(Tool):
         return "FAILED"
 
 
-class ResourcesUtils():
+class ResourcesUtils(Tool):
 
     def __init__(self, yaml=None):
+        Tool.__init__(self)
         default_yaml = """resources:
   acls:
     %(name)s-acl:
@@ -711,27 +712,24 @@ class ResourcesUtils():
         os.unlink(os.path.join(cdir, 'resources', name + '.yaml'))
         self._direct_push(cdir, 'Del project %s' % name)
 
-    def _direct_apply_call(self, prev, new):
-        data = {'prev': prev, 'new': new}
-        cookie = get_cookie(config.SF_SERVICE_USER,
-                            config.SF_SERVICE_USER_PASSWORD)
-        cookie = {"auth_pubtkt": cookie}
-        r = requests.put(config.MANAGESF_API + 'v2/resources/',
-                         cookies=cookie,
-                         json=data)
-        assert r.status_code < 300
-        return r.json()
-
     def direct_create_repo(self, name):
         wanted_state_yaml = self.yaml % {
             'name': name, 'fqdn': config.GATEWAY_HOST}
         previous_state_yaml = yaml.dump({'resources': {}})
-        self._direct_apply_call(previous_state_yaml,
-                                wanted_state_yaml)
+        open("/tmp/prev.yaml", "w").write(previous_state_yaml)
+        open("/tmp/new.yaml", "w").write(wanted_state_yaml)
+        cmd = "managesf-resources "
+        cmd += "direct-apply --prev-yaml /tmp/prev.yaml "
+        cmd += "--new-yaml /tmp/new.yaml"
+        self.exe(cmd)
 
     def direct_delete_repo(self, name):
         previous_state_yaml = self.yaml % {
             'name': name, 'fqdn': config.GATEWAY_HOST}
         wanted_state_yaml = yaml.dump({'resources': {}})
-        self._direct_apply_call(previous_state_yaml,
-                                wanted_state_yaml)
+        open("/tmp/prev.yaml", "w").write(previous_state_yaml)
+        open("/tmp/new.yaml", "w").write(wanted_state_yaml)
+        cmd = "managesf-resources "
+        cmd += "direct-apply --prev-yaml /tmp/prev.yaml "
+        cmd += "--new-yaml /tmp/new.yaml"
+        self.exe(cmd)
