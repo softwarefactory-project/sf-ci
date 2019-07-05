@@ -142,6 +142,7 @@ class TestUserdata(Base):
         new_gerrit_id = self.gu.get_account('freddie').get('_account_id')
         self.assertTrue(gerrit_id != new_gerrit_id)
 
+    @skip("Disable the time we move to scl managesf")
     def test_unicode_user(self):
         """ Try to create a local user with unicode charset, login, delete
         """
