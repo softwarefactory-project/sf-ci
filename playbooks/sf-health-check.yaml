@@ -1,4 +1,8 @@
 ---
+- name: save ansible base path variable for future use
+    set_fact:
+    ansible_base_path: "../roles"
+
 - name: Run health-check zuul
   import_playbook: zuul.yaml
   when: '"zuul" in roles'

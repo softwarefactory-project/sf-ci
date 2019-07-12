@@ -1,7 +1,7 @@
 - name: Execute health-check
   command: >
     ansible-playbook -i /var/lib/software-factory/ansible/hosts
-        -e @{{ sf_ci }}/health-check/group_vars/all.yaml
-        {{ sf_ci }}/health-check/{{ health_check_name|default('sf-health-check') }}.yaml
+        -e @{{ sf_ci }}/playbooks/health-check/group_vars/all.yaml
+        {{ sf_ci }}/playbooks/{{ health_check_name|default('sf-health-check') }}.yaml
   register: health_check
   become: yes
