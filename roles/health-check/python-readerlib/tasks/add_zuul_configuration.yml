@@ -1,0 +1,71 @@
+- name: Test add zuul configuration files
+  block:
+    - name: Add bad YAML file
+      template:
+        src: "{{ item.src }}.j2"
+        dest: "/var/lib/software-factory/health-check/python-readerlib/{{ item.dst }}"
+      loop:
+        - {src: zuul.yaml, dst: .zuul.yaml}
+        - {src: test-file-bad.yaml, dst: file.yaml}
+      register: bad_project_status
+
+    - name: Submit bad change and check for test error
+      command: "{{ item }}"
+      args:
+        chdir: /var/lib/software-factory/health-check/python-readerlib/
+      loop:
+        - git add .zuul.yaml file.yaml
+        - git commit -m "Test project"
+        - /usr/share/sf-config/scripts/submit_and_wait.py --delay 1200 --failure
+      when: bad_project_status is changed
+
+    - name: Fetch logs url
+      uri:
+        url: "https://{{ fqdn }}/zuul/api/tenant/local/builds?job_name=linters&project=tdpw/python-readerlib"
+        return_content: yes
+        status_code: "200,404"
+        validate_certs: no
+      register: _job_logs
+      until: "'json' in _job_logs and _job_logs.json"
+      retries: 120
+      delay: 2
+
+    - name: Ensure ara-report exists
+      uri:
+        url: "{{ _job_logs.json[0]['log_url'] }}/ara-report/ansible.sqlite"
+        return_content: no
+        status_code: 200
+        validate_certs: no
+
+    - name: Add good YAML file
+      template:
+        src: "{{ item.src }}.j2"
+        dest: "/var/lib/software-factory/health-check/python-readerlib/{{ item.dst }}"
+      loop:
+        - {src: test-file-good.yaml, dst: file.yaml}
+      register: good_project_status
+
+    - name: Update change and check for SUCCESS
+      command: "{{ item }}"
+      args:
+        chdir: /var/lib/software-factory/health-check/python-readerlib/
+      loop:
+        - git commit -a --amend
+        - /usr/share/sf-config/scripts/submit_and_wait.py --delay 1200 --approve
+        - git fetch --all
+      environment: {'EDITOR':'test'}
+      when: good_project_status is changed
+
+    - name: Check change was merged
+      command: git diff HEAD origin/master
+      args:
+        chdir: /var/lib/software-factory/health-check/python-readerlib
+      register: diff
+      failed_when: diff.stdout != ''
+  always:
+    # This test only works when executor is running on the install-server
+    - name: Unset executor keep mode
+      include_role:
+        name: health-check/zuul-executor
+      vars:
+        action: nokeep

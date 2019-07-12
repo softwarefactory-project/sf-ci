@@ -12,7 +12,7 @@
 
     - name: Add project files
       command: '{{ item }}'
-      with_items:
+      loop:
         - git add -A .
         - git commit -m 'add zuul configuration'
       args:
