@@ -1,0 +1,4 @@
+- name: Check fake_ircd server log
+  wait_for:
+    path: /var/log/fakeircd.log
+    search_regex: "{{ ircd_logs_pattern }}"
