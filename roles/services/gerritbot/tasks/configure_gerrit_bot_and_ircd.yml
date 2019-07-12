@@ -1,0 +1,39 @@
+- name: Start fake_ircd service
+  block:
+    - name: Setup fake_ircd.py
+      copy:
+        src: fake_ircd.py
+        dest: /usr/local/bin/fake_ircd.py
+        mode: 0755
+
+    - name: Start fake irc server
+      command: /usr/local/bin/fake_ircd.py --daemon
+
+- name: Setup gerritbot and start service
+  block:
+    - name: Setup configuration
+      template:
+        src: gerritbot.conf.j2
+        dest: /etc/gerritbot/gerritbot.conf
+
+    - name: Setup channels
+      copy:
+        src: gerritbot-channels.yaml
+        dest: /etc/gerritbot/channels.yaml
+
+    - name: Restart service
+      service:
+        name: gerritbot
+        state: restarted
+
+- name: Check gerritbot connect to gerrit and irc
+  block:
+    - name: Wait for gerritbot to connect to gerrit
+      wait_for:
+        path: /var/log/gerritbot/gerritbot.log
+        search_regex: "INFO gerritbot{{':'}} Start watching Gerrit event stream."
+
+    - name: Wait for gerritbot to connect to irc
+      wait_for:
+        path: /var/log/gerritbot/gerritbot.log
+        search_regex: "INFO gerritbot{{':'}} Identified with IRC server."

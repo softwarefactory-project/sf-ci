@@ -1,0 +1,94 @@
+- name: Setup demo-project zuul.yaml configuration
+  copy:
+    content: |
+      ---
+      # Test regular openshift project
+      - job:
+          name: demo-project-native
+          parent: base-openshift-native
+          run: native.yaml
+          vars:
+            base_image: "python:3.6"
+
+      # Test regular openshift pod running in a dedicated project
+      - job:
+          name: demo-project-pod
+          parent: base-openshift-pod
+          run: pod.yaml
+
+      # Test openshiftpods provider running in a shared project with regular sa
+      - job:
+          name: linter-job
+          parent: base-openshift-pod
+          nodeset:
+            nodes:
+              - name: pod
+                label: linter-pod
+          run: pod.yaml
+
+      - project:
+          check:
+            jobs:
+              - demo-project-native
+              - demo-project-pod
+              - linter-job
+          gate:
+            jobs:
+              - noop
+    dest: /root/demo-project/.zuul.yaml
+
+- name: Setup demo-project native.yaml playbook
+  copy:
+    content: |
+      ---
+      - hosts: localhost
+        tasks:
+          - name: Fetch pods list from pre run
+            include_vars:
+              file: "{{'{{'}} zuul.executor.work_root {{'}}'}}/pods.yaml"
+
+          - add_host:
+              name: "{{'{{'}} item.pod {{'}}'}}"
+              group: "{{'{{'}} item.name {{'}}'}}"
+              ansible_connection: kubectl
+            with_items: "{{'{{'}} pods {{'}}'}}"
+
+      - hosts: demo-project
+        tasks:
+          - command: ls
+          - command: python demo.py
+            register: demo_output
+          - debug: var=demo_output.stdout
+          - fail:
+            when: "'Hello' not in demo_output.stdout"
+    dest: /root/demo-project/native.yaml
+
+- name: Setup demo-project pod.yaml playbook
+  copy:
+    content: |
+      ---
+      - hosts: pod
+        tasks:
+          - command: python3 demo.py
+            args:
+              chdir: "{{'{{'}} zuul.project.src_dir {{'}}'}}"
+    dest: /root/demo-project/pod.yaml
+
+# TODO use standard role to submit
+- name: Submit change and check for SUCCESS
+  command: "{{ item }}"
+  args:
+    chdir: /root/demo-project
+  with_items:
+    - git add .zuul.yaml pod.yaml native.yaml
+    - git commit -m "Test openshift-base job"
+    - /usr/share/sf-config/scripts/submit_and_wait.py --delay 1900 --approve
+    - git fetch --all
+  environment: {'EDITOR':'test'}
+
+- name: Check change was merged
+  command: git diff HEAD origin/master
+  args:
+    chdir: /root/demo-project
+  register: diff
+  failed_when: diff.stdout != ''
