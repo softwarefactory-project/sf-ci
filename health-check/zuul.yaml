@@ -1,111 +1,25 @@
 ---
-- name: Reset config repos
-  import_playbook: playbooks/config_reset.yaml
-
 - hosts: install-server
   remote_user: root
   tasks:
-    - name: Checkout tdpw/python-readerlib
-      git:
-        repo: https://{{ fqdn }}/r/tdpw/python-readerlib
-        dest: /var/lib/software-factory/health-check/python-readerlib
-        force: yes
-
-    - name: Add python-readerlib to zuul main.yaml
-      copy:
-        content: "{{ zuul_config|to_yaml }}"
-        dest: "{{ config_path }}/zuul/health-check.yaml"
-      register: zuul_conf
-
-    - name: Update change
-      when: zuul_conf is changed
-      command: "{{ item }}"
-      args:
-        chdir: "{{ config_path }}"
-      with_items:
-          - 'git add -A'
-          - 'git commit -m "Add zuul health-check configuration"'
-
-- name: Submit config repos
-  import_playbook: playbooks/config_submit_change.yaml
-  when: zuul_conf is changed
+    - name: Validate Zuul
+      include_role:
+        name: '{{ item }}'
+      loop:
+        - health-check/config-repo-reset
+        - health-check/python-readerlib
 
 - hosts: zuul-executor
   tasks:
     - name: Set executor keep mode
-      command: >
-        /opt/rh/rh-python35/root/bin/zuul-executor
-            -c /etc/opt/rh/rh-python35/zuul/zuul.conf keep
+      include_role:
+        - services/zuul-executor
+      vars:
+        action: keep
 
 - hosts: install-server
   remote_user: root
   tasks:
-    - block:
-        - name: Add bad YAML file
-          template:
-            src: "{{ item.src }}.j2"
-            dest: "/var/lib/software-factory/health-check/python-readerlib/{{ item.dst }}"
-          with_items:
-            - {src: zuul.yaml, dst: .zuul.yaml}
-            - {src: test-file-bad.yaml, dst: file.yaml}
-          register: bad_project_status
-
-        - name: Submit bad change and check for test error
-          command: "{{ item }}"
-          args:
-            chdir: /var/lib/software-factory/health-check/python-readerlib/
-          with_items:
-            - git add .zuul.yaml file.yaml
-            - git commit -m "Test project"
-            - /usr/share/sf-config/scripts/submit_and_wait.py --delay 1200 --failure
-          when: bad_project_status is changed
-
-        - name: Fetch logs url
-          uri:
-            url: "https://{{ fqdn }}/zuul/api/tenant/local/builds?job_name=linters&project=tdpw/python-readerlib"
-            return_content: yes
-            status_code: "200,404"
-            validate_certs: no
-          register: _job_logs
-          until: "'json' in _job_logs and _job_logs.json"
-          retries: 120
-          delay: 2
-
-        - name: Ensure ara-report exists
-          uri:
-            url: "{{ _job_logs.json[0]['log_url'] }}/ara-report/ansible.sqlite"
-            return_content: no
-            status_code: 200
-            validate_certs: no
-
-        - name: Add good YAML file
-          template:
-            src: "{{ item.src }}.j2"
-            dest: "/var/lib/software-factory/health-check/python-readerlib/{{ item.dst }}"
-          with_items:
-            - {src: test-file-good.yaml, dst: file.yaml}
-          register: good_project_status
-
-        - name: Update change and check for SUCCESS
-          command: "{{ item }}"
-          args:
-            chdir: /var/lib/software-factory/health-check/python-readerlib/
-          with_items:
-            - git commit -a --amend
-            - /usr/share/sf-config/scripts/submit_and_wait.py --delay 1200 --approve
-            - git fetch --all
-          environment: {'EDITOR':'test'}
-          when: good_project_status is changed
-
-        - name: Check change was merged
-          command: git diff HEAD origin/master
-          args:
-            chdir: /var/lib/software-factory/health-check/python-readerlib
-          register: diff
-          failed_when: diff.stdout != ''
-      always:
-        # This test only works when executor is running on the install-server
-        - name: Unset executor keep mode
-          command: >
-            /opt/rh/rh-python35/root/bin/zuul-executor
-                -c /etc/opt/rh/rh-python35/zuul/zuul.conf nokeep
+    - name: Add zuul configuration
+      include_role: health-check/python-readerlib
+      tasks_from: add_zuul_configuration
