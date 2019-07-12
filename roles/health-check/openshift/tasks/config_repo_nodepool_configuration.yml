@@ -1,0 +1,33 @@
+- name: Add unprivileged openshift provider to nodepool config
+  copy:
+    content: |
+      ---
+      labels:
+        - name: linter-pod
+          min-ready: 0
+
+      providers:
+        - name: openshift-user
+          driver: openshiftpods
+          context: "/localhost/nodepool-sa"
+          pools:
+            - name: nodepool
+              labels:
+                - name: linter-pod
+                  image: docker.io/fedora:29
+                  python-path: /usr/bin/python3
+    dest: "{{ config_path }}/nodepool/openshift.yaml"
+  register: nodepool_conf
+
+- name: Update and submit change
+  block:
+    - name: Commit change
+      command: chdir={{ config_path }} {{ item }}
+      with_items:
+        - 'git add -A'
+        - 'git commit -m "Add openshift unprivileged configuration"'
+
+    - name: Submit review
+      include_role:
+        name: health-check/config-repo-submit-change
+  when: nodepool_conf is changed
