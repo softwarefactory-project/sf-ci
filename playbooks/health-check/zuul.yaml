@@ -1,0 +1,26 @@
+---
+- hosts: install-server
+  remote_user: root
+  tasks:
+    - name: Add python-readerlib in the config repo
+      include_role:
+        name: '{{ item }}'
+      loop:
+        - health-check/config-repo-reset
+        - health-check/python-readerlib
+
+- hosts: zuul-executor
+  tasks:
+    - name: Set executor keep mode
+      include_role:
+        name: services/zuul-executor
+      vars:
+        action: keep
+
+- hosts: install-server
+  remote_user: root
+  tasks:
+    - name: Add zuul configuration
+      include_role:
+        name: health-check/python-readerlib
+        tasks_from: add_zuul_configuration
