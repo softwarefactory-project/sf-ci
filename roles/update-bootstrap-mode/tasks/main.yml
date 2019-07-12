@@ -3,7 +3,7 @@
     path: "{{ item }}"
     recurse: yes
     owner: "{{ sf_user }}"
-  with_items:
+  loop:
     - /var/lib/software-factory/
     - /etc/software-factory/
   become: yes

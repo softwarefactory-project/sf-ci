@@ -1,0 +1,42 @@
+---
+- hosts: install-server
+  remote_user: root
+  tasks:
+    - name: Create project and add config
+      include_role:
+        name: health-check/openshift
+    # TODO use roles/run-sfconfig when moving data in playbook
+    - name: Re-run sfconfig
+      command: sfconfig --skip-install
+
+- hosts: zuul-executor
+  tasks:
+    # TODO: adapt health-check/zuul-executor to use list
+    - name: Set executor keep mode
+      include_role:
+        name: health-check/zuul-executor
+      vars:
+        action: keep
+
+    - name: Set executor verbose mode
+      include_role:
+        name: health-check/zuul-executor
+      vars:
+        action: verbose
+
+- hosts: install-server
+  remote_user: root
+  tasks:
+    - name: Reset the config repo
+      include_role:
+        name: health-check/config-repo-reset
+
+    - name: Add nodepool configuration in the config repo
+      include_role:
+        name: health-check/openshift
+        tasks_from: config_repo_nodepool_configuration
+
+    - name: Add zuul configuration in the demo-project repo
+      include_role:
+        name: health-check/openshift
+        tasks_from: demo_project_zuul_configuration
