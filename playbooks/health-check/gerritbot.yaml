@@ -1,0 +1,75 @@
+---
+- hosts: gerritbot
+  tasks:
+    - name: Setup gerritbot and ircd services
+      include_role:
+        name: services/gerritbot
+        tasks_from: configure_gerrit_bot_and_ircd
+
+- hosts: install-server
+  tasks:
+    - name: Reset the config repo
+      include_role:
+        name: health-check/config-repo-reset
+
+    - name: Create fake config change
+      include_role:
+        name: services/gerritbot
+        tasks_from: create_change
+      vars:
+        commit_message: "Test gerritbot notif"
+
+- hosts: gerritbot
+  tasks:
+    - name: Check gerritbot send irc message for created notification
+      include_role:
+        name: services/gerritbot
+        tasks_from: ircd_get_logs
+      vars:
+        ircd_logs_pattern: "PRIVMSG .irc-channel-health-check .*ed config.* Test gerritbot notif .*http"
+
+- hosts: install-server
+  tasks:
+    - name: Add gerritbot config in the config-repo
+      include_role:
+        name: services/gerritbot
+
+    - name: Submit review
+      include_role:
+        name:
+          name: health-check/config-repo-submit-change
+
+- hosts: gerritbot
+  tasks:
+    - name: Check for 'merged' notification
+      include_role:
+        name: services/gerritbot
+        tasks_from: ircd_get_logs
+      vars:
+        ircd_logs_pattern: "PRIVMSG .irc-channel-health-check .Merged config.* Change gerritbot channel  http..."
+
+- hosts: install-server
+  tasks:
+    - name: Create fake config change
+      include_role:
+        name: services/gerritbot
+        tasks_from: create_change
+      vars:
+        commit_message: "Create new fake config change"
+
+- hosts: gerritbot
+  vars:
+    suffix: "{{ ansible_date_time.epoch }}"
+    channel_name: "irc-channel-health-check-{{ suffix }}"
+  tasks:
+    - name: Check for 'created' notification on new channel
+      include_role:
+        name: services/gerritbot
+        tasks_from: ircd_get_logs
+      vars:
+        ircd_logs_pattern: "PRIVMSG .{{ channel_name }} .*ed config.* Create new fake config change .*http"
+
+    - name: Kill fake_ircd daemon
+      include_role:
+        name: services/gerritbot
+        tasks_from: kill_ircd_service
