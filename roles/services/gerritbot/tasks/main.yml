@@ -1,0 +1,10 @@
+- name: Add gerritbot IRC channels with config-repo
+  command: chdir={{ config_path }} {{ item }}
+  with_items:
+    - cp /etc/gerritbot/channels.yaml gerritbot/channels.yaml
+    - cp gerritbot/channels.yaml gerritbot/other-channels.yaml
+    - sed -i -e 's/irc-channel-health-check/{{ channel_name }}/' gerritbot/other-channels.yaml
+    # Use 'date' dynamic content to make sure a new change is created
+    - bash -c "date '+%s' >> test_gerritbot_notif"
+    - git add gerritbot/other-channels.yaml test_gerritbot_notif
+    - git commit -m "Change gerritbot channel" -a
