@@ -1,0 +1,4 @@
+- name: Kill fake_ircd daemon
+  shell: kill -9 $(pgrep fake_ircd.py)
+  # shell: kill -9 $(ps aux | awk '/\/usr\/local\/bin\/fake_ircd.py/ { print $2 }')
+  ignore_errors: true
