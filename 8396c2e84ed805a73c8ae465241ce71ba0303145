@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a2976ae5_c9cee668",
+        "filename": "roles/run-health-check/tasks/main.yml",
+        "patchSetId": 24
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2019-07-19T19:23:28Z",
+      "side": 1,
+      "message": "nit: this could be a command with the environment ansible task variable.",
+      "range": {
+        "startLine": 2,
+        "startChar": 2,
+        "endLine": 2,
+        "endChar": 7
+      },
+      "revId": "8396c2e84ed805a73c8ae465241ce71ba0303145",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
