@@ -1,5 +1,7 @@
 ---
 - hosts: install-server
+  vars:
+    add_k1s_hypervisor: true
   tasks:
     - name: Prepare instance
       include_role:
@@ -32,7 +34,7 @@
       include_role:
         name: run-sfconfig
       vars:
-        sfconfig_args: --skip-install
+        sfconfig_args: --skip-install --provision-demo
 
     - name: Run functional tests and health-check
       include_role:

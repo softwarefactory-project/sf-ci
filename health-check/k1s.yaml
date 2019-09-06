@@ -1,0 +1,17 @@
+---
+- hosts: install-server
+  remote_user: root
+  tasks:
+    - name: Reset the config repo
+      include_role:
+        name: health-check/config-repo-reset
+
+    - name: Add nodepool configuration in the config repo
+      include_role:
+        name: health-check/k1s
+        tasks_from: config_repo_nodepool_configuration
+
+    - name: Add zuul configuration in the demo-project repo
+      include_role:
+        name: health-check/k1s
+        tasks_from: demo_project_zuul_configuration
