@@ -1,0 +1,59 @@
+- name: Setup demo-project zuul.yaml configuration
+  copy:
+    content: |
+      ---
+      # Test regular openshift project
+      - job:
+          name: test-k1s
+          run: test-k1s.yaml
+          nodeset:
+            nodes:
+              - name: pod
+                label: pod-fedora-30
+
+      - project:
+          check:
+            jobs:
+              - test-k1s
+          gate:
+            jobs:
+              - noop
+    dest: /root/demo-project/.zuul.yaml
+
+- name: Setup demo-project test-k1s.yaml playbook
+  copy:
+    content: |
+      ---
+      - hosts: all
+        tasks:
+          - command: ls
+          - command: python3 demo.py
+            register: demo_output
+            args:
+              chdir: "{{'{{'}} zuul.project.src_dir {{'}}'}}"
+          - debug: var=demo_output.stdout
+          - fail:
+            when: "'Hello' not in demo_output.stdout"
+          - command: flake8 demo.py
+            args:
+              chdir: "{{'{{'}} zuul.project.src_dir {{'}}'}}"
+    dest: /root/demo-project/test-k1s.yaml
+
+# TODO use standard role to submit
+- name: Submit change and check for SUCCESS
+  command: "{{ item }}"
+  args:
+    chdir: /root/demo-project
+  loop:
+    - git add .zuul.yaml test-k1s.yaml
+    - git commit -m "Test k1s job"
+    - /usr/share/sf-config/scripts/submit_and_wait.py --delay 1900 --approve
+    - git fetch --all
+  environment: {'EDITOR':'test'}
+
+- name: Check change was merged
+  command: git diff HEAD origin/master
+  args:
+    chdir: /root/demo-project
+  register: diff
+  failed_when: diff.stdout != ''
