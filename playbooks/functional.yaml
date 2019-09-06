@@ -20,6 +20,8 @@
     - name: Run sfconfig
       include_role:
         name: run-sfconfig
+      vars:
+        add_k1s_hypervisor: true
 
     - name: Update hostname and fqdn to sftests.com
       include_role:

@@ -1,0 +1,42 @@
+- name: Create fedora-30 containers dir
+  file:
+    path: "{{ config_path }}/containers/fedora-30"
+    state: directory
+
+- name: Add k1s labels and container image
+  copy:
+    content: "{{ item.content }}"
+    dest: "{{ config_path }}/{{ item.dest }}"
+  loop:
+    - content: |
+        FROM registry.fedoraproject.org/fedora:30
+        RUN dnf install -y python3-flake8 rsync
+      dest: containers/fedora-30/Dockerfile
+    - content: |
+        ---
+        labels:
+          - name: pod-fedora-30
+
+        extra-labels:
+          - provider: managed-k1s-provider-managesf.sftests.com
+            pool: main
+            labels:
+              - name: pod-fedora-30
+                image: localhost/k1s/local-fedora-30
+                python-path: /bin/python3
+
+      dest: nodepool/k1s.yaml
+  register: nodepool_conf
+
+- name: Update and submit change
+  block:
+    - name: Commit change
+      command: chdir={{ config_path }} {{ item }}
+      loop:
+        - 'git add -A'
+        - 'git commit -m "Add k1s configuration"'
+
+    - name: Submit review
+      include_role:
+        name: health-check/config-repo-submit-change
+  when: nodepool_conf is changed
