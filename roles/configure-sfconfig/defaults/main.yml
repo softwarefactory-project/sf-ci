@@ -1,6 +1,7 @@
 add_component: []
 unsupported_components: []
 add_runc_hypervisor: true
+add_k1s_hypervisor: true
 static_hostname_ip:
 static_hostname_fqdn:
 # these parameters are used for multitenants deployment

@@ -14,6 +14,13 @@
         line: '      - hypervisor-oci'
       when: add_runc_hypervisor
 
+    - name: Activate hypervisor-k1s role in arch.yaml
+      lineinfile:
+        path: /etc/software-factory/arch.yaml
+        insertafter: '      - nodepool-launcher'
+        line: '      - hypervisor-k1s'
+      when: add_k1s_hypervisor
+
     - name: Add extra components in arch.yaml
       lineinfile:
         path: /etc/software-factory/arch.yaml
