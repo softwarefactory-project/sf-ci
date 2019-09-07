@@ -1,0 +1,115 @@
+---
+- project-template:
+    name: sfci-jobs
+    check:
+      jobs:
+        - sf-rpm-build
+        - sf-ci-functional-minimal:
+            dependencies:
+              - sf-rpm-build
+        - sf-ci-upgrade-minimal:
+            dependencies:
+              - sf-rpm-build
+        - sf-ci-functional-allinone:
+            dependencies:
+              - sf-rpm-build
+        - sf-ci-upgrade-allinone:
+            dependencies:
+              - sf-rpm-build
+        - sf-tenants:
+            dependencies:
+              - sf-rpm-build
+    gate:
+      queue: sf
+      jobs:
+        - sf-rpm-build
+        - sf-ci-functional-minimal:
+            dependencies:
+              - sf-rpm-build
+        - sf-ci-upgrade-minimal:
+            dependencies:
+              - sf-rpm-build
+        - sf-ci-functional-allinone:
+            dependencies:
+              - sf-rpm-build
+        - sf-ci-upgrade-allinone:
+            dependencies:
+              - sf-rpm-build
+        - wait-for-changes-ahead:
+            dependencies:
+              - sf-ci-functional-minimal
+              - sf-ci-upgrade-minimal
+              - sf-ci-functional-allinone
+              - sf-ci-upgrade-allinone
+        - sf-rpm-publish:
+            dependencies:
+              - wait-for-changes-ahead
+    release:
+      jobs:
+        - sf-rpm-publish
+
+- project-template:
+    name: sfci-jobs-light
+    check:
+      jobs:
+        - noop
+    gate:
+      queue: sf
+      jobs:
+        - sf-rpm-build
+        - sf-ci-functional-allinone:
+            dependencies:
+              - sf-rpm-build
+        - sf-ci-upgrade-allinone:
+            dependencies:
+              - sf-rpm-build
+        - wait-for-changes-ahead:
+            dependencies:
+              - sf-ci-functional-allinone
+              - sf-ci-upgrade-allinone
+        - sf-rpm-publish:
+            dependencies:
+              - wait-for-changes-ahead
+    release:
+      jobs:
+        - sf-rpm-publish
+
+- project-template:
+    name: sf-packaging-jobs
+    check:
+      jobs:
+        - noop
+    gate:
+      queue: sf
+      jobs:
+        - sf-rpm-build
+        - wait-for-changes-ahead:
+            dependencies:
+              - sf-rpm-build
+        - sf-rpm-publish:
+            dependencies:
+              - wait-for-changes-ahead
+    release:
+      jobs:
+        - sf-rpm-publish
+
+- project-template:
+    name: sfci-python-jobs
+    check:
+      jobs:
+        - tox-pep8
+        - tox-py27
+    gate:
+      queue: sf
+      jobs:
+        - tox-pep8
+        - tox-py27
+
+- project-template:
+    name: sfci-noop
+    check:
+      jobs:
+        - noop
+    gate:
+      jobs:
+        - noop

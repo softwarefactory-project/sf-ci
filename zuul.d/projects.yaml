@@ -1,7 +1,13 @@
 ---
 - project:
     templates:
-      - sf-ci-jobs
+      - sfci-jobs
+    check:
+      jobs:
+        - linters
+    gate:
+      jobs:
+        - linters
     periodic:
       jobs:
         - sf-deploy-stable:
