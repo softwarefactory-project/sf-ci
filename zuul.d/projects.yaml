@@ -1,7 +1,7 @@
 ---
 - project:
     templates:
-      - imported-sf-ci-jobs
+      - sf-ci-jobs
     check:
       jobs:
         - linters
