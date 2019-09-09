@@ -7,6 +7,12 @@
         dest: /etc/software-factory/arch.yaml
         remote_src: true
 
+    - name: Fix default nodeset to pod-centos-7
+      replace:
+        path: /etc/software-factory/sfconfig.yaml
+        regexp: runc-centos
+        replace: pod-centos-7
+
     - name: Activate hypervisor-oci role in arch.yaml
       lineinfile:
         path: /etc/software-factory/arch.yaml

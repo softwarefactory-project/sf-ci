@@ -2,6 +2,7 @@
 - hosts: install-server
   vars:
     add_k1s_hypervisor: true
+    add_runc_hypervisor: false
   tasks:
     - name: Prepare instance
       include_role:
