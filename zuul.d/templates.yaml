@@ -1,5 +1,96 @@
 ---
 - project-template:
+    name: sf-ci-jobs
+    check:
+      jobs:
+        - sf-rpm-build
+        - sf-ci-functional-minimal:
+            dependencies:
+              - sf-rpm-build
+        - sf-ci-functional-allinone:
+            dependencies:
+              - sf-rpm-build
+        - sf-tenants:
+            dependencies:
+              - sf-rpm-build
+    gate:
+      queue: sf
+      jobs:
+        - sf-rpm-build
+        - sf-ci-functional-minimal:
+            dependencies:
+              - sf-rpm-build
+        - sf-ci-functional-allinone:
+            dependencies:
+              - sf-rpm-build
+        - wait-for-changes-ahead:
+            dependencies:
+              - sf-ci-functional-minimal
+              - sf-ci-functional-allinone
+
+- project-template:
+    name: sf-ci-jobs-light
+    check:
+      jobs:
+        - noop
+    gate:
+      queue: sf
+      jobs:
+        - sf-rpm-build
+        - sf-ci-functional-allinone:
+            dependencies:
+              - sf-rpm-build
+        - wait-for-changes-ahead:
+            dependencies:
+              - sf-ci-functional-allinone
+
+- project-template:
+    name: sf-ci-no-jobs
+    check:
+      jobs:
+        - noop
+    gate:
+      queue: sf
+      jobs:
+        - sf-rpm-build
+        - wait-for-changes-ahead:
+            dependencies:
+              - sf-rpm-build
+
+- project-template:
+    name: sf-ci-packages-publish
+    gate:
+      jobs:
+        - sf-rpm-publish:
+            dependencies:
+              - wait-for-changes-ahead
+    release:
+      jobs:
+        - sf-rpm-publish
+
+- project-template:
+    name: sf-ci-python-jobs
+    check:
+      jobs:
+        - tox-pep8
+        - tox-py27
+    gate:
+      queue: sf
+      jobs:
+        - tox-pep8
+        - tox-py27
+
+- project-template:
+    name: sf-ci-noop
+    check:
+      jobs:
+        - noop
+    gate:
+      jobs:
+        - noop
+
+# To remove when renamed in sfinfo is merged
+- project-template:
     name: imported-sf-ci-jobs
     check:
       jobs:
