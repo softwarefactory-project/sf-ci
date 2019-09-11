@@ -46,7 +46,7 @@
     name: sf-ci-jobs-light
     check:
       jobs:
-        - noop
+        - sf-rpm-build
     gate:
       queue: sf
       jobs:
