@@ -14,3 +14,12 @@
 - name: Install sf-stable repositories
   include_tasks: install_stable_mirror.yml
   when: sf_version != 'master'
+
+- name: Ensure rh-python35-mirror repo is installed
+  yum_repository:
+    name: "arh-python35-mirror"
+    description: "SF python35 mirror"
+    baseurl: "https://softwarefactory-project.io/mirrors/rh-python35/"
+    gpgcheck: "1"
+    enabled: "1"
+    file: "/etc/yum.repos.d/sf-release.repo"
