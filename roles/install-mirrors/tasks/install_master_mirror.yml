@@ -105,8 +105,7 @@
       - name: Install repositories
         yum:
           name:
-            - centos-release-scl
-            - centos-release-openstack-queens
+            - centos-release-scl-rh
         when: ansible_distribution == "CentOS"
     when: zuul_built_repo.stat.exists or sf_release_repo.stat.exists
 
