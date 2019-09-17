@@ -7,6 +7,9 @@
     chdir: "{{ sfnamespace_path }}"
   become: yes
 
+- name: Rename the zuul-built.repo as if it was sf-release
+  command: mv /etc/yum.repos.d/zuul-built.repo /etc/yum.repos.d/sf-release.repo
+
 - name: Install sf-master repositories
   include_tasks: install_master_mirror.yml
   when: sf_version == 'master' or update_mirrors
@@ -14,3 +17,28 @@
 - name: Install sf-stable repositories
   include_tasks: install_stable_mirror.yml
   when: sf_version != 'master'
+
+- name: Install mirror keys
+  copy:
+    src: "files/{{ item }}"
+    dest: "/etc/pki/rpm-gpg/{{ item }}"
+  with_items:
+    - RPM-GPG-KEY-CentOS-SIG-SCLo-python35
+    - RPM-GPG-KEY-CentOS-SIG-Cloud
+  become: yes
+
+- name: Ensure rh-python35-mirror repo is installed
+  yum_repository:
+    name: "a{{ item.name }}-mirror"
+    description: "SF {{ item.name }}"
+    baseurl: "https://softwarefactory-project.io/mirrors/{{ item.name }}/"
+    gpgcheck: "1"
+    gpgkey: "file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-{{ item.key }}"
+    enabled: "1"
+    file: "/etc/yum.repos.d/sf-release"
+  become: yes
+  with_items:
+    - name: rh-python35
+      key: SCLo-python35
+    - name: openstack-queens
+      key: Cloud
