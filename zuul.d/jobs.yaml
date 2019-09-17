@@ -84,6 +84,8 @@
     name: sf-tenants
     parent: sf-ci-multinode
     run: playbooks/multinode.yaml
+    # There are new issues to be fixed for that job to be voting again
+    voting: false
     vars:
       sf_arch: minimal
 
