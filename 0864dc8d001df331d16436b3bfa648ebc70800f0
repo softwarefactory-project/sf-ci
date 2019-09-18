@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df7cce69_e747fdf3",
+        "filename": "roles/install-mirrors/tasks/main.yml",
+        "patchSetId": 9
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2019-09-18T15:38:32Z",
+      "side": 1,
+      "message": "Ensure repos are installed",
+      "revId": "0864dc8d001df331d16436b3bfa648ebc70800f0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
