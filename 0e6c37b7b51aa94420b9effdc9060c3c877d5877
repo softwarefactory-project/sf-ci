@@ -1,0 +1,6 @@
+Verified-1: Zuul CI <zuul@softwarefactory-project.io>
+Submitted-by: Tristan de Cacqueray <tdecacqu@redhat.com>
+Submitted-at: Wed, 18 Sep 2019 18:04:53 +0000
+Reviewed-on: https://softwarefactory-project.io/r/16294
+Project: software-factory/sf-ci
+Branch: refs/heads/3.2
