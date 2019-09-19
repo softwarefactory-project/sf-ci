@@ -6,7 +6,7 @@
         name: '{{ item }}'
       loop:
         - prepare-test-env
-        - install-mirrors
+        - install-ci-repository
         - install-sfconfig
 
     - name: Configure sfconfig
