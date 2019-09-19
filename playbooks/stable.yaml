@@ -5,7 +5,7 @@
       include_role:
         name: '{{ item }}'
       loop:
-        - install-mirrors
+        - install-stable-repository
         - update-system
         - install-sfconfig
         - configure-sfconfig

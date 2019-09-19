@@ -6,7 +6,7 @@
         name: '{{ item }}'
       loop:
         - prepare-test-env
-        - install-mirrors
+        - install-stable-repository
         - update-system
         - check-bubblewrap
         - install-sfconfig
@@ -21,15 +21,13 @@
         - setup-test-env
         - restore-ci-repo
 
-    - name: Update mirrors to use sfmaster
-      include_role:
-        name: install-mirrors
-      vars:
-        update_mirrors: True
-
     - name: Run provisioner
       include_role:
         name: run-provisioner
+
+    - name: Update mirrors to use sfmaster
+      include_role:
+        name: install-ci-repository
 
     - name: Update sfconfig package
       include_role:
