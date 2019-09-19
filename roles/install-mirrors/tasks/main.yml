@@ -17,7 +17,9 @@
 
 - name: Install sf-stable repositories
   include_tasks: install_stable_mirror.yml
-  when: sf_version != 'master'
+  when:
+    - sf_version != 'master'
+    - not update_mirrors
 
 - name: Install mirror keys
   copy:
