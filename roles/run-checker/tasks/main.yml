@@ -1,3 +1,8 @@
+- name: Install checker requirements
+  package:
+    name: python-beautifulsoup4
+  become: yes
+
 - name: Run data checker
   command: python checker.py
   args:
