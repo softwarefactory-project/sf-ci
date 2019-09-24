@@ -24,27 +24,7 @@
   become: yes
   when: centos_cr is defined and centos_cr
 
-- name: Install emergency mirror keys
-  copy:
-    src: "{{ item }}"
-    dest: "/etc/pki/rpm-gpg/{{ item }}"
-  with_items:
-    - RPM-GPG-KEY-CentOS-SIG-SCLo-python35
-    - RPM-GPG-KEY-CentOS-SIG-Cloud
+- name: Install provisioner requirements
+  package:
+    name: python-beautifulsoup4
   become: yes
-
-- name: Ensure emergency mirrors are installed
-  yum_repository:
-    name: "a{{ item.name }}-mirror"
-    description: "SF {{ item.name }}"
-    baseurl: "https://softwarefactory-project.io/mirrors/{{ item.name }}/"
-    gpgcheck: "1"
-    gpgkey: "file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-{{ item.key }}"
-    enabled: "1"
-    file: "/etc/yum.repos.d/sf-emergency-mirror"
-  become: yes
-  with_items:
-    - name: rh-python35
-      key: SCLo-python35
-    - name: openstack-queens
-      key: Cloud
