@@ -6,6 +6,8 @@
 - block:
     - name: Run get-logs playbook
       command: ansible-playbook /var/lib/software-factory/ansible/get_logs.yml
+      environment:
+        ANSIBLE_CONFIG: /usr/share/sf-config/ansible/ansible.cfg
       become: yes
 
     # TODO replace with synchronize
