@@ -1,4 +1,3 @@
 - name: Set zuul executor mode
   command: >
-    /opt/rh/rh-python35/root/bin/zuul-executor
-        -c /etc/opt/rh/rh-python35/zuul/zuul.conf {{ action }}
+    /bin/zuul-executor -c /etc/zuul/zuul.conf {{ action }}
