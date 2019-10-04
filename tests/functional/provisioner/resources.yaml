@@ -11,7 +11,6 @@ resources:
       name: tdpw
       description: The is a demo RPM distribution project to experiment
       review-dashboard: default
-      issue-tracker: SFStoryboard
       source-repositories:
       - tdpw/python-readerlib
       - tdpw/python-readerlib-distgit
