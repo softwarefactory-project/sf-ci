@@ -70,8 +70,6 @@ class TestGateway(Base):
                 subpaths.append("/analytics")
         if "repoxplorer" in services:
             subpaths.append("/repoxplorer/")
-        if "storyboard" in services:
-            subpaths.append("/storyboard/")
         url = config.GATEWAY_URL + "/topmenu.html"
         resp = requests.get(url)
         self.assertEqual(resp.status_code, 200)

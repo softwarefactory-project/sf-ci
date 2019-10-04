@@ -19,11 +19,8 @@ import time
 from utils import Base
 from utils import ResourcesUtils
 from utils import GerritGitUtils
-from utils import create_random_str
 from utils import set_private_key
-from utils import skipIfServiceMissing
 from utils import get_gerrit_utils
-from utils import SFStoryboard
 
 
 TEST_MSGS = [
@@ -47,14 +44,8 @@ class TestGerritHooks(Base):
         self.gitu = GerritGitUtils(config.ADMIN_USER,
                                    priv_key_path,
                                    config.USERS[config.ADMIN_USER]['email'])
-        self.client_stb = SFStoryboard(
-            config.GATEWAY_URL + "/storyboard_api",
-            config.USERS[config.ADMIN_USER]['auth_cookie'])
 
     def tearDown(self):
-        for issue in self.issues:
-            self.client_stb.stories.get(id=issue[1]).tasks.delete(id=issue[0])
-            self.client_stb.stories.delete(id=issue[1])
         for name in self.projects:
             self.ru.delete_repo(name)
         for dirs in self.dirs_to_delete:
@@ -63,41 +54,6 @@ class TestGerritHooks(Base):
     def create_project(self, name):
         self.ru.create_repo(name)
         self.projects.append(name)
-
-    def create_story(self, project, title):
-        project = self.client_stb.projects.get(project)
-        story = self.client_stb.stories.create(title=title)
-        task = self.client_stb.tasks.create(
-            story_id=story.id, project_id=project.id,
-            title="%s - task 1" % title)
-        return story.id, task.id
-
-    def _test_update_issue_hooks(self, comment_template, status,
-                                 pname):
-        """ A referenced issue in commit msg triggers the hook
-        """
-        # Create the project
-        self.create_project(pname)
-
-        # Create an issue on the project
-        sid, tid = self.create_story(pname, "There is a problem")
-        self.issues.append((sid, tid))
-
-        # Clone and commit something
-        url = "ssh://%s@%s:29418/%s" % (
-            config.ADMIN_USER, config.GATEWAY_HOST, pname)
-        clone_dir = self.gitu.clone(url, pname)
-        cmt_msg = comment_template % {'tid': tid, 'sid': sid}
-        self.gitu.add_commit_and_publish(clone_dir, 'master', cmt_msg)
-
-        # Check issue status (Gerrit hook updates the issue to in progress)
-        for retry in xrange(10):
-            task = self.client_stb.tasks.get(tid)
-            if task.status == "inprogress":
-                break
-            time.sleep(1)
-        self.assertEquals(task.status, "inprogress")
-        self._test_merging(pname, tid, status)
 
     def _test_merging(self, pname, tid, status):
         # Get the change id and merge the patch
@@ -116,23 +72,3 @@ class TestGerritHooks(Base):
                 break
             time.sleep(1)
         self.assertEquals(task.status, status)
-
-    @skipIfServiceMissing('storyboard')
-    def test_gerrit_hook(self):
-        """test various commit messages triggering a hook"""
-        for template, final_status in TEST_MSGS:
-            pname = create_random_str()
-            self._test_update_issue_hooks(template, final_status, pname)
-
-    @skipIfServiceMissing('storyboard')
-    def test_gerrit_hook_double_quotes(self):
-        """test commit messages with double quotes"""
-        template, final_status = TEST_MSGS[0]
-        verbose_template = """Super fix
-
-This fix solves the Universe. Not just the "Universe", the Universe.
-"""
-        verbose_template += template
-        pname = create_random_str()
-        self._test_update_issue_hooks(verbose_template, final_status,
-                                      pname)

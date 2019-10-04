@@ -30,7 +30,6 @@ from utils import ResourcesUtils
 from utils import GerritGitUtils
 from utils import get_cookie
 from utils import is_present
-from utils import SFStoryboard
 
 # TODO: Create pads and pasties.
 
@@ -56,9 +55,6 @@ class SFProvisioner(object):
         self.ggu = GerritGitUtils(config.ADMIN_USER,
                                   config.ADMIN_PRIV_KEY_PATH,
                                   config.USERS[config.ADMIN_USER]['email'])
-        self.stb_client = SFStoryboard(
-            config.GATEWAY_URL + "/storyboard_api",
-            config.USERS[config.ADMIN_USER]['auth_cookie'])
 
     def create_resources(self):
         self.ru.create_resources("provisioner",
@@ -87,21 +83,10 @@ class SFProvisioner(object):
         self.ggu.add_commit_for_all_new_additions(self.clone_dir)
         self.ggu.direct_push_branch(self.clone_dir, 'master')
 
-    def create_storyboard_issue(self, name, issue_name):
-        project = self.stb_client.projects.get(name)
-        story = self.stb_client.stories.create(title=issue_name)
-        task = self.stb_client.tasks.create(
-            story_id=story.id, project_id=project.id,
-            title=issue_name)
-        return task.id, story.id
-
     def create_issues_on_project(self, name, issues):
         self.log.info(" Create %s issue(s) for that project ..." % len(issues))
         for i in issues:
-            if is_present('storyboard'):
-                issue = self.create_storyboard_issue(name, i['name'])
-            else:
-                issue = (random.randint(1,100), random.randint(1,100))
+            issue = (random.randint(1,100), random.randint(1,100))
             yield issue, i['review']
 
     def simple_login(self, user, password):

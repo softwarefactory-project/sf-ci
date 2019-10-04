@@ -29,7 +29,6 @@ from utils import get_cookie
 from utils import get_gerrit_utils
 from utils import GerritGitUtils
 from utils import is_present
-from utils import SFStoryboard
 
 
 class SFchecker:
@@ -48,19 +47,12 @@ class SFchecker:
         self.ggu = GerritGitUtils(config.ADMIN_USER,
                                   config.ADMIN_PRIV_KEY_PATH,
                                   config.USERS[config.ADMIN_USER]['email'])
-        self.stb_client = SFStoryboard(
-            config.GATEWAY_URL + "/storyboard_api",
-            config.USERS[config.ADMIN_USER]['auth_cookie'])
 
     def check_project(self, name):
         print " Check project %s exists ..." % name,
         if not self.gu.project_exists(name):
             print "FAIL"
             exit(1)
-        if is_present('storyboard'):
-            if name not in [p.name for p in self.stb_client.projects.get_all()]:
-                print "FAIL"
-                exit(1)
         print "OK"
 
     def check_files_in_project(self, name, files):
@@ -73,19 +65,6 @@ class SFchecker:
             if not os.path.isfile(os.path.join(clone_dir, f)):
                 print "FAIL"
                 exit(1)
-
-    def check_issues_on_project(self, name, issues):
-        print (" Check that at least %s issues exists "
-               "for that project ..." % len(issues))
-        p = [p for p in self.stb_client.projects.get_all()
-             if p.name == name][0]
-        pt = [t for t in self.stb_client.tasks.get_all() if
-              t.project_id == p.id]
-        if len(pt) != len(issues):
-            print "FAIL: expected %s, project has %s" % (
-                len(issues), len(pt))
-            exit(1)
-        print "OK"
 
     def check_reviews_on_project(self, name, issues):
         reviews = [i for i in issues if i['review']]
@@ -179,9 +158,6 @@ class SFchecker:
             self.check_project(project['name'])
             self.check_files_in_project(project['name'],
                                         [f['name'] for f in project['files']])
-            if is_present('storyboard'):
-                self.check_issues_on_project(project['name'],
-                                             project['issues'])
             self.check_reviews_on_project(project['name'], project['issues'])
         for user in self.resources['local_users']:
             print "Check user %s can log in ..." % user['username'],
