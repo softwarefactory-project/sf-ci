@@ -8,6 +8,7 @@
     # TODO use roles/run-sfconfig when moving data in playbook
     - name: Re-run sfconfig
       command: sfconfig --skip-install
+      become: yes
 
 - hosts: zuul-executor
   tasks:
