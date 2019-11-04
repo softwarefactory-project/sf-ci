@@ -1,3 +1,7 @@
 ---
 - name: Check mount points
   command: cat /proc/mounts
+
+- name: Check what is installed
+  command: yum -C list installed
+  become: yes
