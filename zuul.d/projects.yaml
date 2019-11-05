@@ -1,10 +1,10 @@
 ---
 - project:
-    templates:
-      - sf-ci-jobs
+#    templates:
+#      - sf-ci-jobs
     check:
       jobs:
-        - linters
+        - sf-ci-functional-minimal
     gate:
       jobs:
         - linters

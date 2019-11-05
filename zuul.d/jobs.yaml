@@ -50,7 +50,13 @@
     name: sf-ci-functional-minimal
     description: The sf functional tests of the minimal architecture
     parent: sf-ci
+    pre-run:
+      - playbooks/start-tracer.yaml
     run: playbooks/functional.yaml
+    post-run:
+      - playbooks/stop-tracer.yaml
+    roles:
+      - zuul: software-factory/ci-tracer
     vars:
       sf_arch: minimal
 

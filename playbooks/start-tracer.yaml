@@ -1,0 +1,11 @@
+- hosts: all
+  pre_tasks:
+    - name: Install python3
+      package:
+        name: python3
+      become: yes
+  vars:
+    ci_tracer_args: "--min-cpu 50"
+  roles:
+    - ensure-output-dirs
+    - run-ci-tracer
