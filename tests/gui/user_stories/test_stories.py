@@ -93,8 +93,8 @@ class ShellRecorder(BaseGuiTest):
         spielbash.TmuxSendKeys(session_name, 'C-m')
         reel.communicate('exit')
         out, err = movie.communicate()
-        print out
-        print err
+        print(out)
+        print(err)
         display.communicate()
         with open(output_file, 'r') as m:
             j = json.load(m)
