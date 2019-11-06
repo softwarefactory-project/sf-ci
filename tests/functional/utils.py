@@ -65,7 +65,7 @@ def has_issue_tracker():
 
 
 def skipIfStrInFile(check_str, path):
-    return skipIf(check_str in file(path).read(),
+    return skipIf(check_str in open(path).read(),
                   'File %s contains %s' % (path, check_str))
 
 
@@ -88,7 +88,7 @@ def skipIfServicePresent(service):
 
 def get_module_version(module):
     m = module
-    if not isinstance(m, basestring):
+    if not isinstance(m, str):
         m = module.__name__
     try:
         return pkg_resources.get_distribution(m).version
@@ -104,7 +104,7 @@ def create_random_str():
 def set_private_key(priv_key):
     tempdir = tempfile.mkdtemp()
     priv_key_path = os.path.join(tempdir, 'user.priv')
-    file(priv_key_path, 'w').write(priv_key)
+    open(priv_key_path, 'w').write(priv_key)
     os.chmod(priv_key_path, stat.S_IREAD | stat.S_IWRITE)
     return priv_key_path
 
@@ -162,7 +162,6 @@ class Tool:
 
     def exe(self, cmd, cwd=None):
         logger.debug('Starting Process "%s"' % cmd)
-        cmd = map(lambda s: s.decode('utf8'), shlex.split(cmd.encode('utf8')))
         ocwd = os.getcwd()
         output = ''
         if cwd:
@@ -170,10 +169,9 @@ class Tool:
         try:
             self.env['LC_ALL'] = 'en_US.UTF-8'
             output = subprocess.check_output(
-                cmd, stderr=subprocess.STDOUT,
-                env=self.env)
+                shlex.split(cmd), stderr=subprocess.STDOUT,
+                env=self.env).decode('utf-8')
             if output:
-                output = unicode(output, encoding='utf8')
                 logger.debug(u'Process Output [%s]' % output.strip())
         except subprocess.CalledProcessError as err:
             if err.output:
@@ -442,7 +440,7 @@ class GerritGitUtils(Tool):
         ssh_wrapper = "ssh -o StrictHostKeyChecking=no -i " \
                       "%s \"$@\"" % os.path.abspath(self.priv_key_path)
         wrapper_path = os.path.join(self.tempdir, 'ssh_wrapper.sh')
-        file(wrapper_path, 'w').write(ssh_wrapper)
+        open(wrapper_path, 'w').write(ssh_wrapper)
         os.chmod(wrapper_path, stat.S_IRWXU)
         self.env['GIT_SSH'] = wrapper_path
         self.env['GIT_COMMITTER_NAME'] = self.user
@@ -500,7 +498,7 @@ class GerritGitUtils(Tool):
         if branch != 'master':
             self.exe('git checkout -b %s' % branch, clone_dir)
         if not files:
-            file(os.path.join(clone_dir, 'testfile'), 'w').write('data')
+            open(os.path.join(clone_dir, 'testfile'), 'w').write('data')
             files = ['testfile']
         self.git_add(clone_dir, files)
         if not commit:
@@ -548,7 +546,7 @@ class GerritGitUtils(Tool):
             # If no file names are passed, create a test file
             fname = create_random_str()
             data = 'data'
-            file(os.path.join(clone_dir, fname), 'w').write(data)
+            open(os.path.join(clone_dir, fname), 'w').write(data)
             fnames = [fname]
 
         self.git_add(clone_dir, fnames)
@@ -681,19 +679,19 @@ class ResourcesUtils(Tool):
         c1 = "SUCCESS" in config_update_log
         c2 = len(
             re.findall(
-                'managesf\..*failed=0', config_update_log)) == 1
+                r'managesf\..*failed=0', config_update_log)) == 1
         assert c1 or c2
 
     def create_resources(self, name, data):
         cdir = self.ggu.clone(self.url, 'config', config_review=False)
         rfile = os.path.join(cdir, 'resources', name + '.yaml')
-        yaml.dump(data, file(rfile, "w"), default_flow_style=False)
+        yaml.dump(data, open(rfile, "w"), default_flow_style=False)
         self._direct_push(cdir, 'Add resources %s' % name)
 
     def create_repo(self, name):
         yaml = self.yaml % {'name': name, 'fqdn': config.GATEWAY_HOST}
         cdir = self.ggu.clone(self.url, 'config', config_review=False)
-        file(os.path.join(cdir, 'resources', name + '.yaml'), 'w').write(yaml)
+        open(os.path.join(cdir, 'resources', name + '.yaml'), 'w').write(yaml)
         self._direct_push(cdir, 'Add project %s' % name)
 
     def delete_repo(self, name):

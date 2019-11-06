@@ -68,7 +68,7 @@ class TestResourcesWorkflow(Base):
         config_clone_dir = self.clone_as_admin("config")
         path = os.path.join(config_clone_dir, fpath)
         if mode == 'add':
-            file(path, 'w').write(resources)
+            open(path, 'w').write(resources)
         elif mode == 'del':
             os.unlink(path)
         change_sha = self.commit_direct_push_as_admin(
@@ -86,7 +86,7 @@ class TestResourcesWorkflow(Base):
         config_clone_dir = self.clone_as_admin("config")
         path = os.path.join(config_clone_dir, fpath)
         if mode == 'add':
-            file(path, 'w').write(resources)
+            open(path, 'w').write(resources)
         elif mode == 'del':
             os.unlink(path)
 
