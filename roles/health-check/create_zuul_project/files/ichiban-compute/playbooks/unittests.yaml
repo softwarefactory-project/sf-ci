@@ -2,5 +2,5 @@
   tasks:
     - name: Run unittests
       shell:
-        cmd: "python -m unittest -v hello"
+        cmd: "python3 -m unittest -v hello"
         chdir: "{{ zuul.project.src_dir }}"
