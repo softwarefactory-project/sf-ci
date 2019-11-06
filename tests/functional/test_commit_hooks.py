@@ -66,7 +66,7 @@ class TestGerritHooks(Base):
         self.assertTrue(self.gu.submit_patch(change_id, "current"))
 
         # Check issue status (Gerrit hook updates the issue to in progress)
-        for retry in xrange(10):
+        for retry in range(10):
             task = self.client_stb.tasks.get(tid)
             if task.status == status:
                 break
