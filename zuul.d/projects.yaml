@@ -4,10 +4,12 @@
       - sf-ci-jobs
     check:
       jobs:
-        - linters
+        - linters:
+            nodeset: fedora-latest-pod
     gate:
       jobs:
-        - linters
+        - linters:
+            nodeset: fedora-latest-pod
     periodic:
       jobs:
         - sf-deploy-stable:
