@@ -19,7 +19,7 @@ import random
 import string
 import subprocess
 import time
-import urllib
+import urllib.request
 
 from utils import Base, skipIfServiceMissing
 from utils import set_private_key
@@ -40,7 +40,7 @@ class TestLogExportedInElasticSearch(Base):
     def copy_request_script(self, index, newhash):
         newhash = newhash.rstrip()
         elastic_url = '%s/elasticsearch' % config.GATEWAY_URL
-        data = json.loads(urllib.urlopen(elastic_url).read())
+        data = json.loads(urllib.request.urlopen(elastic_url).read())
         if data['version']['number'] == '2.4.6':
             extra_headers = " -H 'kbn-version:4.5.4'"
         else:
@@ -68,16 +68,14 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
         # Here we fetch the index name, but also we wait for
         # it to appears in ElasticSearch for 5 mins
         index = []
-        for retry in xrange(300):
-            try:
-                outlines = subprocess.check_output(subcmd).split('\n')
-                indexes = filter(
-                    lambda l: l.find('logstash-%s' % today_str) >= 0,
-                    outlines)
-                if indexes:
-                    break
-            except Exception:
-                time.sleep(2)
+        for retry in range(300):
+            outlines = subprocess.check_output(subcmd).decode("utf-8").split('\n')
+            indexes = list(filter(
+                lambda l: l.find('logstash-%s' % today_str) >= 0,
+                outlines))
+            if indexes:
+                break
+            time.sleep(1)
         self.assertEqual(
             len(indexes), 1,
             "No logstash index has been found for today logstash-%s (%s)" % (
@@ -87,7 +85,7 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
 
     def verify_logs_exported(self):
         subcmd = ["bash", "/tmp/test_request.sh"]
-        for retry in xrange(300):
+        for retry in range(300):
             out = subprocess.check_output(subcmd)
             ret = json.loads(out)
             if len(ret['hits']['hits']) >= 1:

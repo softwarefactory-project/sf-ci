@@ -17,7 +17,6 @@
         name: '{{ item }}'
       loop:
         - run-sfconfig
-        - setup-test-env
         - restore-ci-repo
 
     - name: Run provisioner
@@ -42,6 +41,7 @@
       include_role:
         name: '{{ item }}'
       loop:
-         - run-checker
-         - run-health-check
-         - run-functional-tests
+        - setup-test-env
+        - run-checker
+        - run-health-check
+        - run-functional-tests
