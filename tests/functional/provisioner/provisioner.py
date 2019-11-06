@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/bin/env python3
 #
 # Copyright (C) 2014 eNovance SAS <licensing@enovance.com>
 #
@@ -16,12 +16,9 @@
 
 import os
 import random
-import sys
 import yaml
 import subprocess
 
-pwd = os.path.dirname(os.path.abspath(__file__))  # flake8: noqa
-sys.path.append(os.path.dirname(pwd))             # flake8: noqa
 import config
 import logging
 
@@ -29,7 +26,6 @@ from utils import ManageSfUtils
 from utils import ResourcesUtils
 from utils import GerritGitUtils
 from utils import get_cookie
-from utils import is_present
 
 # TODO: Create pads and pasties.
 
@@ -46,7 +42,7 @@ class SFProvisioner(object):
     log = logging.getLogger("Provisioner")
 
     def __init__(self):
-        with open("%s/resources.yaml" % pwd, 'r') as rsc:
+        with open("%s/resources.yaml" % os.getcwd(), 'r') as rsc:
             self.resources = yaml.load(rsc)
         config.USERS[config.ADMIN_USER]['auth_cookie'] = get_cookie(
             config.ADMIN_USER, config.USERS[config.ADMIN_USER]['password'])
@@ -58,7 +54,7 @@ class SFProvisioner(object):
 
     def create_resources(self):
         self.ru.create_resources("provisioner",
-            {'resources': self.resources['resources']})
+                                 {'resources': self.resources['resources']})
         # Create review for the first few repositories
         for project in self.resources['resources']['repos'].keys()[:3]:
             self.clone_project(project)
@@ -78,7 +74,7 @@ class SFProvisioner(object):
         self.log.info(" Add files(%s) in a commit ..." % ",".join(files))
         self.clone_project(name)
         for f in files:
-            file(os.path.join(self.clone_dir, f), 'w').write('data')
+            open(os.path.join(self.clone_dir, f), 'w').write('data')
             self.ggu.git_add(self.clone_dir, (f,))
         self.ggu.add_commit_for_all_new_additions(self.clone_dir)
         self.ggu.direct_push_branch(self.clone_dir, 'master')
@@ -86,7 +82,7 @@ class SFProvisioner(object):
     def create_issues_on_project(self, name, issues):
         self.log.info(" Create %s issue(s) for that project ..." % len(issues))
         for i in issues:
-            issue = (random.randint(1,100), random.randint(1,100))
+            issue = (random.randint(1, 100), random.randint(1, 100))
             yield issue, i['review']
 
     def simple_login(self, user, password):
@@ -94,7 +90,6 @@ class SFProvisioner(object):
         if not get_cookie(user, password):
             self.log.error("Couldn't log in as %s" % user)
             exit(1)
-
 
     def create_review(self, project, commit_message, branch='master'):
         """Very basic review creator for statistics and restore tests
@@ -122,7 +117,7 @@ class SFProvisioner(object):
             return out.split()[0]
 
     def read_file(self, f):
-        return file(f).read()
+        return open(f).read()
 
     def provision(self):
         for cmd in self.resources['commands']:
@@ -131,14 +126,14 @@ class SFProvisioner(object):
             if out:
                 self.log.info(out)
         checksum_list = {}
-        for checksum in self.resources['checksum'] :
+        for checksum in self.resources['checksum']:
             self.log.info("Compute checksum for file %s" % checksum['file'])
             checksum_list[checksum['file']] = self.compute_checksum(
                 checksum['file'])
             checksum_list['content_' + checksum['file']] = self.read_file(
                 checksum['file'])
-        yaml.dump(checksum_list, file('pc_checksums.yaml', 'w'),
-            default_flow_style=False)
+        yaml.dump(checksum_list, open('pc_checksums.yaml', 'w'),
+                  default_flow_style=False)
         for user in self.resources['local_users']:
             self.log.info("Create local user %s" % user['username'])
             self.create_local_user(user['username'],
@@ -162,6 +157,7 @@ class SFProvisioner(object):
                     self.create_review_for_issue(project['name'], i)
 
         self.create_resources()
+
 
 p = SFProvisioner()
 p.provision()

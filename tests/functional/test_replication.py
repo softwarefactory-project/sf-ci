@@ -55,15 +55,15 @@ class TestProjectReplication(Base):
         self.mt = Tool()
         self.mt_tempdir = tempfile.mkdtemp()
         # Copy the service private key in a flat file
-        priv_key = file(config.SERVICE_PRIV_KEY_PATH, 'r').read()
+        priv_key = open(config.SERVICE_PRIV_KEY_PATH, 'r').read()
         priv_key_path = os.path.join(self.mt_tempdir, 'user.priv')
-        file(priv_key_path, 'w').write(priv_key)
+        open(priv_key_path, 'w').write(priv_key)
         os.chmod(priv_key_path, stat.S_IREAD | stat.S_IWRITE)
         # Prepare the ssh wrapper script
         ssh_wrapper = "ssh -o StrictHostKeyChecking=no -i %s \"$@\"" % (
             priv_key_path)
         wrapper_path = os.path.join(self.mt_tempdir, 'ssh_wrapper.sh')
-        file(wrapper_path, 'w').write(ssh_wrapper)
+        open(wrapper_path, 'w').write(ssh_wrapper)
         os.chmod(wrapper_path, stat.S_IRWXU)
         # Set the wrapper as GIT_SSH env variable
         self.mt.env['GIT_SSH'] = wrapper_path
@@ -120,7 +120,7 @@ class TestProjectReplication(Base):
     def create_config_section(self, project):
         logger.info("Add the replication config section")
         host = '%s@%s' % (config.GERRIT_USER, config.GATEWAY_HOST)
-        mirror_repo_path = '/var/lib/gerrit/tmp/\${name}.git'
+        mirror_repo_path = r'/var/lib/gerrit/tmp/\${name}.git'
         url = '%s:%s' % (host, mirror_repo_path)
         path = os.path.join(self.config_clone_dir,
                             'gerrit/replication.config')
@@ -178,7 +178,7 @@ class TestProjectReplication(Base):
         raise Exception('replication.config has not been updated (rm)')
 
     def mirror_clone_and_check_files(self, url, pname):
-        for retry in xrange(50):
+        for retry in range(50):
             clone = self.clone(url, pname)
             # clone may fail, as mirror repo is not yet ready(i.e gerrit not
             # yet replicated the project)
