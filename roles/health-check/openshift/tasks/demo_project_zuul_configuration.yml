@@ -56,7 +56,7 @@
       - hosts: demo-project
         tasks:
           - command: ls
-          - command: python demo.py
+          - command: python3 demo.py
             register: demo_output
           - debug: var=demo_output.stdout
           - fail:
