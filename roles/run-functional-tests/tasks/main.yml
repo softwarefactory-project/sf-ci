@@ -9,7 +9,9 @@
 
 - name: Start functional tests
   command: >
-    {{ sf_ci }}/scripts/create_ns.sh nosetests --with-timer --with-html
+    {{ sf_ci }}/scripts/create_ns.sh env
+    PYTHONPATH=/home/zuul-worker/src/softwarefactory-project.io/software-factory/sf-ci/tests/functional
+    nosetests-3 --with-timer --with-html
     --html-file=nose_results.html
     --logging-format '%(asctime)s: %(levelname)s - %(message)s'
     -sv {{ sf_ci }}/{{ func_test_case }}
