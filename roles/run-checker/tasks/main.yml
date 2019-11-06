@@ -4,7 +4,9 @@
   become: yes
 
 - name: Run data checker
-  command: python checker.py
+  command: python3 checker.py
+  environment:
+    PYTHONPATH: "{{ sf_ci }}/tests/functional/"
   args:
     chdir: "{{ sf_ci }}/tests/functional/provisioner/"
   become: yes

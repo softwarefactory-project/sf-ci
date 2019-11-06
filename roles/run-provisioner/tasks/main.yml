@@ -1,6 +1,8 @@
 ---
 - name: Run data provisionner
-  command: python provisioner.py
+  command: python3 provisioner.py
+  environment:
+    PYTHONPATH: "{{ sf_ci }}/tests/functional/"
   args:
     chdir: "{{ sf_ci }}/tests/functional/provisioner"
   become: yes

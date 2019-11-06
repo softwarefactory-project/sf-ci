@@ -68,7 +68,7 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
         # Here we fetch the index name, but also we wait for
         # it to appears in ElasticSearch for 5 mins
         index = []
-        for retry in xrange(300):
+        for retry in range(300):
             try:
                 outlines = subprocess.check_output(subcmd).split('\n')
                 indexes = filter(
@@ -87,7 +87,7 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
 
     def verify_logs_exported(self):
         subcmd = ["bash", "/tmp/test_request.sh"]
-        for retry in xrange(300):
+        for retry in range(300):
             out = subprocess.check_output(subcmd)
             ret = json.loads(out)
             if len(ret['hits']['hits']) >= 1:
