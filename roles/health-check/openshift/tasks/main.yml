@@ -37,7 +37,7 @@
 
 - name: Add unprivileged openshift provider to sfconfig
   command: |
-    python -c 'import yaml
+    python3 -c 'import yaml
     data = yaml.safe_load(open("/etc/software-factory/sfconfig.yaml"))
     data["nodepool"]["kube_file"] = "/etc/software-factory/kube.config"
     yaml.safe_dump(data, open("/etc/software-factory/sfconfig.yaml", "w"), default_flow_style=False)'

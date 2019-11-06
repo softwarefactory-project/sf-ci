@@ -69,7 +69,7 @@ class TestGerrit(Base):
         if not data:
             gitu.add_commit_and_publish(clone_dir, "master", "Test commit")
         else:
-            file(os.path.join(clone_dir, "file"), 'w').write(data[1])
+            open(os.path.join(clone_dir, "file"), 'w').write(data[1])
             gitu.add_commit_and_publish(clone_dir, "master", "Test commit",
                                         fnames=[data[0]])
 
@@ -128,7 +128,7 @@ class TestGerrit(Base):
         self.assertIn("revisions", resp)
         current_rev = resp["current_revision"]
         fetch = resp["revisions"][current_rev]["fetch"]
-        self.assertGreater(fetch.keys(), 0)
+        self.assertGreater(len(list(fetch.keys())), 0)
 
     def test_check_add_automatic_reviewers(self):
         """ Test if reviewers-by-blame plugin works
@@ -155,7 +155,7 @@ class TestGerrit(Base):
         clone_dir = gitu2.clone(url, pname)
         self.dirs_to_delete.append(os.path.dirname(clone_dir))
         data = ['this', 'is', 'some', 'lines']
-        file(os.path.join(clone_dir, "file"), 'w').write("\n".join(data))
+        open(os.path.join(clone_dir, "file"), 'w').write("\n".join(data))
         gitu2.add_commit_and_publish(
             clone_dir, "master", "Test commit", fnames=["file"])
         # Get the change id

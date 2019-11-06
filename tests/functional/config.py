@@ -174,8 +174,8 @@ USER_6_PRIV_KEY = USER_4_PRIV_KEY
 USERS = {
     USER_1: {"password": ADMIN_PASSWORD,
              "email": "admin@%s" % DOMAIN,
-             "pubkey": file(ADMIN_PUB_KEY_PATH).read(),
-             "privkey": file(ADMIN_PRIV_KEY_PATH).read(),
+             "pubkey": open(ADMIN_PUB_KEY_PATH).read(),
+             "privkey": open(ADMIN_PRIV_KEY_PATH).read(),
              "auth_cookie": "",
              "api_key": groupvars.get("gerrit_admin_password"),
              },

@@ -65,7 +65,7 @@ class TestRepoxplorer(Base):
         config_clone_dir = self.clone_as_admin("config")
         path = os.path.join(config_clone_dir, fpath)
         if mode == 'add':
-            file(path, 'w').write(resources)
+            open(path, 'w').write(resources)
         elif mode == 'del':
             os.unlink(path)
         change_sha = self.commit_direct_push_as_admin(
@@ -106,7 +106,7 @@ class TestRepoxplorer(Base):
             "/repoxplorer/api/v1/commits/commits.json?pid=internal")
         resp = requests.get(url)
         self.assertEqual(resp.status_code, 200)
-        self.assertTrue(resp.json()[2] > 0)
+        self.assertTrue(len(resp.json()[2]) > 0)
 
     @skipIfServiceMissing('repoxplorer')
     def test_repoxplorer_displayed_top_menu(self):
