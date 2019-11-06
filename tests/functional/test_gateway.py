@@ -15,7 +15,7 @@
 import config
 import json
 import shlex
-import urllib
+import urllib.request
 
 from utils import Base
 from utils import skipIfServiceMissing
@@ -63,7 +63,7 @@ class TestGateway(Base):
             subpaths.append("/paste/")
         if "kibana" in services:
             elastic_url = '%s/elasticsearch' % config.GATEWAY_URL
-            data = json.loads(urllib.urlopen(elastic_url).read())
+            data = json.loads(urllib.request.urlopen(elastic_url).read())
             if data['version']['number'] == '2.4.6':
                 subpaths.append("/app/kibana")
             else:
@@ -181,7 +181,7 @@ class TestGateway(Base):
         """ Test if Kibana is accessible on gateway host
         """
         elastic_url = '%s/elasticsearch' % config.GATEWAY_URL
-        data = json.loads(urllib.urlopen(elastic_url).read())
+        data = json.loads(urllib.request.urlopen(elastic_url).read())
         if data['version']['number'] == '2.4.6':
             url = config.GATEWAY_URL + "/app/kibana"
         else:
@@ -243,7 +243,7 @@ class TestGateway(Base):
         url = config.GATEWAY_URL + "/static/js/jquery.min.js"
         resp = requests.get(url)
         self.assertEqual(resp.status_code, 200)
-        self.assertTrue("jQuery" in resp.content)
+        self.assertTrue("jQuery" in resp.content.decode('utf-8'))
 
         paths = ('js/bootstrap.min.js', 'css/bootstrap.min.css')
         for p in paths:

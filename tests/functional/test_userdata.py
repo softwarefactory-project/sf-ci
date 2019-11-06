@@ -17,7 +17,7 @@ import config
 import json
 import requests
 import time
-import urllib2
+import urllib.parse
 import warnings
 import subprocess
 
@@ -56,7 +56,7 @@ class TestUserdata(Base):
         """
         self.logout()
         url = config.GATEWAY_URL + "/aservice/"
-        quoted_url = urllib2.quote(url, safe='')
+        quoted_url = urllib.parse.quote(url, safe='')
         response = self.login('user5', config.ADMIN_PASSWORD, quoted_url)
 
         self.assertEqual(url, response.url)
@@ -78,7 +78,7 @@ class TestUserdata(Base):
             skip("user management not supported in this version of managesf")
         self.logout()
         url = config.GATEWAY_URL + "/sf/welcome.html"
-        quoted_url = urllib2.quote(url, safe='')
+        quoted_url = urllib.parse.quote(url, safe='')
         response = self.login('Flea', 'RHCP', quoted_url)
         self.assertEqual(url, response.url)
 
@@ -171,7 +171,7 @@ class TestUserdata(Base):
                              int(create_user.status_code))
         self.logout()
         url = config.GATEWAY_URL + "/sf/welcome.html"
-        quoted_url = urllib2.quote(url, safe='')
+        quoted_url = urllib.parse.quote(url, safe='')
         response = self.login('naruto',
                               'rasengan', quoted_url)
         self.assertEqual(url, response.url)
