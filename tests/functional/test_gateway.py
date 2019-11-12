@@ -148,9 +148,9 @@ class TestGateway(Base):
     def test_codesearch(self):
         """ Test if codesearch service works
         """
-        # Look for 'config-check', it should returns a zuul.d path
+        # Look for 'merge-check', it should returns a zuul.d path
         url = config.GATEWAY_URL + "/codesearch"
-        search = "api/v1/search?q=config-check&repos=*"
+        search = "api/v1/search?q=merge-check&repos=*"
 
         resp = requests.get("%s/%s" % (url, search))
         self.assertEqual(resp.status_code, 200)
