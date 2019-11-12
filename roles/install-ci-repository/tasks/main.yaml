@@ -12,6 +12,16 @@
   command: mv /etc/yum.repos.d/zuul-built.repo /etc/yum.repos.d/sf-release.repo
   become: yes
 
+- name: Exclude sf-release package from the packages update
+  yum_repository:
+    name: "{{ item }}"
+    exclude:
+      - sf-release
+    file: sf-release
+  loop:
+    - sfmaster
+    - sftesting
+
 - name: Setup /etc/sf-release file
   copy:
     content: "master"
