@@ -161,7 +161,7 @@ class TestUserdata(Base):
             create_url = config.GATEWAY_URL + "/manage/user/naruto"
             headers = {'Content-Type': 'application/json; charset=utf8'}
             data = {'email': 'datte@bayo.org',
-                    'fullname': u'うずまきナルト'.encode('utf8'),
+                    'fullname': 'うずまきナルト',
                     'password': 'rasengan'}
             create_user = requests.post(create_url,
                                         headers=headers,
@@ -176,7 +176,7 @@ class TestUserdata(Base):
                               'rasengan', quoted_url)
         self.assertEqual(url, response.url)
         naru_gerrit = self.gu.get_account('naruto')
-        self.assertEqual(u'うずまきナルト',
+        self.assertEqual('うずまきナルト',
                          naru_gerrit.get('name'))
         # TODO this should be tested in the tracker as well
         del_url = config.GATEWAY_URL +\
