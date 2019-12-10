@@ -61,6 +61,6 @@
       vars:
         sfconfig_args: --recover
 
-    - name: Validate backup recovery
-      include_role:
-        name: run-checker
+#    - name: Validate backup recovery
+#      include_role:
+#        name: run-checker

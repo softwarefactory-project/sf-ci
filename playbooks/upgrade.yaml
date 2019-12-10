@@ -42,6 +42,6 @@
         name: '{{ item }}'
       loop:
         - setup-test-env
-        - run-checker
+#        - run-checker
         - run-health-check
         - run-functional-tests
