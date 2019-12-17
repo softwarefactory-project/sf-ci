@@ -4,18 +4,18 @@
     check:
       jobs:
         - sf-rpm-build
-        - sf-ci-functional-minimal:
-            dependencies:
-              - sf-rpm-build
-        - sf-ci-upgrade-minimal:
-            dependencies:
-              - sf-rpm-build
-        - sf-ci-functional-allinone:
-            dependencies:
-              - sf-rpm-build
-        - sf-ci-upgrade-allinone:
-            dependencies:
-              - sf-rpm-build
+        # - sf-ci-functional-minimal:
+        #     dependencies:
+        #       - sf-rpm-build
+        # - sf-ci-upgrade-minimal:
+        #     dependencies:
+        #       - sf-rpm-build
+        # - sf-ci-functional-allinone:
+        #     dependencies:
+        #       - sf-rpm-build
+        # - sf-ci-upgrade-allinone:
+        #     dependencies:
+        #       - sf-rpm-build
         - sf-tenants:
             dependencies:
               - sf-rpm-build
