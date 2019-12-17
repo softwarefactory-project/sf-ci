@@ -82,6 +82,7 @@
 
 - job:
     name: sf-tenants
+    ansible-version: 2.6
     parent: sf-ci-multinode
     run: playbooks/multinode.yaml
     vars:
