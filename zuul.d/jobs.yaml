@@ -69,7 +69,7 @@
     run: playbooks/upgrade.yaml
     vars:
       sf_arch: minimal
-      sf_version: 3.3
+      sf_version: 3.2
 
 - job:
     name: sf-ci-upgrade-allinone
@@ -78,7 +78,7 @@
     run: playbooks/upgrade.yaml
     vars:
       sf_arch: allinone
-      sf_version: 3.3
+      sf_version: 3.2
 
 - job:
     name: sf-tenants
@@ -103,7 +103,7 @@
     run: playbooks/stable.yaml
     vars:
       sf_arch: allinone
-      sf_version: 3.3
+      sf_version: 3.2
       centos_cr: false
 
 - job:
@@ -113,5 +113,5 @@
     run: playbooks/stable.yaml
     vars:
       sf_arch: allinone
-      sf_version: 3.3
+      sf_version: 3.2
       centos_cr: true
