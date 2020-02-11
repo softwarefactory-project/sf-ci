@@ -16,9 +16,6 @@
         - sf-ci-upgrade-allinone:
             dependencies:
               - sf-rpm-build
-        - sf-tenants:
-            dependencies:
-              - sf-rpm-build
     gate:
       queue: sf
       jobs:
