@@ -1,4 +1,25 @@
 ---
+- name: Backward compatible service_rsa key used in test
+  become: yes
+  vars:
+    bootstrap_data: /var/lib/software-factory/bootstrap-data/ssh_keys
+    _key: "{{ bootstrap_data }}/service_rsa"
+  block:
+    - file:
+        path: "{{ bootstrap_data }}"
+        state: directory
+
+    - command: "ssh-keygen -f {{ _key }} -t rsa -m PEM -N '' -C server_rsa"
+      args:
+        creates: "{{ _key }}"
+
+    - command: "cat {{ _key }}.pub"
+      register: _pub_key
+
+    - authorized_key:
+        user: root
+        key: "{{ _pub_key.stdout }}"
+
 - name: Ensure no zuul and nodepool working directories exist
   file:
     path: '{{ item }}'

@@ -103,8 +103,9 @@ class TestProjectReplication(Base):
                   '-o', 'StrictHostKeyChecking=no',
                   '-o', 'UserKnownHostsFile=/dev/null', '-i',
                   sshkey_priv_path, host]
-        cmd = sshcmd + subcmd
+        return self.run_cmd(sshcmd + subcmd)
 
+    def run_cmd(self, cmd):
         p = Popen(cmd, stdout=PIPE)
         return p.communicate(), p.returncode
 
@@ -138,11 +139,10 @@ class TestProjectReplication(Base):
             self.config_clone_dir, 'master')
         logger.info("Waiting for config-update on %s" % change_sha)
         self.ju.wait_for_config_update(change_sha)
-        cmd = ['ssh', 'gerrit.%s' % config.GATEWAY_HOST, 'grep',
-               'test_project', '/etc/gerrit/replication.config']
+        cmd = ['sudo', 'grep', 'test_project',
+               '/etc/gerrit/replication.config']
         logger.info("Wait for the replication config section to land")
-        _, code = self.ssh_run_cmd(config.SERVICE_PRIV_KEY_PATH,
-                                   'root', config.GATEWAY_HOST, cmd)
+        _, code = self.run_cmd(cmd)
         if code == 0:
             return
         raise Exception('replication.config file has not been updated (add)')
@@ -168,11 +168,9 @@ class TestProjectReplication(Base):
             self.config_clone_dir, 'master')
         logger.info("Waiting for config-update on %s" % change_sha)
         self.ju.wait_for_config_update(change_sha)
-        cmd = ['ssh', 'gerrit.%s' % config.GATEWAY_HOST, 'grep',
-               'test_project',
+        cmd = ['sudo', 'grep', 'test_project',
                '/etc/gerrit/replication.config']
-        _, code = self.ssh_run_cmd(config.SERVICE_PRIV_KEY_PATH,
-                                   'root', config.GATEWAY_HOST, cmd)
+        _, code = self.run_cmd(cmd)
         if code != 0:
             return
         raise Exception('replication.config has not been updated (rm)')
@@ -198,13 +196,9 @@ class TestProjectReplication(Base):
         self.create_project(self.pname)
 
         # Be sure instance host key is inside the known_hosts
-        cmds = [['ssh', 'gerrit.%s' % config.GATEWAY_HOST,
-                 'ssh-keyscan', config.GATEWAY_HOST, '>',
-                 '/var/lib/gerrit/.ssh/known_hosts']]
-        for cmd in cmds:
-            self.ssh_run_cmd(config.SERVICE_PRIV_KEY_PATH,
-                             'root',
-                             config.GATEWAY_HOST, cmd)
+        self.run_cmd(
+            ['sudo', 'sh', '-c', 'ssh-keyscan ' + config.GATEWAY_HOST +
+             ' > /var/lib/gerrit/.ssh/known_hosts'])
 
         # Create new section for this project in replication.config
         self.create_config_section(self.pname)
