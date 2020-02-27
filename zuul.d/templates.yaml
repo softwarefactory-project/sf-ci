@@ -20,7 +20,7 @@
             dependencies:
               - sf-rpm-build
     gate:
-      queue: sf
+      queue: sf-34
       jobs:
         - sf-rpm-build
         - sf-ci-functional-minimal:
@@ -48,7 +48,7 @@
       jobs:
         - sf-rpm-build
     gate:
-      queue: sf
+      queue: sf-34
       jobs:
         - sf-rpm-build
         - sf-ci-functional-allinone:
@@ -68,7 +68,7 @@
       jobs:
         - noop
     gate:
-      queue: sf
+      queue: sf-34
       jobs:
         - sf-rpm-build
         - wait-for-changes-ahead:
@@ -93,7 +93,7 @@
         - tox-pep8
         - tox-py27
     gate:
-      queue: sf
+      queue: sf-34
       jobs:
         - tox-pep8
         - tox-py27
