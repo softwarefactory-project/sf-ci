@@ -7,5 +7,5 @@
   become: yes
 
 - name: Temporary fix the koji-url to use the vexxhost instance directly
-  command: sed -e "s#https://softwarefactory-project.io#http://38.102.83.102#" -i /etc/yum.repos.d/sf-release.repo
+  command: sed -e "s#https://softwarefactory-project.io/k#http://38.102.83.102/k#" -i /etc/yum.repos.d/sf-release.repo
   become: yes
