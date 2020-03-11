@@ -9,7 +9,7 @@
           nodeset:
             nodes:
               - name: pod
-                label: pod-fedora-30
+                label: pod-fedora-31
 
       - project:
           check:

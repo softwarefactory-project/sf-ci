@@ -1,6 +1,6 @@
-- name: Create fedora-30 containers dir
+- name: Create fedora-31 containers dir
   file:
-    path: "{{ config_path }}/containers/fedora-30"
+    path: "{{ config_path }}/containers/fedora-31"
     state: directory
 
 - name: Add k1s labels and container image
@@ -9,20 +9,20 @@
     dest: "{{ config_path }}/{{ item.dest }}"
   loop:
     - content: |
-        FROM registry.fedoraproject.org/fedora:30
+        FROM registry.fedoraproject.org/fedora:31
         RUN dnf install -y python3-flake8 rsync
-      dest: containers/fedora-30/Dockerfile
+      dest: containers/fedora-31/Dockerfile
     - content: |
         ---
         labels:
-          - name: pod-fedora-30
+          - name: pod-fedora-31
 
         extra-labels:
           - provider: managed-k1s-provider-managesf
             pool: main
             labels:
-              - name: pod-fedora-30
-                image: localhost/k1s/fedora-30
+              - name: pod-fedora-31
+                image: localhost/k1s/fedora-31
                 python-path: /bin/python3
 
       dest: nodepool/k1s.yaml
