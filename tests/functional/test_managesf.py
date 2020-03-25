@@ -60,6 +60,7 @@ class TestManageSF(Base):
         self.ru.direct_create_repo(name)
         self.projects.append(name)
 
+    @skipIfServicePresent("keycloak")
     def test_api_key_auth_with_sfmanager(self):
         """Test the api key auth workflow"""
         user2_cookies = dict(
