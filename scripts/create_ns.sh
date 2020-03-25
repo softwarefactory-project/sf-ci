@@ -23,6 +23,10 @@ if [ "$1" == "stop" ]; then
     exit 0
 fi
 
+# Allow ssh gerrit access
+mkdir /etc/netns/local-test/
+echo "192.168.42.2  gerrit" >> /etc/netns/local-tests/hosts
+
 # Authorize gerrit reindex from local-test netns
 sql_file='/var/lib/software-factory/sql/databases.sql'
 sql_command=$(grep gerrit.*sftests.com $sql_file | sed -e "s/\(gerrit'@'\).*sftests.com/\1192.168.42.2/g")
