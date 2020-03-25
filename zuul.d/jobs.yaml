@@ -63,6 +63,33 @@
       sf_arch: allinone
 
 - job:
+    name: sf-ci-functional-minimal-keycloak
+    description: The sf functional tests of the minimal architecture (keycloak enabled)
+    parent: sf-ci
+    run: playbooks/functional.yaml
+    vars:
+      sf_arch: minimal
+      add_component:
+        - component: keycloak
+          insertafter: gateway
+      unsupported_components:
+        - cauth
+
+- job:
+    name: sf-ci-functional-allinone-keycloak
+    description: The sf functional tests of the allinone architecture (keycloak enabled)
+    parent: sf-ci
+    run: playbooks/functional.yaml
+    vars:
+      sf_arch: allinone
+      add_component:
+        - component: keycloak
+          insertafter: gateway
+      unsupported_components:
+        - cauth
+
+
+- job:
     name: sf-ci-upgrade-minimal
     description: The sf upgrade tests of the minimal architecture
     parent: sf-ci
