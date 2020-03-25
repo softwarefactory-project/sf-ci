@@ -27,6 +27,8 @@ from utils import ManageSfUtils
 from utils import skip
 from utils import get_cookie
 from utils import get_gerrit_utils
+from utils import skipIfServicePresent
+from utils import is_present
 
 
 class TestUserdata(Base):
@@ -52,8 +54,28 @@ class TestUserdata(Base):
                 'back': redirect}
         return requests.post(url, data=data)
 
-    def test_login_and_redirect(self):
-        """ Verify the user creation and the login redirection
+    def login_kc(self, username, password):
+        token_endpoint = "auth/realms/sf/protocol/openid-connect/token"
+        url = "%(auth_url)s/%(endpoint)s" % {'auth_url': config.GATEWAY_URL,
+                                             'endpoint': token_endpoint}
+        resp = requests.post(url, data={'client_id': 'managesf',
+                                        'grant_type': 'password',
+                                        'username': username,
+                                        'password': password})
+        return resp
+
+    @skipIfServicePresent("cauth")
+    def test_login_kc(self):
+        """Verify user creation and ability to log in"""
+        username = config.USER_5
+        password = config.USERS[config.USER_5]['password']
+        resp = self.login_kc(username, password)
+        self.assertTrue(resp.ok)
+        self.assertTrue('access_token' in resp.json())
+
+    @skipIfServicePresent("keycloak")
+    def test_login_and_redirect_cauth(self):
+        """ Verify the user creation and the login redirection (cauth)
         """
         self.logout()
         url = config.GATEWAY_URL + "/aservice/"
@@ -63,6 +85,7 @@ class TestUserdata(Base):
         self.assertEqual(url, response.url)
         self.verify_userdata_gerrit('user5')
 
+    @skipIfServicePresent("keycloak")
     def test_invalid_user_login(self):
         """ Try to login with an invalid user
         """
@@ -70,6 +93,7 @@ class TestUserdata(Base):
         response = self.login('toto', 'nopass', '/')
         self.assertEqual(response.status_code, 401)
 
+    @skipIfServicePresent("keycloak")
     def test_create_local_user_and_login(self):
         """ Try to create a local user then login
         """
@@ -83,6 +107,7 @@ class TestUserdata(Base):
         response = self.login('Flea', 'RHCP', quoted_url)
         self.assertEqual(url, response.url)
 
+    @skipIfServicePresent("keycloak")
     def test_delete_user_in_backends_by_username(self):
         """ Delete a user previously registered user by username
         """
@@ -117,6 +142,7 @@ class TestUserdata(Base):
         time.sleep(1)
         self.assertFalse(self.gu.is_account_active('bootsy'))
 
+    @skipIfServicePresent("keycloak")
     def test_delete_in_backend_and_recreate(self):
         """Make sure we can recreate a user"""
         # first, create a user and register it with services
@@ -173,18 +199,24 @@ class TestUserdata(Base):
                                         cookies={'auth_pubtkt': auth_cookie})
             self.assertEqual(201,
                              int(create_user.status_code))
-        self.logout()
-        url = config.GATEWAY_URL + "/sf/welcome.html"
-        quoted_url = urllib.parse.quote(url, safe='')
-        response = self.login('naruto',
-                              'rasengan', quoted_url)
-        self.assertEqual(url, response.url)
+        if is_present("cauth"):
+            self.logout()
+            url = config.GATEWAY_URL + "/sf/welcome.html"
+            quoted_url = urllib.parse.quote(url, safe='')
+            response = self.login('naruto',
+                                  'rasengan', quoted_url)
+            self.assertEqual(url, response.url)
+        if is_present("keycloak"):
+            resp = self.login_kc('naruto', 'rasengan')
+            self.assertTrue(resp.ok)
+            self.assertTrue('access_token' in resp.json())
         naru_gerrit = self.gu.get_account('naruto')
         self.assertEqual('うずまきナルト',
                          naru_gerrit.get('name'))
-        # TODO this should be tested in the tracker as well
-        del_url = config.GATEWAY_URL +\
-            '/manage/services_users/?username=naruto'
-        d = requests.delete(del_url,
-                            cookies={'auth_pubtkt': auth_cookie})
-        self.assertTrue(int(d.status_code) < 400, d.status_code)
+        if is_present("cauth"):
+            # TODO this should be tested in the tracker as well
+            del_url = config.GATEWAY_URL +\
+                '/manage/services_users/?username=naruto'
+            d = requests.delete(del_url,
+                                cookies={'auth_pubtkt': auth_cookie})
+            self.assertTrue(int(d.status_code) < 400, d.status_code)
