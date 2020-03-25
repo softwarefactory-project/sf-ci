@@ -24,6 +24,7 @@ from utils import ManageSfUtils
 from utils import skipIfProvisionVersionLesserThan
 from utils import ssh_run_cmd
 from utils import GerritClient
+from utils import is_present
 
 from requests.auth import HTTPBasicAuth
 
@@ -133,9 +134,16 @@ class TestGateway(Base):
 
         # Authenticated URL that requires login
         url = config.GATEWAY_URL + "/r/a/projects/?"
-        resp = requests.get(
-            url,
-            auth=HTTPBasicAuth("user2", config.USERS["user2"]["api_key"]))
+        if is_present("cauth"):
+            resp = requests.get(
+                url,
+                auth=HTTPBasicAuth("user2", config.USERS["user2"]["api_key"]))
+        elif is_present("keycloak"):
+            resp = requests.get(
+                url,
+                auth=HTTPBasicAuth("user2", config.USERS["user2"]["password"]))
+        else:
+            raise Exception("This deployment has no SSO?!")
         self.assertEqual(resp.status_code, 200)
         # /r/a/projects returns JSON list of projects
         self.assertTrue('All-Users' in resp.text)
@@ -151,8 +159,9 @@ class TestGateway(Base):
             resp = requests.get(url, allow_redirects=False)
             self.assertEqual(resp.status_code, 404)
 
-    def test_gerrit_api_accessible(self):
-        """ Test if Gerrit API is accessible on gateway hosts
+    @skipIfServiceMissing("cauth")
+    def test_gerrit_api_accessible_cauth(self):
+        """ Test if Gerrit API is accessible on gateway hosts (SSO: cauth)
         """
         m = ManageSfUtils(config.GATEWAY_URL)
         url = config.GATEWAY_URL + "/r/a/"
@@ -168,6 +177,22 @@ class TestGateway(Base):
         m.delete_gerrit_api_password("user3")
         a = GerritClient(url, auth=auth)
         self.assertRaises(RuntimeError, a.get_account, "user3")
+
+        a = GerritClient(url, auth=HTTPBasicAuth("admin", "password"))
+        self.assertRaises(RuntimeError, a.get_account, 'john')
+
+    @skipIfServiceMissing("keycloak")
+    def test_gerrit_api_accessible_keycloak(self):
+        """ Test if Gerrit API is accessible on gateway hosts (SSO: keycloak)
+        """
+        url = config.GATEWAY_URL + "/r/a/"
+
+        a = GerritClient(url, auth=HTTPBasicAuth("admin", "password"))
+        self.assertRaises(RuntimeError, a.get_account, config.USER_1)
+
+        auth = HTTPBasicAuth("user3", config.USERS["user3"]["password"])
+        a = GerritClient(url, auth=auth)
+        self.assertTrue(a.get_account("user3"))
 
         a = GerritClient(url, auth=HTTPBasicAuth("admin", "password"))
         self.assertRaises(RuntimeError, a.get_account, 'john')
