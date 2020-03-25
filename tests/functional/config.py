@@ -19,6 +19,9 @@ if "REQUESTS_CA_BUNDLE" not in os.environ and os.path.isfile(requests_ca):
 
 groupvars = yaml.safe_load(open(SF_GROUPVARS))
 
+
+KC_AUTH = ('keycloak' in groupvars['roles'])
+
 GATEWAY_HOST = groupvars['fqdn']
 DOMAIN = GATEWAY_HOST
 
