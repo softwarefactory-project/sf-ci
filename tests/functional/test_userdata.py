@@ -26,6 +26,7 @@ from utils import ManageSfUtils
 from utils import skip
 from utils import get_cookie
 from utils import get_gerrit_utils
+from utils import skipIfServicePresent
 
 
 class TestUserdata(Base):
@@ -82,6 +83,7 @@ class TestUserdata(Base):
         response = self.login('Flea', 'RHCP', quoted_url)
         self.assertEqual(url, response.url)
 
+    @skipIfServicePresent("keycloak")
     def test_delete_user_in_backends_by_username(self):
         """ Delete a user previously registered user by username
         """
@@ -115,6 +117,7 @@ class TestUserdata(Base):
         time.sleep(1)
         self.assertFalse(self.gu.is_account_active('bootsy'))
 
+    @skipIfServicePresent("keycloak")
     def test_delete_in_backend_and_recreate(self):
         """Make sure we can recreate a user"""
         # first, create a user and register it with services
