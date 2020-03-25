@@ -27,6 +27,7 @@ from utils import JobUtils
 from utils import create_random_str
 from utils import get_gerrit_utils
 from utils import ssh_run_cmd
+from utils import get_auth_params
 
 
 class TestResourcesWorkflow(Base):
@@ -105,9 +106,10 @@ class TestResourcesWorkflow(Base):
         self.assertEqual(note, expected_note)
 
     def get_resources(self):
-        gateau = config.USERS[config.ADMIN_USER]['auth_cookie']
+        params = get_auth_params(config.ADMIN_USER,
+                                 config.USERS[config.ADMIN_USER]['password'])
         resp = requests.get("%s/manage/v2/resources/" % config.GATEWAY_URL,
-                            cookies={'auth_pubtkt': gateau})
+                            **params)
         return resp.json()
 
     def test_validate_wrong_resource_workflow(self):
@@ -452,7 +454,8 @@ class TestResourcesWorkflow(Base):
 
     def test_GET_resources(self):
         """ Check resources - GET resources works as expected"""
-        cookies = dict(auth_pubtkt=config.USERS[config.USER_1]['auth_cookie'])
+        params = get_auth_params(config.USER_1,
+                                 config.USERS[config.USER_1]['password'])
         ret = requests.get("%s/manage/v2/resources/" % config.GATEWAY_URL,
-                           cookies=cookies)
+                           **params)
         self.assertIn('resources', ret.json())
