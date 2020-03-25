@@ -119,6 +119,29 @@ def copytree(src, dst, symlinks=False, ignore=None):
             shutil.copy2(s, d)
 
 
+def get_auth_params(username, password):
+    params = {'cookies': {},
+              'headers': {}}
+    if not config.KC_AUTH:
+        params['cookies']['auth_pubtkt'] = get_cookie(username,
+                                                      password)
+    else:
+        params['headers']['Authorization'] = 'Bearer %s' % get_jwt(username,
+                                                                   password)
+    return params
+
+
+def get_jwt(username, password):
+    token_endpoint = "auth/realms/sf/protocol/openid-connect/token"
+    url = "%(auth_url)s/%(endpoint)s" % {'auth_url': config.GATEWAY_URL,
+                                         'endpoint': token_endpoint}
+    resp = requests.post(url, params={'client_id': 'managesf',
+                                      'grant_type': 'password',
+                                      'username': username,
+                                      'password': password})
+    return resp.json().get('access_token')
+
+
 def get_cookie(username, password):
     url = "%(auth_url)s/auth/login" % {'auth_url': config.GATEWAY_URL}
     resp = requests.post(url, params={'username': username,
@@ -129,9 +152,13 @@ def get_cookie(username, password):
 
 
 def get_gerrit_utils(user):
+    if is_present("cauth"):
+        http_password = config.USERS[user]['api_key']
+    elif is_present("keycloak"):
+        http_password = config.USERS[user]['password']
     return GerritClient(
         config.GATEWAY_URL + "/r/a",
-        auth=HTTPBasicAuth(user, config.USERS[user]['api_key']))
+        auth=HTTPBasicAuth(user, http_password))
 
 
 def ssh_run_cmd(sshkey_priv_path, user, host, subcmd, verbose=False):
@@ -210,17 +237,17 @@ class ManageSfUtils(Tool):
 
     def create_gerrit_api_password(self, user):
         passwd = config.USERS[user]['password']
-        cookie = {'auth_pubtkt': get_cookie(user, passwd)}
-        r = requests.get(config.GATEWAY_URL + "/auth/apikey/", cookies=cookie)
+        kwargs = get_auth_params(user, passwd)
+        r = requests.get(config.GATEWAY_URL + "/auth/apikey/", **kwargs)
         if r.status_code != 200:
             r = requests.post(config.GATEWAY_URL + "/auth/apikey/",
-                              cookies=cookie)
+                              **kwargs)
         return r.json()['api_key']
 
     def delete_gerrit_api_password(self, user):
         passwd = config.USERS[user]['password']
-        cookie = {'auth_pubtkt': get_cookie(user, passwd)}
-        requests.delete(config.GATEWAY_URL + "/auth/apikey/", cookies=cookie)
+        kwargs = get_auth_params(user, passwd)
+        requests.delete(config.GATEWAY_URL + "/auth/apikey/", **kwargs)
 
     def create_user(self, user, password, email, fullname=None):
         subcmd = (" user create --username=%s "
@@ -576,8 +603,8 @@ class GerritGitUtils(Tool):
 class JobUtils(Tool):
     def __init__(self):
         Tool.__init__(self)
-        self.cookies = {'auth_pubtkt': get_cookie(config.USER_1,
-                                                  config.USER_1_PASSWORD)}
+        # self.cookies = {'auth_pubtkt': get_cookie(config.USER_1,
+        #                                           config.USER_1_PASSWORD)}
 
     def wait_for_config_update(self, revision, return_result=False):
         base_url = "%s/zuul/api/tenant/local/builds" % config.GATEWAY_URL
