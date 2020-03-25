@@ -25,7 +25,7 @@ import logging
 from utils import ManageSfUtils
 from utils import ResourcesUtils
 from utils import GerritGitUtils
-from utils import get_cookie
+from utils import get_auth_params
 
 # TODO: Create pads and pasties.
 
@@ -44,8 +44,11 @@ class SFProvisioner(object):
     def __init__(self):
         with open("%s/resources.yaml" % os.getcwd(), 'r') as rsc:
             self.resources = yaml.load(rsc)
-        config.USERS[config.ADMIN_USER]['auth_cookie'] = get_cookie(
-            config.ADMIN_USER, config.USERS[config.ADMIN_USER]['password'])
+        if not config.KC_AUTH:
+            auth = get_auth_params(
+                config.ADMIN_USER, config.USERS[config.ADMIN_USER]['password'])
+            cookie = auth['cookies']['auth_pubtkt']
+            config.USERS[config.ADMIN_USER]['auth_cookie'] = cookie
         self.msu = ManageSfUtils(config.GATEWAY_URL)
         self.ru = ResourcesUtils()
         self.ggu = GerritGitUtils(config.ADMIN_USER,
@@ -87,7 +90,11 @@ class SFProvisioner(object):
 
     def simple_login(self, user, password):
         """log as user to make the user listable"""
-        if not get_cookie(user, password):
+        try:
+            params = get_auth_params(user, password)
+            if params['cookies'] == params['headers'] == {}:
+                raise Exception('no auth')
+        except Exception:
             self.log.error("Couldn't log in as %s" % user)
             exit(1)
 
