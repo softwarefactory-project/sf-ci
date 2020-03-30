@@ -1,5 +1,5 @@
 - name: Submit and approve config change
-  command: /usr/share/sf-config/scripts/submit_and_wait.py --approve
+  command: /usr/share/sf-config/scripts/submit_and_wait.py --approve --delay 1200
   args:
     chdir: "{{ config_path }}"
   register: submit_status
