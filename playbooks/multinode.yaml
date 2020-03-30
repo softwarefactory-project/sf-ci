@@ -116,16 +116,8 @@
 # commit of the slave/config.
 - hosts: master
   tasks:
-    - name: Check for non-scl
-      stat:
-        path: /usr/bin/zuul-scheduler
-      register: _nonscl
-
-    - name: Reload zuul-scheduler
-      systemd:
-        name: "zuul-scheduler"
-        state: reloaded
-      become: true
+    - name: Force scheduler reconfiguration
+      command: zuul-scheduler full-reconfigure
 
 - hosts: slave
   tasks:
