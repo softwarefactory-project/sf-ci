@@ -115,3 +115,23 @@
       sf_arch: allinone
       sf_version: 3.4
       centos_cr: true
+
+- job:
+    name: maven-build
+    parent: base
+    description: build the extension with maven
+    run: playbooks/keycloak/maven-build.yaml
+    nodeset:
+      nodes:
+        - name: builder
+          label: cloud-centos-7
+- job:
+    name: keycloak-test-deploy
+    parent: base
+    description: install, deploy and configure a minimal keycloak.
+    run: playbooks/keycloak/test-deploy.yaml
+    post-run: playbooks/keycloak/get-keycloak-logs.yaml
+    nodeset:
+      nodes:
+        - name: server
+          label: cloud-centos-7

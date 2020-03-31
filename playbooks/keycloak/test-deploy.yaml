@@ -1,0 +1,53 @@
+---
+- hosts: server
+  tasks:
+    - name: Install sf-rpm-build repository
+      yum_repository:
+        name: sf-rpm-build
+        description: SF rpm-build repository
+        baseurl: "{{ buildset_artifacts_url }}"
+        gpgcheck: no
+      become: true
+      when: buildset_artifacts_url is defined
+    - name: Install SF master repository if there is no pre-build
+      become: true
+      yum_repository:
+        name: sf-master
+        description: SF master repository
+        baseurl: https://softwarefactory-project.io/kojifiles/repos/sf-master-el7/
+        gpgcheck: no
+      when: buildset_artifacts_url is not defined
+
+    - name: Install keycloak
+      yum:
+        name: keycloak
+        state: present
+      become: true
+
+    - name: Create admin user
+      shell: /opt/jboss/keycloak/bin/add-user-keycloak.sh -r master -u admin -p admin
+      become: true
+
+    - name: Start service
+      service:
+        name: keycloak
+        state: started
+        enabled: "yes"
+      become: true
+
+    - name: Wait for service to be ready
+      uri:
+        url: "http://localhost:8080/auth"
+        method: GET
+        follow_redirects: all
+      register: _result
+      until: _result.status == 200
+      retries: 100
+      delay: 2
+
+    - name: Create a realm
+      command: |
+        /opt/jboss/keycloak/bin/kcadm.sh create realms
+        -s realm=test
+        -s enabled=true
+        --no-config --server http://localhost:8080/auth --realm master --user admin --password admin
