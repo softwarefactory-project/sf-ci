@@ -1,0 +1,9 @@
+---
+- hosts: server
+  tasks:
+    - name: Fetch logs
+      synchronize:
+        src: /opt/jboss/keycloak/standalone/log/
+        dest: "{{ zuul.executor.log_root }}/keycloak"
+        mode: pull
+      become: yes
