@@ -1,0 +1,22 @@
+---
+- hosts: builder
+  tasks:
+    - name: install maven and dependencies
+      package:
+        name:
+          - maven
+        state: present
+      become: true
+    - name: run maven clean install
+      command: "/usr/bin/mvn clean install -l {{ ansible_user_dir }}/logs/maven-build.log"
+      args:
+        chdir: "{{ zuul.project.src_dir }}"
+      become: yes
+      ignore_errors: yes
+      register: build_result
+    - name: export artifacts
+      shell: >
+        cp {{ansible_user_dir}}/{{ zuul.project.src_dir }}/target/*.jar
+        {{ ansible_user_dir }}/logs/
+      when:
+        - build_result.rc == 0
