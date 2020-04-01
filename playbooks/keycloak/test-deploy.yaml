@@ -1,0 +1,93 @@
+---
+- hosts: server
+  tasks:
+    - file:
+        path: "{{ ansible_user_dir }}/logs"
+        state: directory
+
+    - name: Install maven
+      package:
+        name: maven
+        state: present
+      become: true
+
+    - stat:
+        path: "{{ ansible_user_dir }}/{{ item.project.src_dir }}/pom.xml"
+      register: pom_stats
+      loop: "{{ zuul['items'] }}"
+
+    - command: >
+        /usr/bin/mvn clean install -l
+        {{ ansible_user_dir }}/logs/{{ item.item.project.short_name }}-maven-build.log
+      args:
+        chdir: "{{ ansible_user_dir}}/{{ item.item.project.src_dir }}"
+      when: "item.stat.exists"
+      loop: "{{ pom_stats.results }}"
+
+    - shell: >
+        cp {{ansible_user_dir}}/{{ item.item.project.src_dir }}/target/*dependencies.jar
+        {{ ansible_user_dir }}/logs/
+      when: "item.stat.exists"
+      loop: "{{ pom_stats.results }}"
+
+    - name: Install sf-rpm-build repository
+      yum_repository:
+        name: sf-rpm-build
+        description: SF rpm-build repository
+        baseurl: "{{ buildset_artifacts_url }}"
+        gpgcheck: no
+      become: true
+
+    - name: Install keycloak
+      package:
+        name: keycloak
+        state: present
+      become: true
+
+    - shell: ls {{ ansible_user_dir }}/logs/event-listener-*-dependencies.jar
+      register: event_listener_jar_path
+      ignore_errors: true
+
+    - shell: >
+        cp {{ event_listener_jar_path.stdout|trim }}
+        /opt/jboss/keycloak/standalone/deployments/event-listener-mqtt.jar
+      when: event_listener_jar_path.rc == 0
+      become: true
+
+    - shell: ls {{ ansible_user_dir }}/logs/github-ssh-mapper-*-dependencies.jar
+      register: github_ssh_mapper_jar_path
+      ignore_errors: true
+
+    - shell: >
+        cp {{ github_ssh_mapper_jar_path.stdout|trim }}
+        /opt/jboss/keycloak/standalone/deployments/github-ssh-mapper.jar
+      when: github_ssh_mapper_jar_path.rc == 0
+      become: true
+
+    - name: Create admin user
+      shell: /opt/jboss/keycloak/bin/add-user-keycloak.sh -r master -u admin -p admin
+      become: true
+
+    - name: Start service
+      service:
+        name: keycloak
+        state: started
+        enabled: "yes"
+      become: true
+
+    - name: Wait for service to be ready
+      uri:
+        url: "http://localhost:8080/auth"
+        method: GET
+        follow_redirects: all
+      register: _result
+      until: _result.status == 200
+      retries: 100
+      delay: 2
+
+    - name: Create a realm
+      command: |
+        /opt/jboss/keycloak/bin/kcadm.sh create realms
+        -s realm=test
+        -s enabled=true
+        --no-config --server http://localhost:8080/auth --realm master --user admin --password admin

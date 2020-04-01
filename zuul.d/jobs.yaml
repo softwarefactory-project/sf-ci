@@ -115,3 +115,13 @@
       sf_arch: allinone
       sf_version: 3.4
       centos_cr: true
+
+- job:
+    name: keycloak-test-deploy
+    parent: base
+    description: install, deploy and configure a minimal keycloak.
+    run: playbooks/keycloak/test-deploy.yaml
+    nodeset:
+      nodes:
+        - name: server
+          label: cloud-centos-7
