@@ -121,6 +121,7 @@
     parent: base
     description: install, deploy and configure a minimal keycloak.
     run: playbooks/keycloak/test-deploy.yaml
+    post: playbooks/keycloak/post.yaml
     nodeset:
       nodes:
         - name: server

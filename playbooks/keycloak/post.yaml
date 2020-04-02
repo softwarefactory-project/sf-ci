@@ -1,0 +1,21 @@
+---
+- hosts: server
+  tasks:
+    - name: Stop service
+      service:
+        name: keycloak
+        state: stopped
+      become: true
+    - name: export keycloak logs
+      shell: >
+        cp /opt/jboss/keycloak/standalone/log/*
+        {{ ansible_user_dir }}/logs/
+      become: true
+    - name: look for fatal errors
+      lineinfile:
+        path: "{{ ansible_user_dir }}/logs/server.log"
+        line: "FATAL"
+        state: present
+      check_mode: yes
+      register: fatality
+      failed_when: fatality is not changed
