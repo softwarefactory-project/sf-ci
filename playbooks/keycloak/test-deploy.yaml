@@ -1,8 +1,10 @@
 ---
 - hosts: server
   tasks:
+    - set_fact:
+        zuul_output_dir: "{{ ansible_user_dir }}/zuul-output"
     - file:
-        path: "{{ ansible_user_dir }}/logs"
+        path: "{{ zuul_output_dir }}/logs/jars/"
         state: directory
 
     - name: Install maven
@@ -22,7 +24,7 @@
 
     - command: >
         /usr/bin/mvn clean install -l
-        {{ ansible_user_dir }}/logs/{{ item.item.project.short_name }}-maven-build.log
+        {{ zuul_output_dir }}/logs/{{ item.item.project.short_name }}-maven-build.log
       args:
         chdir: "{{ ansible_user_dir}}/{{ item.item.project.src_dir }}"
       when: "item.stat.exists"
@@ -30,7 +32,7 @@
 
     - shell: >
         cp {{ansible_user_dir}}/{{ item.item.project.src_dir }}/target/*dependencies.jar
-        {{ ansible_user_dir }}/logs/
+        {{ zuul_output_dir }}/logs/jars
       when: "item.stat.exists"
       loop: "{{ pom_stats.results }}"
 
@@ -57,7 +59,7 @@
         state: present
       become: true
 
-    - shell: ls {{ ansible_user_dir }}/logs/event-listener-*-dependencies.jar
+    - shell: ls {{ zuul_output_dir }}/logs/jars/event-listener-*-dependencies.jar
       register: event_listener_jar_path
       ignore_errors: true
 
@@ -67,7 +69,7 @@
       when: event_listener_jar_path.rc == 0
       become: true
 
-    - shell: ls {{ ansible_user_dir }}/logs/github-ssh-mapper-*-dependencies.jar
+    - shell: ls {{ zuul_output_dir }}/logs/jars/github-ssh-mapper-*-dependencies.jar
       register: github_ssh_mapper_jar_path
       ignore_errors: true
 
@@ -104,3 +106,18 @@
         -s realm=test
         -s enabled=true
         --no-config --server http://localhost:8080/auth --realm master --user admin --password admin
+
+    - name: Stop service
+      service:
+        name: keycloak
+        state: stopped
+      become: true
+
+    - name: look for fatal errors
+      lineinfile:
+        path: "/opt/jboss/keycloak/standalone/log/server.log"
+        line: "FATAL"
+        state: present
+      check_mode: yes
+      register: fatality
+      failed_when: fatality is not changed

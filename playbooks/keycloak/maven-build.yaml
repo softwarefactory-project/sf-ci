@@ -1,9 +1,12 @@
 ---
 - hosts: builder
   tasks:
+    - set_fact:
+        zuul_output_dir: "{{ ansible_user_dir }}/zuul-output"
     - file:
-        path: "{{ ansible_user_dir }}/logs"
+        path: "{{ zuul_output_dir }}/logs/jars/"
         state: directory
+
     - name: install maven and dependencies
       package:
         name:
@@ -11,7 +14,7 @@
         state: present
       become: true
     - name: run maven clean install
-      command: "/usr/bin/mvn clean install -l {{ ansible_user_dir }}/logs/maven-build.log"
+      command: "/usr/bin/mvn clean install -l {{zuul_output_dir }}/logs/maven-build.log"
       args:
         chdir: "{{ zuul.project.src_dir }}"
       become: yes
@@ -20,6 +23,6 @@
     - name: export artifacts
       shell: >
         cp {{ansible_user_dir}}/{{ zuul.project.src_dir }}/target/*.jar
-        {{ ansible_user_dir }}/logs/
+        {{ zuul_output_dir }}/logs/jars/
       when:
         - build_result.rc == 0

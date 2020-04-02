@@ -1,0 +1,13 @@
+---
+- hosts: server
+  tasks:
+    - set_fact:
+        zuul_output_dir: "{{ ansible_user_dir }}/zuul-output"
+    - file:
+        path: "{{ zuul_output_dir }}/logs/keycloak/"
+        state: directory
+    - name: export keycloak logs
+      shell: >
+        cp /opt/jboss/keycloak/standalone/log/*
+        {{ zuul_output_dir }}/logs/keycloak/
+      become: true
