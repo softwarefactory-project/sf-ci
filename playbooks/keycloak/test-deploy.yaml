@@ -2,7 +2,7 @@
 - hosts: server
   tasks:
     - file:
-        path: "{{ ansible_user_dir }}/logs"
+        path: "{{ zuul_output_dir }}/logs"
         state: directory
 
     - name: Install maven
@@ -22,7 +22,7 @@
 
     - command: >
         /usr/bin/mvn clean install -l
-        {{ ansible_user_dir }}/logs/{{ item.item.project.short_name }}-maven-build.log
+        {{ zuul_output_dir }}/logs/{{ item.item.project.short_name }}-maven-build.log
       args:
         chdir: "{{ ansible_user_dir}}/{{ item.item.project.src_dir }}"
       when: "item.stat.exists"
@@ -30,7 +30,7 @@
 
     - shell: >
         cp {{ansible_user_dir}}/{{ item.item.project.src_dir }}/target/*dependencies.jar
-        {{ ansible_user_dir }}/logs/
+        {{ zuul_output_dir }}/logs/
       when: "item.stat.exists"
       loop: "{{ pom_stats.results }}"
 
@@ -57,7 +57,7 @@
         state: present
       become: true
 
-    - shell: ls {{ ansible_user_dir }}/logs/event-listener-*-dependencies.jar
+    - shell: ls {{ zuul_output_dir }}/logs/event-listener-*-dependencies.jar
       register: event_listener_jar_path
       ignore_errors: true
 
@@ -67,7 +67,7 @@
       when: event_listener_jar_path.rc == 0
       become: true
 
-    - shell: ls {{ ansible_user_dir }}/logs/github-ssh-mapper-*-dependencies.jar
+    - shell: ls {{ zuul_output_dir }}/logs/github-ssh-mapper-*-dependencies.jar
       register: github_ssh_mapper_jar_path
       ignore_errors: true
 
