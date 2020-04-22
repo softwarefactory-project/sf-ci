@@ -25,7 +25,7 @@
       include_role:
         name: run-sfconfig
       vars:
-        sfconfig_args: --provision-demo
+        sfconfig_args: --provision-demo --extra-logs
 
     - name: Run health-check
       include_role:

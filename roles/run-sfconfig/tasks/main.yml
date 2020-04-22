@@ -7,7 +7,7 @@
   loop:
     - arch.yaml
     - sfconfig.yaml
-  when:  sfconfig_args == '--recover'
+  when:  "'--recover' in sfconfig_args"
 
 - name: Ensure default_pods are not used
   command: |
@@ -23,7 +23,7 @@
 
 - name: Collect packages list
   include_tasks: collect_packages_list.yml
-  when:  sfconfig_args == '--upgrade'
+  when:  "'--upgrade' in sfconfig_args"
 
 - name: Allow users to have access to generated files
   include_role:

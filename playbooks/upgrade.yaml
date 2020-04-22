@@ -35,7 +35,7 @@
       include_role:
         name: run-sfconfig
       vars:
-        sfconfig_args: --upgrade
+        sfconfig_args: --upgrade --extra-logs
 
     - name: Run functional tests and health-check
       include_role:

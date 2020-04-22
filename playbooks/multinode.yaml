@@ -41,6 +41,8 @@
     - name: Run sfconfig
       include_role:
         name: run-sfconfig
+      vars:
+        sfconfig_args: --extra-logs
 
 - hosts: slave
   tasks:
@@ -76,6 +78,8 @@
     - name: Run sfconfig
       include_role:
         name: run-sfconfig
+      vars:
+        sfconfig_args: --extra-logs
 
 - hosts: master
   tasks:
@@ -97,7 +101,7 @@
       include_role:
         name: run-sfconfig
       vars:
-        sfconfig_args: --skip-install
+        sfconfig_args: --skip-install --extra-logs
 
     - name: Add resources in the config repo
       include_role:
@@ -109,7 +113,7 @@
       include_role:
         name: run-sfconfig
       vars:
-        sfconfig_args: --skip-install
+        sfconfig_args: --skip-install --extra-logs
 
 # this should not be needed but zuul didn't reconfigure when
 # base, config-check and config-update are added in the last

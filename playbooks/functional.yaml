@@ -22,6 +22,8 @@
     - name: Run sfconfig
       include_role:
         name: run-sfconfig
+      vars:
+         sfconfig_args: --extra-logs
 
     - name: Update hostname and fqdn to sftests.com
       include_role:
@@ -33,7 +35,7 @@
       include_role:
         name: run-sfconfig
       vars:
-        sfconfig_args: --skip-install --provision-demo
+        sfconfig_args: --skip-install --provision-demo --extra-logs
 
     - name: Run functional tests and health-check
       include_role:
@@ -59,7 +61,7 @@
       include_role:
         name: run-sfconfig
       vars:
-        sfconfig_args: --recover
+        sfconfig_args: --recover --extra-logs
 
 #    - name: Validate backup recovery
 #      include_role:
