@@ -15,7 +15,7 @@
   become: yes
 
 - name: Run sfconfig
-  command: 'sfconfig {{ sfconfig_args }}'
+  command: 'sfconfig {{ sfconfig_args }} --extra-logs'
   become: yes
 
 - name: Store package list
