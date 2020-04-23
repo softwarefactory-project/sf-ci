@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0b77a668_ed72f85d",
+        "filename": "playbooks/upgrade.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2020-04-23T12:11:57Z",
+      "side": 1,
+      "message": "Let\u0027s make this a job variable. If this increase the output too much then I would vote to keep it empty by default and only enable it speculatively when needed.",
+      "range": {
+        "startLine": 38,
+        "startChar": 32,
+        "endLine": 38,
+        "endChar": 45
+      },
+      "revId": "ac77f9b662c917b756553741dcd51b4777445a14",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
