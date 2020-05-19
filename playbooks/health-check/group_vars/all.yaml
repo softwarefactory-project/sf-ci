@@ -1,8 +1,6 @@
 ---
 # Keep created ressources, otherwise test artifacts are deleted
 keep: true
-# Use dynamic suffix for project name to create temporary project
-suffix: "-{{ ansible_date_time.epoch }}"
 # Default project name
 project: "zuul-basic{{ suffix }}"
 # Default node label
@@ -24,7 +22,7 @@ image_name: sfcentos
 
 # Gerritbot
 bot_name: health-check-bot
-channel_name: "irc-channel-health-check{{ suffix }}"
+channel_name: "irc-channel-health-check"
 
 # Zuul config
 zuul_config:

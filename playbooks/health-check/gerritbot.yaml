@@ -62,9 +62,6 @@
         commit_message: "Create new fake config change"
 
 - hosts: gerritbot
-  vars:
-    suffix: "{{ ansible_date_time.epoch }}"
-    channel_name: "irc-channel-health-check-{{ suffix }}"
   tasks:
     - name: Check for 'created' notification on new channel
       include_role:
