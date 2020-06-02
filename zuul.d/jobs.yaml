@@ -86,11 +86,12 @@
 
 - job:
     name: sf-tenants
-    ansible-version: 2.6
+    ansible-version: 2.7
     parent: sf-ci-multinode
     run: playbooks/multinode.yaml
     vars:
       sf_arch: minimal
+      sf_version: master
       show_hidden_logs: false
 
 - job:
