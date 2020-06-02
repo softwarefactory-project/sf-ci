@@ -21,6 +21,10 @@
             voting: false
             dependencies:
               - sf-rpm-build
+        - sf-ci-keycloak-migrate:
+            voting: false
+            dependencies:
+              - sf-rpm-build
         - sf-ci-upgrade-allinone:
             dependencies:
               - sf-rpm-build
