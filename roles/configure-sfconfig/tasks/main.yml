@@ -22,7 +22,7 @@
       loop: '{{ add_component }}'
       when: add_component
 
-    - name: Fix default nodeset to pod-centos-7
+    - name: Fix default nodeset to pod-fedora
       replace:
         path: /etc/software-factory/sfconfig.yaml
         regexp: "default_nodeset_label.*"
