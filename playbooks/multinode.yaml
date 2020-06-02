@@ -28,6 +28,8 @@
         - install-sfconfig
 
 - hosts: master
+  vars:
+    add_k1s_hypervisor: true
   tasks:
     - name: Configure sfconfig
       include_role:
@@ -77,6 +79,8 @@
         name: run-sfconfig
 
 - hosts: master
+  vars:
+    add_k1s_hypervisor: true
   tasks:
     - name: Fetch master CA pem file
       include_role:
