@@ -28,6 +28,9 @@
         - install-sfconfig
 
 - hosts: master
+  vars:
+    add_k1s_hypervisor: true
+    fqdn: sftests.com
   tasks:
     - name: Configure sfconfig
       include_role:
@@ -41,6 +44,17 @@
     - name: Run sfconfig
       include_role:
         name: run-sfconfig
+
+    - name: Reset the config repo
+      include_role:
+        name: health-check/config-repo-reset
+
+    - name: Add nodepool configuration in the config repo
+      include_role:
+        name: health-check/k1s
+        tasks_from: config_repo_nodepool_configuration
+      vars:
+        config_path: /var/lib/software-factory/health-check/config
 
 - hosts: slave
   tasks:
@@ -77,6 +91,8 @@
         name: run-sfconfig
 
 - hosts: master
+  vars:
+    add_k1s_hypervisor: true
   tasks:
     - name: Fetch master CA pem file
       include_role:
