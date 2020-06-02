@@ -1,5 +1,6 @@
 ---
-- hosts: install-server
+# TODO: when job works, ensure get-logs works with slave instance
+- hosts: install-server:master
   tasks:
     - name: Collect artifacts
       include_role:
