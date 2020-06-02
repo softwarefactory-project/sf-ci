@@ -1,0 +1,57 @@
+---
+- hosts: install-server
+  tasks:
+    - name: Prepare instance
+      include_role:
+        name: '{{ item }}'
+      loop:
+        - prepare-test-env
+        - install-stable-repository
+        - check-bubblewrap
+        - install-sfconfig
+        - configure-sfconfig
+        - configure-fqdn
+
+    - name: Deploy sf and setup test env
+      include_role:
+        name: '{{ item }}'
+      loop:
+        - run-sfconfig
+        - restore-ci-repo
+
+    - name: Run provisioner
+      include_role:
+        name: run-provisioner
+
+    - name: Update mirrors to use sfmaster
+      include_role:
+        name: install-ci-repository
+
+    - name: Update sfconfig package
+      include_role:
+        name: install-sfconfig
+
+    - name: Remove cauth, add keycloak role
+      include_role:
+        name: configure-sfconfig
+      vars:
+        add_component:
+          - component: keycloak
+            insertafter: gateway
+        unsupported_components:
+          - cauth
+
+    - name: Run sfconfig upgrade
+      include_role:
+        name: run-sfconfig
+      vars:
+        sfconfig_args: --upgrade
+
+    - name: Run functional tests and health-check
+      include_role:
+        name: '{{ item }}'
+      loop:
+        - setup-test-env
+#        - run-checker
+        - run-health-check
+        - run-functional-tests
