@@ -28,6 +28,10 @@
         - install-sfconfig
 
 - hosts: master
+  vars:
+    add_k1s_hypervisor: true
+    fqdn: sftests.com
+    config_path: /var/lib/software-factory/health-check/config
   tasks:
     - name: Configure sfconfig
       include_role:
@@ -41,6 +45,36 @@
     - name: Run sfconfig
       include_role:
         name: run-sfconfig
+
+    - name: Reset the config repo
+      include_role:
+        name: health-check/config-repo-reset
+
+    - name: Create git config for root
+      command: "{{ item }}"
+      args:
+        chdir: "{{ config_path }}"
+      loop:
+        - "git config --global user.email admin@{{ fqdn }}"
+        - "git config --global user.name admin"
+        - "git config --add gitreview.username admin"
+      become: yes
+
+    - name: Create git config
+      command: "{{ item }}"
+      args:
+        chdir: "{{ config_path }}"
+      loop:
+        - "git config --global user.email admin@{{ fqdn }}"
+        - "git config --global user.name admin"
+        - "git config --add gitreview.username admin"
+
+    - name: Add nodepool configuration in the config repo
+      include_role:
+        name: health-check/k1s
+        tasks_from: config_repo_nodepool_configuration
+      vars:
+        push_change: true
 
 - hosts: slave
   tasks:
@@ -77,6 +111,8 @@
         name: run-sfconfig
 
 - hosts: master
+  vars:
+    add_k1s_hypervisor: true
   tasks:
     - name: Fetch master CA pem file
       include_role:
