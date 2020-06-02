@@ -94,6 +94,15 @@
       unsupported_components:
         - cauth
 
+- job:
+    name: sf-ci-keycloak-migrate
+    description: Test a migration to keycloak while updating
+    parent: sf-ci
+    run: playbooks/keycloak-migrate.yaml
+    vars:
+      sf_arch: all-in-one
+      sf_version: 3.4
+      show_hidden_logs: true
 
 - job:
     name: sf-ci-upgrade-minimal
