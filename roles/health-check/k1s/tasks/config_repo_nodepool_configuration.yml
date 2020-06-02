@@ -39,4 +39,16 @@
     - name: Submit review
       include_role:
         name: health-check/config-repo-submit-change
+      when: push_change is not True
   when: nodepool_conf is changed
+
+- name: Force Push change
+  block:
+    - name: push change
+      command: chdr={{ config_path }} git push git+ssh://gerrit/config master
+    - name: Check if config update
+      include_role:
+        name: wait_for_config_update
+  when:
+    - nodepool_conf is changed
+    - push_change is true
