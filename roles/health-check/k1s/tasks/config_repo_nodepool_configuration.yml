@@ -39,4 +39,8 @@
     - name: Submit review
       include_role:
         name: health-check/config-repo-submit-change
+
+    - name: Check if config update
+      include_role:
+        name: wait_for_config_update
   when: nodepool_conf is changed
