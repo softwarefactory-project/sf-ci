@@ -1,7 +1,7 @@
 resources:
   projects:
     ichiban-cloud:
-      tenant: slave
+      tenant: worker
       description: The best cloud platform engine
       contacts:
         - contacts@ichiban-cloud.io
@@ -53,9 +53,9 @@ resources:
   groups:
     ichiban-ptl:
       members:
-        - admin@slave.sftests.com
+        - admin@worker.sftests.com
       description: Project Techincal Leaders of ichiban-cloud
     ichiban-core:
       members:
-        - admin@slave.sftests.com
+        - admin@worker.sftests.com
       description: Project Core of ichiban-cloud

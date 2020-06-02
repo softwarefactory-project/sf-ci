@@ -1,5 +1,5 @@
 ---
-- hosts: install-server
+- hosts: install-server:master:worker
   tasks:
     - name: Collect artifacts
       include_role:

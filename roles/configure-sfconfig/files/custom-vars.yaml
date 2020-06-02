@@ -6,5 +6,5 @@ nodepool_loglevel: DEBUG
 zuul_default_retry_attempts: 3
 
 # Enable using hypervisor role on the install-server
-enable_insecure_slaves: true
+enable_insecure_workers: true
 enable_insecure_workers: true

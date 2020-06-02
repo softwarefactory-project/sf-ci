@@ -1,14 +1,14 @@
 ---
 - hosts: master
   tasks:
-    - name: Get slave ip in /etc/hosts files (configured by multinode parent)
-      command: awk '/slave/ {print $1}' /etc/hosts
-      register: host_slave_ip
+    - name: Get worker ip in /etc/hosts files (configured by multinode parent)
+      command: awk '/worker/ {print $1}' /etc/hosts
+      register: host_worker_ip
 
     - set_fact:
-        slave_ip: '{{ host_slave_ip.stdout }}'
+        worker_ip: '{{ host_worker_ip.stdout }}'
 
-- hosts: slave
+- hosts: worker
   tasks:
     - name: Get master ip in /etc/hosts files (configured by multinode parent)
       command: awk '/master/ {print $1}' /etc/hosts
@@ -28,6 +28,8 @@
         - install-sfconfig
 
 - hosts: master
+  vars:
+    add_k1s_hypervisor: true
   tasks:
     - name: Configure sfconfig
       include_role:
@@ -42,7 +44,7 @@
       include_role:
         name: run-sfconfig
 
-- hosts: slave
+- hosts: worker
   tasks:
     - name: Fetch master CA pem file
       include_role:
@@ -54,7 +56,7 @@
       include_role:
         name: configure-fqdn
       vars:
-        domain: slave.sftests.com
+        domain: worker.sftests.com
 
     - name: Configure sfconfig
       include_role:
@@ -77,20 +79,22 @@
         name: run-sfconfig
 
 - hosts: master
+  vars:
+    add_k1s_hypervisor: true
   tasks:
     - name: Fetch master CA pem file
       include_role:
         name: fetch-ca-pem
       vars:
-        instance: slave
+        instance: worker
 
     - name: Add gerrit connection in sfconfig.yaml
       include_role:
         name: configure-sfconfig
       vars:
         sf_main_instance: true
-        static_hostname_ip: '{{ slave_ip }}'
-        static_hostname_fqdn: slave.sftests.com
+        static_hostname_ip: '{{ worker_ip }}'
+        static_hostname_fqdn: worker.sftests.com
 
     - name: Run sfconfig to apply configuration
       include_role:
@@ -102,7 +106,7 @@
       include_role:
         name: configure-resource
 
-- hosts: slave
+- hosts: worker
   tasks:
     - name: Run sfconfig to finalize configuration
       include_role:
@@ -112,20 +116,20 @@
 
 # this should not be needed but zuul didn't reconfigure when
 # base, config-check and config-update are added in the last
-# commit of the slave/config.
+# commit of the worker/config.
 - hosts: master
   tasks:
     - name: Force scheduler reconfiguration
       command: zuul-scheduler full-reconfigure
       become: true
 
-- hosts: slave
+- hosts: worker
   tasks:
     - name: Add resources in tenant
       include_role:
         name: health-check/add_resources
       vars:
-        fqdn: slave.sftests.com
+        fqdn: worker.sftests.com
         resource_file: ichiban.yaml
         tenant_deployment: True
 
@@ -133,18 +137,18 @@
       include_role:
         name: health-check/create_zuul_project
       vars:
-        fqdn: slave.sftests.com
+        fqdn: worker.sftests.com
         project: ichiban-compute
 
     - name: Validate project data are present on CodeSearch
       include_role:
         name: health-check/validate_project
       vars:
-        service_uri: 'http://managesf.slave.sftests.com:6080/api/v1/search?q=TestHello&i=nope&files=&repos=ichiban-compute'
+        service_uri: 'http://managesf.worker.sftests.com:6080/api/v1/search?q=TestHello&i=nope&files=&repos=ichiban-compute'
         service_until_condition: _result.json['Results']['ichiban-compute']['FilesWithMatch'] == 1
 
     - name: Validate project is present on RepoXplorer
       include_role:
         name: health-check/validate_project
       vars:
-        service_uri: 'http://repoxplorer.slave.sftests.com:20002/api/v1/commits/commits?pid=ichiban-cloud'
+        service_uri: 'http://repoxplorer.worker.sftests.com:20002/api/v1/commits/commits?pid=ichiban-cloud'
