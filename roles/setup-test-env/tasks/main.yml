@@ -1,3 +1,9 @@
+- name: Ensure that python-nose is not installed
+  yum:
+    name: python-nose
+    state: absent
+  become: yes
+
 - name: Ensure test tools are installed
   yum:
     name:
