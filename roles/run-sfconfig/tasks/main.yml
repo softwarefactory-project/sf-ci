@@ -9,11 +9,6 @@
     - sfconfig.yaml
   when:  sfconfig_args == '--recover'
 
-- name: Ensure default_pods are not used
-  command: |
-    sed -e 's/k1s_default_pods.*/k1s_default_pods: false/' -i /etc/software-factory/sfconfig.yaml
-  become: yes
-
 - name: Run sfconfig
   command: 'sfconfig {{ sfconfig_args }}'
   become: yes
