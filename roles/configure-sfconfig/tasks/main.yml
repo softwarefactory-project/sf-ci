@@ -7,13 +7,6 @@
         dest: /etc/software-factory/arch.yaml
         remote_src: true
 
-    - name: Activate hypervisor-oci role in arch.yaml
-      lineinfile:
-        path: /etc/software-factory/arch.yaml
-        insertafter: '      - nodepool-launcher'
-        line: '      - hypervisor-oci'
-      when: add_runc_hypervisor
-
     - name: Activate hypervisor-k1s role in arch.yaml
       lineinfile:
         path: /etc/software-factory/arch.yaml
@@ -28,6 +21,12 @@
         line: '      - {{ item.component }}'
       loop: '{{ add_component }}'
       when: add_component
+
+    - name: Fix default nodeset to pod-centos-7
+      replace:
+        path: /etc/software-factory/sfconfig.yaml
+        regexp: runc-centos
+        replace: pod-centos-7
 
     - name: Install extra custom-vars for ci tunning
       copy:
