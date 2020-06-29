@@ -61,7 +61,6 @@
         name: configure-sfconfig
       vars:
         sf_arch: tenant-minimal
-        add_runc_hypervisor: false
         add_component:
           - component: gerrit
             insertafter: cauth

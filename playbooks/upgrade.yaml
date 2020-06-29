@@ -31,6 +31,21 @@
       include_role:
         name: install-sfconfig
 
+    # Remove next two tasks once sf-3.5 is released
+    - name: Activate hypervisor-k1s role in arch.yaml
+      become: yes
+      lineinfile:
+        path: /etc/software-factory/arch.yaml
+        insertafter: '      - nodepool-launcher'
+        line: '      - hypervisor-k1s'
+
+    - name: Patch k1s/centos image to include yamllint for health-check job
+      become: yes
+      shell: |
+        CTX=$(buildah from localhost/k1s/centos-7)
+        buildah run $CTX pip3 install yamllint
+        buildah commit --rm $CTX localhost/k1s/centos-7
+
     - name: Run sfconfig upgrade
       include_role:
         name: run-sfconfig
