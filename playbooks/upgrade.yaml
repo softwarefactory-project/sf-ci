@@ -31,6 +31,13 @@
       include_role:
         name: install-sfconfig
 
+    - name: Activate hypervisor-k1s role in arch.yaml
+      become: yes
+      lineinfile:
+        path: /etc/software-factory/arch.yaml
+        insertafter: '      - nodepool-launcher'
+        line: '      - hypervisor-k1s'
+
     - name: Run sfconfig upgrade
       include_role:
         name: run-sfconfig
