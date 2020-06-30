@@ -187,11 +187,16 @@ class TestGateway(Base):
         else:
             url = config.GATEWAY_URL + "/analytics/app/kibana"
 
+        if int(data['version']['number'].split('.')[0]) >= 7:
+            kibana_title = '<title>Elastic</title>'
+        else:
+            kibana_title = '<title>Kibana</title>'
+
         # Without SSO cookie. Note that auth is no longer enforced
 
         resp = requests.get(url)
         self.assertEqual(resp.status_code, 200)
-        self.assertTrue('<title>Kibana</title>' in resp.text)
+        self.assertTrue(kibana_title in resp.text)
 
     @skipIfServiceMissing('zuul')
     def test_zuul_accessible(self):
