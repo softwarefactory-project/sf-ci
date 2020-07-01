@@ -1,0 +1,18 @@
+---
+- name: Install makelogs
+  command: |
+    npm install -g @elastic/makelogs
+
+- name: Generate logs
+  command: |
+    /bin/makelogs --url http://{{ ansible_host }}:9200 -d 70 --verbose
+
+- name: Executing create_index curator rule
+  command:
+    /bin/curator --config /etc/logstash/curator.yml /etc/logstash/delete_old_indices.yml
+  register: old_indices
+
+- name: Check if outpus is ok
+  fail:
+    msg: "Curator did not delete any index. Failing"
+  when: "'---deleting index logstash-0' not in old_indices.stdout"
