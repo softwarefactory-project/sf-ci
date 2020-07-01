@@ -1,0 +1,58 @@
+---
+- name: Ensure that npm is already instaleld
+  yum:
+    name: rh-nodejs10-npm
+    state: present
+
+- name: Install makelogs
+  shell: |
+    source scl_source enable rh-nodejs10 ;
+    npm install -g "@elastic/makelogs"
+
+- name: Generate logs
+  shell: |
+    source scl_source enable rh-nodejs10 ;
+    makelogs --url http://{{ fqdn }}:9200 -d 100/10 --verbose --no-reset
+
+- name: Create delete_old_indices curator file
+  copy:
+    content: |
+      actions:
+        1:
+          action: delete_indices
+          description: >-
+              Delete data from logstash
+          options:
+            ignore_empty_list: True
+            disable_action: False
+          filters:
+          - filtertype: pattern
+            kind: prefix
+            value: logstash-
+            exclude:
+          - filtertype: age
+            source: field_stats
+            direction: older
+            unit: days
+            unit_count: 3
+            field: '@timestamp'
+            stats_result: min_value
+    dest: delete-test-index.yml
+
+- name: Executing create_index curator rule
+  shell: |
+    /bin/curator --config /etc/logstash/curator.yml delete-test-index.yml
+  register: old_indices
+
+- name: test
+  fail:
+    msg: "{{ old_indices.stdout }}"
+
+- name: Check if outpus is wrong
+  fail:
+    msg: "Curator did not delete any index. Failing"
+  when: "'---deleting index logstash-0' not in old_indices.stdout"
+
+- name: Show output when all is fine
+  debug:
+    var: old_indices
