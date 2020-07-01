@@ -1,0 +1,44 @@
+---
+- name: Ensure that npm is already instaleld
+  yum:
+    name: rh-nodejs10-npm
+    state: present
+
+- name: Install makelogs
+  shell: |
+    source scl_source enable rh-nodejs10 ;
+    npm install -g "@elastic/makelogs"
+
+- name: Generate logs
+  shell: |
+    source scl_source enable rh-nodejs10 ;
+    makelogs --url http://{{ ansible_host }}:9200 -d 100 --verbose --indexPrefix myindex --no-reset
+
+- name: Create delete_old_indices curator file
+  copy:
+    content: |
+      ---
+      actions:
+        1:
+          action: delete_indices
+          description: >-
+              Delete data from myindex
+          options:
+            ignore_empty_list: True
+            disable_action: False
+          filters:
+          - filtertype: pattern
+            kind: regex
+            value: '^myindex.'
+            exclude:
+    dest: delete-myindex.yml
+
+- name: Executing create_index curator rule
+  shell: |
+    /bin/curator --config /etc/logstash/curator.yml delete-myindex.yml
+  register: old_indices
+
+- name: Check if outpus is wrong
+  fail:
+    msg: "Curator did not delete any index. Failing"
+  when: "'---deleting index myindex0' not in old_indices.stdout"
