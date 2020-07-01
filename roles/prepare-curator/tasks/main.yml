@@ -1,0 +1,125 @@
+---
+- name: Set required facts
+  set_fact:
+    elasticsearch_version: 7.3.1-linux-x86_64
+    curator_version: 5.8
+
+- name: Install curator test required packages
+  yum:
+    name:
+      - git
+      - java-1.8.0-openjdk-headless.x86_64
+      - python3-devel
+      - libyaml-devel.x86_64
+      - "@Development tools"
+			- python3-requests_aws4auth
+			- python3-boto3
+			- python3-botocore
+			- python3-idna
+			- python3-pyyaml
+			- python3-s3transfer
+      - python3-urllib3
+      - python3-elasticsearch
+      - python3-voluptuous
+      - python3-requests
+      - python3-click
+      - python3-certifi
+      - python3-six
+    state: latest
+  become: true
+
+- name: Download elasticsearch
+  command: |
+    curl -OL "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-{{ elasticsearch_version }}.tar.gz"
+
+- name: Create elasticsearch required dirs
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - elasticsearch
+    - config
+
+- name: Unpack elasticsearch
+  command: |
+    tar -xzf elasticsearch-{{ elasticsearch_version }}.tar.gz --strip-components=1 -C ./elasticsearch/.
+
+- name: Create elasticsearch config file
+  copy:
+    content: |
+      # Taken from: https://raw.githubusercontent.com/elastic/curator/5.8.0/travis-run.sh
+      network.host: 127.0.0.1
+      http.port: 9200
+      cluster.name: local
+      node.name: local
+      node.max_local_storage_nodes: 2
+      transport.port: 9300
+      discovery.seed_hosts: ["localhost:9300"]
+      discovery.type: single-node
+      xpack.monitoring.enabled: false
+      node.ml: false
+      xpack.security.enabled: false
+      xpack.watcher.enabled: false
+      path.repo: /
+      reindex.remote.whitelist: localhost:9201
+    dest: config/elasticsearch.yml
+
+- name: Create jvm options file
+  copy:
+    content: |
+      # Taken from: https://raw.githubusercontent.com/elastic/curator/5.8.0/travis-run.sh
+      -Xms1g
+      -Xmx1g
+      -XX:+UseConcMarkSweepGC
+      -XX:CMSInitiatingOccupancyFraction=75
+      -XX:+UseCMSInitiatingOccupancyOnly
+      -Des.networkaddress.cache.ttl=60
+      -Des.networkaddress.cache.negative.ttl=10
+      -XX:+AlwaysPreTouch
+      -Xss1m
+      -Djava.awt.headless=true
+      -Dfile.encoding=UTF-8
+      -Djna.nosys=true
+      -XX:-OmitStackTraceInFastThrow
+      -Dio.netty.noUnsafe=true
+      -Dio.netty.noKeySetOptimization=true
+      -Dio.netty.recycler.maxCapacityPerThread=0
+      -Dlog4j.shutdownHookEnabled=false
+      -Dlog4j2.disable.jmx=true
+      -Djava.io.tmpdir=${ES_TMPDIR}
+      -XX:+HeapDumpOnOutOfMemoryError
+      -XX:HeapDumpPath=data
+      -XX:ErrorFile=logs/hs_err_pid%p.log
+      8:-XX:+PrintGCDetails
+      8:-XX:+PrintGCDateStamps
+      8:-XX:+PrintTenuringDistribution
+      8:-XX:+PrintGCApplicationStoppedTime
+      8:-Xloggc:logs/gc.log
+      8:-XX:+UseGCLogFileRotation
+      8:-XX:NumberOfGCLogFiles=32
+      8:-XX:GCLogFileSize=64m
+      9-:-Xlog:gc*,gc+age=trace,safepoint:file=logs/gc.log:utctime,pid,tags:filecount=32,filesize=64m
+      9-:-Djava.locale.providers=COMPAT
+    dest: config/jvm.options
+
+- name: Copy log4j2 property file
+  copy:
+    src: elasticsearch/config/log4j2.properties
+    dest: config/log4j2.properties
+    remote_src: true
+
+- name: Start elasticsearch in backgroud
+  shell: |
+    ES_PATH_CONF=$(pwd)/config $(pwd)/elasticsearch/bin/elasticsearch  > /tmp/elastic.log &
+    sleep 20
+    curl http://127.0.0.1:9200 && echo "Elasticsearch is up!" || cat /tmp/elastic.log ./elasticsearch/logs/local.log
+
+- name: Clone curator
+  git:
+    repo: https://github.com/elastic/curator
+    dest: curator
+    version: "{{ curator_version }}"
+
+- name: Remove all dependencies from requirements.txt setup.py and setup.cfg
+  shell: |
+    for req in $(cat curator/requirements.txt | cur -f1 -d'='); do sed -i '/$req/d' curator/setup.py curator/setup.cfg curator/requirements.txt; done

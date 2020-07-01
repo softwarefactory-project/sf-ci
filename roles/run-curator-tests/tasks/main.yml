@@ -1,0 +1,5 @@
+---
+- name: Run tests
+  shell: |
+    cd curator
+    python3 setup.py test
