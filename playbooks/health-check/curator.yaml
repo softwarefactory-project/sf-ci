@@ -1,0 +1,5 @@
+---
+- hosts: install-server
+  tasks:
+    - name: Check curator
+      include_role: health-check/check-curator
