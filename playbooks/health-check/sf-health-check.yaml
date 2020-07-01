@@ -10,3 +10,7 @@
 - name: Run health-check gerritbot
   import_playbook: gerritbot.yaml
   when: '"gerritbot" in roles'
+
+- name: Run health-check curator
+  import_playbook: curator.yaml
+  when: '"elasticsearch" in roles'
