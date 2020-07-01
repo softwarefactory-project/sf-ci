@@ -1,0 +1,10 @@
+---
+- hosts: install-server
+  tasks:
+    - name: Prepare instance
+      include_role:
+        name: '{{ item }}'
+      loop:
+        - prepare-test-env
+        - run-provisioner
+        - check-curator
