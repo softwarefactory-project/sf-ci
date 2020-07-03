@@ -25,8 +25,8 @@
     - name: Fix default nodeset to pod-centos-7
       replace:
         path: /etc/software-factory/sfconfig.yaml
-        regexp: runc-centos
-        replace: pod-centos-7
+        regexp: "default_nodeset_label.*"
+        replace: "default_nodeset_label: pod-fedora"
 
     - name: Install extra custom-vars for ci tunning
       copy:
