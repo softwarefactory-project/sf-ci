@@ -1,11 +1,11 @@
 ---
-- name: Run health-check zuul
-  import_playbook: zuul.yaml
-  when: '"zuul" in roles'
-
 - name: Run health-check k1s
   import_playbook: k1s.yaml
   when: '"hypervisor-k1s" in roles'
+
+- name: Run health-check zuul
+  import_playbook: zuul.yaml
+  when: '"zuul" in roles'
 
 - name: Run health-check gerritbot
   import_playbook: gerritbot.yaml
