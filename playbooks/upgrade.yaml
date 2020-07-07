@@ -41,15 +41,6 @@
         insertafter: '      - nodepool-launcher'
         line: '      - hypervisor-k1s'
 
-    - name: Patch k1s/centos image to include yamllint for health-check job
-      become: yes
-      shell: |
-        cp /usr/share/sf-config/ansible/roles/sf-repos/files/config/containers/centos-7/Dockerfile /root/config/containers/centos-7/Dockerfile
-        cd /root/config
-        git commit -a -m "Force update centos-7"
-        git remote add gerrit ssh://admin@sftests.com:29418/config
-        git push gerrit master
-
     - name: Run sfconfig upgrade
       include_role:
         name: run-sfconfig
