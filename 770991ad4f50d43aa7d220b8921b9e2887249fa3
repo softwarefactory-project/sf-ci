@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1ef6c5d1_2022ee94",
+        "filename": "playbooks/upgrade.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-07-07T13:35:35Z",
+      "side": 1,
+      "message": "its not better to add regex?",
+      "range": {
+        "startLine": 41,
+        "startChar": 22,
+        "endLine": 41,
+        "endChar": 28
+      },
+      "revId": "770991ad4f50d43aa7d220b8921b9e2887249fa3",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
