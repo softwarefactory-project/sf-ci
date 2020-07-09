@@ -16,6 +16,24 @@
       "revId": "f8b75f39a8d1a7adeee23b25426e9f3529864c11",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "08576324_27edfcdc",
+        "filename": "roles/health-check/check-curator/tasks/main.yml",
+        "patchSetId": 19
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-07-09T13:15:34Z",
+      "side": 1,
+      "message": "it does not metter, but it can be logstash-",
+      "parentUuid": "3fc17f2a_12bc670f",
+      "revId": "f8b75f39a8d1a7adeee23b25426e9f3529864c11",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
