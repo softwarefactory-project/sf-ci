@@ -11,3 +11,10 @@
         cp /opt/jboss/keycloak/standalone/log/*
         {{ zuul_output_dir }}/logs/keycloak/
       become: true
+    - name: export MQTT logs
+      shell: >
+        cp /var/log/keycloak_mqtt.log {{ zuul_output_dir }}/logs/keycloak/
+      become: true
+    - name: export screencast
+      shell: >
+        cp /tmp/screencast.mp4 {{ zuul_output_dir }}/logs/screencast.mp4
