@@ -1,0 +1,12 @@
+[Unit]
+Description=ffmpeg screen video capture daemon
+
+[Service]
+User=root
+Group=root
+ExecStart=/usr/bin/podman run --privileged --net host -v /tmp/.X11-unix:/tmp/.X11-unix -v /tmp:/tmp -e HOME=/tmp -e DISPLAY=:99 --rm -it mhuin/ffmpeg-x11grab -f x11grab -video_size 1280x720 -i :99 -vcodec h264 -framerate 15 /tmp/screencast.mp4
+# KillSignal=SIGINT
+ExecStop=/usr/bin/podman kill -l --signal=SIGINT
+
+[Install]
+WantedBy=multi-user.target
