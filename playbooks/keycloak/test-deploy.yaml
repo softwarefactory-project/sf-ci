@@ -31,7 +31,7 @@
       loop: "{{ pom_stats.results }}"
 
     - shell: >
-        cp {{ansible_user_dir}}/{{ item.item.project.src_dir }}/target/*dependencies.jar
+        cp {{ansible_user_dir}}/{{ item.item.project.src_dir }}/target/*.jar
         {{ zuul_output_dir }}/logs/jars
       when: "item.stat.exists"
       loop: "{{ pom_stats.results }}"
@@ -44,6 +44,7 @@
         gpgcheck: no
       become: true
       when: buildset_artifacts_url is defined
+
     - name: Install SF master repository if there is no pre-build
       become: true
       yum_repository:
@@ -59,7 +60,17 @@
         state: present
       become: true
 
-    - shell: ls {{ zuul_output_dir }}/logs/jars/event-listener-*-dependencies.jar
+    - name: Configure standalone deployment
+      copy:
+        src: standalone.xml
+        dest: /opt/jboss/keycloak/standalone/configuration/standalone.xml
+        mode: '0440'
+        owner: keycloak
+        group: keycloak
+      become: true
+
+    - name: Detect dependency build of the MQTT event listener extension
+      shell: ls {{ zuul_output_dir }}/logs/jars/event-listener-*-dependencies.jar
       register: event_listener_jar_path
       ignore_errors: true
 
@@ -69,7 +80,8 @@
       when: event_listener_jar_path.rc == 0
       become: true
 
-    - shell: ls {{ zuul_output_dir }}/logs/jars/github-ssh-mapper-*-dependencies.jar
+    - name: Detect dependency build of the Github SSH key mapper
+      shell: ls {{ zuul_output_dir }}/logs/jars/github-ssh-mapper-*.jar
       register: github_ssh_mapper_jar_path
       ignore_errors: true
 
@@ -77,6 +89,41 @@
         cp {{ github_ssh_mapper_jar_path.stdout|trim }}
         /opt/jboss/keycloak/standalone/deployments/github-ssh-mapper.jar
       when: github_ssh_mapper_jar_path.rc == 0
+      become: true
+
+    - name: Install SF master repository to install mosquitto
+      become: true
+      yum_repository:
+        name: sf-master
+        description: SF master repository
+        baseurl: https://softwarefactory-project.io/kojifiles/repos/sf-master-el7/
+        gpgcheck: no
+
+    - name: install mosquitto
+      package:
+        name: mosquitto
+        state: present
+      become: true
+
+    - name: Start MQTT service
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: mosquitto
+      become: true
+
+    - name: Install mosquitto_sub service
+      copy:
+        src: mosquitto-client-tests.service
+        dest: /lib/systemd/system/mosquitto-client-tests.service
+        mode: 0640
+      become: true
+
+    - name: Start mosquitto_sub service
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: mosquitto-client-tests
       become: true
 
     - name: Create admin user
@@ -107,6 +154,136 @@
         -s enabled=true
         --no-config --server http://localhost:8080/auth --realm master --user admin --password admin
 
+    - name: Activate the MQTT event listener
+      command: |
+        /opt/jboss/keycloak/bin/kcadm.sh update events/config
+            -r test
+            -s 'eventsListeners=["jboss-logging","mqtt"]'
+            -s eventsEnabled=true
+            -s enabledEventTypes=[]
+            --no-config --server http://localhost:8080/auth --realm master --user admin --password admin
+
+    - name: create a realm user
+      command: >
+        /opt/jboss/keycloak/bin/kcadm.sh create users
+            -r test
+            -s 'username=testuser'
+            -s 'email=testuser@testdomain.com'
+            -s 'firstName=test'
+            -s 'lastName=user'
+            -s 'enabled=true'
+            --no-config --server http://localhost:8080/auth --realm master --user admin --password admin
+
+    - name: retrieve user info
+      command: >
+        /opt/jboss/keycloak/bin/kcadm.sh get users
+            -r test
+            -q username=testuser
+            --no-config --server http://localhost:8080/auth --realm master --user admin --password admin
+      register: testuser_info
+
+    - debug:
+        var: testuser_info.stdout_lines[1:]
+        verbosity: 0
+
+    - name: set user info as fact
+      set_fact:
+        testuser: "{{ testuser_info.stdout_lines[1:] | join('\n') | from_json }}"
+
+    - debug:
+        var: testuser
+        verbosity: 0
+
+    - name: set test user password
+      command: >
+        /opt/jboss/keycloak/bin/kcadm.sh set-password
+            -r test
+            --userid {{ testuser[0]['id'] }}
+            --new-password testpassword
+            --no-config --server http://localhost:8080/auth --realm master --user admin --password admin
+
+    - name: attempt cURL login
+      uri:
+        url: http://localhost:8080/auth/realms/test/protocol/openid-connect/token
+        method: POST
+        body:
+          client_id: admin-cli
+          username: testuser
+          password: testpassword
+          grant_type: password
+        status_code: 200
+        body_format: form-urlencoded
+      register: token
+      failed_when: "'access_token' not in token.json"
+
+    # The secret being exposed here is not a big deal. The authorized callback URL for this app is localhost, thus greatly limiting attack surfaces.
+    - name: Create a github identity provider
+      command: |
+        /opt/jboss/keycloak/bin/kcadm.sh create identity-provider/instances
+            -r test
+            -s alias=github
+            -s providerId=github
+            -s enabled=true
+            -s 'config.useJwksUrl="true"'
+            -s config.clientId=fbf3c0514eb3b0180911
+            -s config.clientSecret=ad79036c04f777d149e5c66a365f53a75a8cd65d
+            --no-config --server http://localhost:8080/auth --realm master --user admin --password admin
+
+    - name: Create the SSH key mapper
+      command: |
+        /opt/jboss/keycloak/bin/kcadm.sh create identity-provider/instances/github/mappers
+            -r test
+            -s name=pubkey_mapper
+            -s identityProviderMapper=github-ssh-key-mapper
+            -s 'config={"keyAttribute":"publicKey"}'
+            -s identityProviderAlias=github
+            --no-config --server http://localhost:8080/auth --realm master --user admin --password admin
+
+    - name: Install dependencies for GUI login testing
+      yum:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - "@X Window System"
+        # - "@Desktop"
+        - "@Fonts"
+        - firefox
+        - ImageMagick
+        - Xvfb
+        - tmux
+        - python3-pip
+        - podman
+      become: true
+
+    - name: install python-selenium via pip
+      pip:
+        name: selenium
+        executable: pip3
+
+    - name: Start Xvfb as a background process
+      shell: "(Xvfb :99 -screen 0 1280x720x16 > /dev/null 2>&1 &)"
+
+    # - name: Fail to trigger a autohold
+    #   fail:
+    #     msg: REMOVE ME!
+
+    - name: Start the screen capture service
+      shell: "tmux new-session -d -s RecordThis 'podman run --privileged --net host -v /tmp/.X11-unix:/tmp/.X11-unix -v $PWD:$HOME -e HOME=$HOME -e DISPLAY=:99 --rm -it mhuin/ffmpeg-x11grab -f x11grab -video_size 1280x720 -i ${DISPLAY} -vcodec h264 -framerate 15 $HOME/screencast.mp4'"
+
+    - name: Start headless firefox as a background process
+      shell: "(DISPLAY=:99 firefox http://localhost:8080/auth/realms/test/account/ > /dev/null 2>&1 &)"
+
+    - name: pause the playbook
+      pause:
+        seconds: 15
+
+    - name: Stop the screen capture service
+      shell: "tmux send-keys -t RecordThis q"
+
+    - name: pause the playbook to finish the recording
+      pause:
+        seconds: 15
+
     - name: Stop service
       service:
         name: keycloak
@@ -121,3 +298,6 @@
       check_mode: yes
       register: fatality
       failed_when: fatality is not changed
+
+    - name: Check logging of a log in event
+      command: grep \'LOGIN\' /var/log/keycloak_mqtt.log
