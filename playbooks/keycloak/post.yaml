@@ -1,13 +1,34 @@
 ---
 - hosts: server
   tasks:
+    - name: Stop the screen capture service
+      service:
+        name: x11grab
+        state: stopped
+      become: true
+
+    - name: pause the playbook to finish the recording
+      pause:
+        seconds: 15
+
     - set_fact:
         zuul_output_dir: "{{ ansible_user_dir }}/zuul-output"
+
     - file:
         path: "{{ zuul_output_dir }}/logs/keycloak/"
         state: directory
+
     - name: export keycloak logs
       shell: >
         cp /opt/jboss/keycloak/standalone/log/*
         {{ zuul_output_dir }}/logs/keycloak/
       become: true
+
+    - name: export MQTT logs
+      shell: >
+        cp /var/log/keycloak_mqtt.log {{ zuul_output_dir }}/logs/keycloak/
+      become: true
+
+    - name: export screencast
+      shell: >
+        cp /tmp/screencast.mp4 {{ zuul_output_dir }}/logs/screencast.mp4

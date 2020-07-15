@@ -1,0 +1,10 @@
+[Unit]
+Description=Keycloak MQTT event listener daemon
+
+[Service]
+User=root
+Group=root
+ExecStart=/bin/bash -c 'exec /usr/bin/mosquitto_sub -t "#" > /var/log/keycloak_mqtt.log'
+
+[Install]
+WantedBy=multi-user.target
