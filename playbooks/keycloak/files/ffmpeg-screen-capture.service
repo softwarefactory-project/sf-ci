@@ -1,0 +1,12 @@
+[Unit]
+Description=ffmpeg screen video capture daemon
+
+[Service]
+User=root
+Group=root
+ExecStart=/bin/bash -c 'tmux new-session -d -s RecordThis "ffmpeg -f x11grab -video_size 1280x720 -i 127.0.0.1:99 -codec:v libx264 -r 12 /var/log/screencast.mp4"'
+'
+ExecStop=/bin/bash -c 'tmux send-keys -t RecordThis q'
+
+[Install]
+WantedBy=multi-user.target
