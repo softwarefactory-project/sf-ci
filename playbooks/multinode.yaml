@@ -1,14 +1,14 @@
 ---
 - hosts: master
   tasks:
-    - name: Get slave ip in /etc/hosts files (configured by multinode parent)
-      command: awk '/slave/ {print $1}' /etc/hosts
-      register: host_slave_ip
+    - name: Get tenant ip in /etc/hosts files (configured by multinode parent)
+      command: awk '/tenant/ {print $1}' /etc/hosts
+      register: host_tenant_ip
 
     - set_fact:
-        slave_ip: '{{ host_slave_ip.stdout }}'
+        tenant_ip: '{{ host_tenant_ip.stdout }}'
 
-- hosts: slave
+- hosts: tenant
   tasks:
     - name: Get master ip in /etc/hosts files (configured by multinode parent)
       command: awk '/master/ {print $1}' /etc/hosts
@@ -44,7 +44,7 @@
       include_role:
         name: run-sfconfig
 
-- hosts: slave
+- hosts: tenant
   tasks:
     - name: Fetch master CA pem file
       include_role:
@@ -56,7 +56,7 @@
       include_role:
         name: configure-fqdn
       vars:
-        domain: slave.sftests.com
+        domain: tenant.sftests.com
 
     - name: Configure sfconfig
       include_role:
@@ -84,15 +84,15 @@
       include_role:
         name: fetch-ca-pem
       vars:
-        instance: slave
+        instance: tenant
 
     - name: Add gerrit connection in sfconfig.yaml
       include_role:
         name: configure-sfconfig
       vars:
         sf_main_instance: true
-        static_hostname_ip: '{{ slave_ip }}'
-        static_hostname_fqdn: slave.sftests.com
+        static_hostname_ip: '{{ tenant_ip }}'
+        static_hostname_fqdn: tenant.sftests.com
 
     - name: Run sfconfig to apply configuration
       include_role:
@@ -104,7 +104,7 @@
       include_role:
         name: configure-resource
 
-- hosts: slave
+- hosts: tenant
   tasks:
     - name: Run sfconfig to finalize configuration
       include_role:
@@ -114,20 +114,20 @@
 
 # this should not be needed but zuul didn't reconfigure when
 # base, config-check and config-update are added in the last
-# commit of the slave/config.
+# commit of the tenant/config.
 - hosts: master
   tasks:
     - name: Force scheduler reconfiguration
       command: zuul-scheduler full-reconfigure
       become: true
 
-- hosts: slave
+- hosts: tenant
   tasks:
     - name: Add resources in tenant
       include_role:
         name: health-check/add_resources
       vars:
-        fqdn: slave.sftests.com
+        fqdn: tenant.sftests.com
         resource_file: ichiban.yaml
         tenant_deployment: True
 
@@ -135,18 +135,18 @@
       include_role:
         name: health-check/create_zuul_project
       vars:
-        fqdn: slave.sftests.com
+        fqdn: tenant.sftests.com
         project: ichiban-compute
 
     - name: Validate project data are present on CodeSearch
       include_role:
         name: health-check/validate_project
       vars:
-        service_uri: 'http://managesf.slave.sftests.com:6080/api/v1/search?q=TestHello&i=nope&files=&repos=ichiban-compute'
+        service_uri: 'http://managesf.tenant.sftests.com:6080/api/v1/search?q=TestHello&i=nope&files=&repos=ichiban-compute'
         service_until_condition: _result.json['Results']['ichiban-compute']['FilesWithMatch'] == 1
 
     - name: Validate project is present on RepoXplorer
       include_role:
         name: health-check/validate_project
       vars:
-        service_uri: 'http://repoxplorer.slave.sftests.com:20002/api/v1/commits/commits?pid=ichiban-cloud'
+        service_uri: 'http://repoxplorer.tenant.sftests.com:20002/api/v1/commits/commits?pid=ichiban-cloud'
