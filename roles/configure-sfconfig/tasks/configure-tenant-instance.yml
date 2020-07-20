@@ -4,5 +4,5 @@
     insertafter: '^tenant-deployment:$'
     marker: "# {mark} ANSIBLE MANAGED BLOCK tenant"
     block: |2
-        name: slave
+        name: tenant
         master-sf: https://sftests.com

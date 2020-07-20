@@ -1,37 +1,37 @@
-- name: Add slave resource
+- name: Add tenant resource
   block:
     - name: Check if config update
       include_role:
         name: wait_for_config_update
 
-    - name: Add slave gerrit connection
+    - name: Add tenant gerrit connection
       blockinfile:
-        path: /root/config/resources/slave.sftests.com.yaml
+        path: /root/config/resources/tenant.sftests.com.yaml
         create: yes
         block: |
           resources:
             tenants:
-              slave:
+              tenant:
                 description: "The new tenant"
-                url: "https://slave.sftests.com/manage"
-                default-connection: gerrit-slave
+                url: "https://tenant.sftests.com/manage"
+                default-connection: gerrit-tenant
 
     - name: Push resources configuration
       command: '{{ item }}'
       args:
         chdir: /root/config
       loop:
-        - git add resources/slave.sftests.com.yaml
-        - git commit -m 'Create slave resource'
+        - git add resources/tenant.sftests.com.yaml
+        - git commit -m 'Create tenant resource'
         - git push git+ssh://gerrit/config master
 
     - name: Check if config update
       include_role:
         name: wait_for_config_update
 
-    - name: Ensure slave tenant is present on zuul main.yml
+    - name: Ensure tenant tenant is present on zuul main.yml
       wait_for:
         path: /etc/zuul/main.yaml
-        search_regex: 'slave'
+        search_regex: 'tenant'
         timeout: 600
   become: true
