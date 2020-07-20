@@ -34,7 +34,7 @@
 
 - name: Executing create_index curator rule
   shell: |
-    /bin/curator --config /etc/logstash/curator.yml delete-other-indexes.yml
+    LC_ALL=en_US.UTF-8 /bin/curator --config /etc/logstash/curator.yml delete-other-indexes.yml
   register: other_index
 
 - name: Check if outpus is wrong for delete-other-indexes
@@ -72,7 +72,7 @@
 
 - name: Executing create_index curator rule
   shell: |
-    /bin/curator --config /etc/logstash/curator.yml delete-old-indices.yml
+    LC_ALL=en_US.UTF-8 /bin/curator --config /etc/logstash/curator.yml delete-other-indexes.yml
   register: old_indices
 
 - name: Check if outpus is wrong for delete-old-indices
