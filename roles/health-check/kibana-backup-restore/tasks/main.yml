@@ -1,0 +1,70 @@
+---
+- name: Backup dashboard and visualizations
+  command: |
+    /usr/local/bin/backup-kibana.sh
+
+- name: Ensure that dashboard and visualizations are empty
+  command: |
+    cat /usr/share/sf-config/kibana-backup/*
+  register: backup_files_output
+
+- name: Ensure that files are empty
+  fail:
+    msg: "Backup files should be empty!"
+  when:
+    - backup_files_output.stdout
+
+- name: Copy example ndjson files
+  copy:
+    src: "{{ item }}"
+    dest: "/usr/share/sf-config/kibana-backup/"
+  loop:
+    - dashboard.ndjson
+    - visualization.ndjson
+
+- name: Run restore script for dashboard
+  command:
+    /usr/lobal/bin/restore-kibana.sh
+  environment:
+    RESTORE_FILE: /usr/share/sf-config/kibana-backup/dashboard.ndjson
+    KIBANA_HOST:  "{{ kibana_host }}"
+  register: restore_dashboard
+
+- name: Run restore script for visualization
+  command:
+    /usr/lobal/bin/restore-kibana.sh
+  environment:
+    RESTORE_FILE: /usr/share/sf-config/kibana-backup/visualization.ndjson
+    KIBANA_HOST:  "{{ kibana_host }}"
+  register: restore_visualization
+
+- name: Ensure that restore was OK
+  fail:
+    msg: "Failing on restoring dashboard or visualization"
+  when:
+    - "restore_dashboard.stdout == '{\"success\":true,\"successCount\":1}'"
+    - "restore_visualization.stdout == '{\"success\":true,\"successCount\":1}'"
+
+- name: Rename files before backup
+  command: |
+    mv /usr/share/sf-config/kibana-backup/{{ item }}.ndjson /usr/share/sf-config/kibana-backup/{{ item }}-old.ndjson
+  loop:
+    - dashboard
+    - visualization
+
+- name: Create new backup of visualization and dashboard
+  command: |
+    /usr/local/bin/backup-kibana.sh
+
+- name: Check if there are some difference between example and backup file
+  command:
+    diff /usr/share/sf-config/kibana-backup/{{ item }}.ndjson /usr/share/sf-config/kibana-backup/{{ item }}-old.ndjson
+  loop:
+    - dashboard
+    - visualization
+  register: new_backup_diff
+
+- name: Backup and restore should be the same
+  fail:
+    msg: "There is a difference between example file and backup"
+  when: new_backup_diff.stdout
