@@ -1,0 +1,65 @@
+---
+- name: Backup all Kibana objects
+  command: |
+    /usr/local/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --backup-dir {{ kibana_backup_dir }} backup
+
+- name: Get content of current backup
+  command: |
+    cat /usr/share/sf-config/kibana-backup/backup.ndjson
+  register: backup_files_output
+
+- name: Ensure that backup has only index
+  fail:
+    msg: "Backup files should be empty!"
+  when:
+    - "'visualization' not in backup_files_output.stdout"
+    - "'dashboard' not in backup_files_output.stdout"
+
+- name: Copy example ndjson files
+  copy:
+    src: "{{ item }}"
+    dest: "/usr/share/sf-config/kibana-backup/"
+  loop:
+    - dashboard.ndjson
+    - visualization.ndjson
+
+- name: Run restore script for visualization
+  command: |
+    /usr/lobal/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --restore-file {{ kibana_backup_dir }}/visualization.ndjson restore
+  register: restore_visualization
+
+- name: Run restore script for dashboard
+  command: |
+    /usr/lobal/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --restore-file {{ kibana_backup_dir }}/dashboard.ndjson restore
+  register: restore_dashboard
+
+- name: Ensure that restore was OK
+  fail:
+    msg: "Failing on restoring dashboard or visualization"
+  when:
+    - "'{\"success\":true,\"successCount\":1}' in restore_dashboard.stdout"
+    - "'{\"success\":true,\"successCount\":1}' in restore_visualization.stdout"
+
+- name: Rename files before backup
+  command: |
+    mv /usr/share/sf-config/kibana-backup/{{ item }}.ndjson /usr/share/sf-config/kibana-backup/{{ item }}-old
+  loop:
+    - dashboard.ndjson
+    - visualization.ndjson
+
+- name: Create new backup of Kibana objects
+  command: |
+    /usr/local/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --backup-dir {{ kibana_backup_dir }} backup
+
+- name: Check if there are some difference between example and backup file
+  command: |
+    diff /usr/share/sf-config/kibana-backup/{{ item }} /usr/share/sf-config/kibana-backup/{{ item }}-old
+  loop:
+    - dashboard.ndjson
+    - visualization.ndjson
+  register: new_backup_diff
+
+- name: Backup and restore should be the same
+  fail:
+    msg: "There is a difference between example file and backup"
+  when: new_backup_diff.stdout
