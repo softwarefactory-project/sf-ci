@@ -1,0 +1,86 @@
+---
+- name: Set kibana backup directory
+  set_fact:
+    backup_dest: /var/lib/software-factory/backup/kibana
+
+- name: Ensure that Kibana backup_dest dir exist
+  file:
+    path: "{{ backup_dest }}"
+    state: directory
+
+- name: Backup all Kibana objects
+  command: |
+    /usr/local/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --backup-dir {{ backup_dest }} backup
+
+- name: Get content of current backup
+  command: |
+    cat {{ backup_dest }}/backup.ndjson
+  register: backup_files_output
+
+- name: Fail if there are more than index objects in backup
+  fail:
+    msg: "Backup files should be empty!"
+  when:
+    - "'visualization' in backup_files_output.stdout"
+    - "'dashboard' in backup_files_output.stdout"
+
+- name: Copy example ndjson files
+  copy:
+    src: "{{ item }}"
+    dest: "{{ backup_dest }}/"
+  loop:
+    - dashboard.ndjson
+    - visualization.ndjson
+
+- name: Ensure that example file exists
+  file:
+    path: "{{ backup_dest }}/{{ item }}"
+    state: file
+  loop:
+    - dashboard.ndjson
+    - visualization.ndjson
+
+- name: Run restore script for dashboard
+  command: |
+    /usr/local/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --restore-file {{ backup_dest }}/dashboard.ndjson restore
+  register: restore_dashboard
+
+- name: Run restore script for visualization
+  command: |
+    /usr/local/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --restore-file {{ backup_dest }}/visualization.ndjson restore
+  register: restore_visualization
+
+- name: Ensure that restore was OK
+  fail:
+    msg: "Failing on restoring dashboard or visualization"
+  when:
+    - "{{ restore_dashboard.stdout | json_query('success') }}"
+    - "{{ restore_visualization.stdout | json_query('success') }}"
+
+- name: Rename files before backup
+  command: |
+    mv {{ backup_dest }}/{{ item }} {{ backup_dest }}/{{ item }}-old
+  loop:
+    - dashboard.ndjson
+    - visualization.ndjson
+
+- name: Create new backup of Kibana objects
+  command: |
+    /usr/local/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --backup-dir {{ backup_dest }} backup
+
+- name: Get content of new backup - dashboard
+  command: |
+    cat {{ backup_dest }}/dashboard.ndjson
+  register: dashboard_new
+
+- name: Get content of new backup - visualization
+  command: |
+    cat {{ backup_dest }}/visualization.ndjson
+  register: visualization_new
+
+- name: Fail if there are not required words in new backup
+  fail:
+    msg: "New backup file can be broken!"
+  when:
+    - "'dashboard' not in dashboard_new.stdout"
+    - "'visualization' not in visualization_new.stdout"
