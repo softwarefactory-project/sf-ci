@@ -1,3 +1,12 @@
+- name: Ensure previous test tools are removed
+  yum:
+    name:
+      - python-nose
+      - python-nose-timer
+      - python-nose-htmloutput
+    state: absent
+  become: yes
+
 - name: Ensure test tools are installed
   yum:
     name:
