@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ddd9790d_2c43c954",
+        "filename": "playbooks/keycloak/files/ffmpeg_installer.sh",
+        "patchSetId": 26
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2020-07-23T18:10:32Z",
+      "side": 1,
+      "message": "Wouldn\u0027t it be better to use a fedora container to run ffmpeg?",
+      "revId": "ccfe4f49ca60c94cb9258851c5f99b825f54b659",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
