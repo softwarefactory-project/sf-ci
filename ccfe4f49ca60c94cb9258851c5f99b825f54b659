@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "3253224a_36e92466",
+        "filename": "playbooks/keycloak/files/ffmpeg-screen-capture.service",
+        "patchSetId": 26
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2020-07-24T15:42:24Z",
+      "side": 1,
+      "message": "That could be replaced by something like:\n\n  ExecStart\u003dpodman run --privileged -v /tmp/:/tmp/ -it --rm ffmpeg -- -f x11grab...\n\nAnd no need for tmux or stop",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 54
+      },
+      "revId": "ccfe4f49ca60c94cb9258851c5f99b825f54b659",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ddd9790d_2c43c954",
         "filename": "playbooks/keycloak/files/ffmpeg_installer.sh",
         "patchSetId": 26
@@ -31,6 +54,47 @@
       "side": 1,
       "message": "I\u0027d like to test on the environment we deploy. I agree that installing from sources like this is cumbersome and has its disadvantages, but the idea is to validate that our packaging of Keycloak + custom extensions runs on CentOS 7.",
       "parentUuid": "ddd9790d_2c43c954",
+      "revId": "ccfe4f49ca60c94cb9258851c5f99b825f54b659",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8d711f1d_531c15b5",
+        "filename": "playbooks/keycloak/files/ffmpeg_installer.sh",
+        "patchSetId": 26
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2020-07-24T15:42:24Z",
+      "side": 1,
+      "message": "Using a container doesn\u0027t prevent testing the deployment of keycloak. The suggestion was just to avoid building ffmpeg here.",
+      "parentUuid": "a48c580b_e6b774d4",
+      "revId": "ccfe4f49ca60c94cb9258851c5f99b825f54b659",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "92bf7cdc_9ad2f6d7",
+        "filename": "playbooks/keycloak/post.yaml",
+        "patchSetId": 26
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2020-07-24T15:42:24Z",
+      "side": 1,
+      "message": "wasn\u0027t the screencast stored in /var/log ?",
+      "range": {
+        "startLine": 20,
+        "startChar": 11,
+        "endLine": 20,
+        "endChar": 31
+      },
       "revId": "ccfe4f49ca60c94cb9258851c5f99b825f54b659",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
