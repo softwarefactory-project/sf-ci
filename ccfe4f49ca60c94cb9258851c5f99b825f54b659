@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "0c6cabf4_e35927e7",
+        "filename": "playbooks/keycloak/files/ffmpeg-screen-capture.service",
+        "patchSetId": 26
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 68
+      },
+      "writtenOn": "2020-07-24T15:47:41Z",
+      "side": 1,
+      "message": "This service file is not used anymore, the tmux is launched in the playbook directly.\n\nAs for the stopping, it is required for ffmpeg to finish the encoding, \u0027q\u0027 has to be sent to the program at the end of the video.",
+      "parentUuid": "3253224a_36e92466",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 54
+      },
+      "revId": "ccfe4f49ca60c94cb9258851c5f99b825f54b659",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ddd9790d_2c43c954",
         "filename": "playbooks/keycloak/files/ffmpeg_installer.sh",
         "patchSetId": 26
@@ -89,6 +113,30 @@
       "writtenOn": "2020-07-24T15:42:24Z",
       "side": 1,
       "message": "wasn\u0027t the screencast stored in /var/log ?",
+      "range": {
+        "startLine": 20,
+        "startChar": 11,
+        "endLine": 20,
+        "endChar": 31
+      },
+      "revId": "ccfe4f49ca60c94cb9258851c5f99b825f54b659",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "641a04b6_286833ee",
+        "filename": "playbooks/keycloak/post.yaml",
+        "patchSetId": 26
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 68
+      },
+      "writtenOn": "2020-07-24T15:47:41Z",
+      "side": 1,
+      "message": "not anymore as the daemon is not used anymore, I should have removed the service file in the previous patch",
+      "parentUuid": "92bf7cdc_9ad2f6d7",
       "range": {
         "startLine": 20,
         "startChar": 11,
