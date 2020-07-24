@@ -16,6 +16,24 @@
       "revId": "ccfe4f49ca60c94cb9258851c5f99b825f54b659",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a48c580b_e6b774d4",
+        "filename": "playbooks/keycloak/files/ffmpeg_installer.sh",
+        "patchSetId": 26
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 68
+      },
+      "writtenOn": "2020-07-24T09:05:23Z",
+      "side": 1,
+      "message": "I\u0027d like to test on the environment we deploy. I agree that installing from sources like this is cumbersome and has its disadvantages, but the idea is to validate that our packaging of Keycloak + custom extensions runs on CentOS 7.",
+      "parentUuid": "ddd9790d_2c43c954",
+      "revId": "ccfe4f49ca60c94cb9258851c5f99b825f54b659",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
