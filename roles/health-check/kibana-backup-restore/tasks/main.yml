@@ -2,6 +2,8 @@
 - name: Set kibana backup directory
   set_fact:
     backup_dest: /var/lib/software-factory/backup/kibana
+    username: admin
+    password: admin
 
 - name: Ensure that Kibana backup_dest dir exist
   file:
@@ -10,7 +12,7 @@
 
 - name: Backup all Kibana objects
   command: |
-    /usr/local/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --backup-dir {{ backup_dest }} backup
+    /usr/local/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --backup-dir {{ backup_dest }} --user {{ username }} --password {{ password }} backup
 
 - name: Get content of current backup
   command: |
@@ -42,12 +44,12 @@
 
 - name: Run restore script for dashboard
   command: |
-    /usr/local/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --restore-file {{ backup_dest }}/dashboard.ndjson restore
+    /usr/local/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --restore-file {{ backup_dest }}/dashboard.ndjson --user {{ username }} --password {{ password }} restore
   register: restore_dashboard
 
 - name: Run restore script for visualization
   command: |
-    /usr/local/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --restore-file {{ backup_dest }}/visualization.ndjson restore
+    /usr/local/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --restore-file {{ backup_dest }}/visualization.ndjson --user {{ username }} --password {{ password }} restore
   register: restore_visualization
 
 - name: Ensure that restore was OK
@@ -66,7 +68,7 @@
 
 - name: Create new backup of Kibana objects
   command: |
-    /usr/local/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --backup-dir {{ backup_dest }} backup
+    /usr/local/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --backup-dir {{ backup_dest }} --user {{ username }} --password {{ password }} backup
 
 - name: Get content of new backup - dashboard
   command: |
