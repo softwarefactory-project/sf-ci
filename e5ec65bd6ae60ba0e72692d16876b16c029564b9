@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f6bcc072_a5c4fc04",
+        "filename": "roles/health-check/kibana-backup-restore/tasks/main.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 68
+      },
+      "writtenOn": "2020-08-26T10:05:21Z",
+      "side": 1,
+      "message": "you should generate a password for this service. You can look at how passwords are generated for mysql databases per service, for example.",
+      "range": {
+        "startLine": 6,
+        "startChar": 4,
+        "endLine": 6,
+        "endChar": 19
+      },
+      "revId": "e5ec65bd6ae60ba0e72692d16876b16c029564b9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
