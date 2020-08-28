@@ -40,7 +40,21 @@ class TestLogExportedInElasticSearch(Base):
     def copy_request_script(self, index, newhash):
         newhash = newhash.rstrip()
         elastic_url = '%s/elasticsearch' % config.GATEWAY_URL
-        data = json.loads(urllib.request.urlopen(elastic_url).read())
+        try:
+            data = json.loads(urllib.request.urlopen(elastic_url).read())
+        except urllib.error.HTTPError as e:
+            if e.code == 401:
+                opendistro = True
+                password_mgr = urllib.request.HTTPPasswordMgrWithDefaultRealm()
+                # FIXME: Change admin credentials when admin password is
+                # generated.
+                password_mgr.add_password(None, elastic_url, 'admin', 'admin')
+                handler = urllib.request.HTTPBasicAuthHandler(password_mgr)
+                opener = urllib.request.build_opener(handler)
+                opener.open(elastic_url)
+                urllib.request.install_opener(opener)
+                data = json.loads(urllib.request.urlopen(elastic_url).read())
+
         if data['version']['number'] == '2.4.6':
             extra_headers = " -H 'kbn-version:4.5.4'"
         else:
