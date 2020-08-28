@@ -27,7 +27,11 @@ from utils import GerritClient
 
 from requests.auth import HTTPBasicAuth
 
+import os
 import requests
+import subprocess
+
+elasticsearch_credential_file = '/etc/software-factory/sfconfig.yaml'
 
 
 class TestGateway(Base):
@@ -40,6 +44,21 @@ class TestGateway(Base):
         """Utility function to make sure a url is not accessible"""
         resp = requests.get(url)
         self.assertTrue(resp.status_code > 399, resp.status_code)
+
+    def _check_if_auth_required(self, gateway):
+        subcmd = ["curl", "-s",
+                  "%s/elasticsearch/_cat/indices" % config.GATEWAY_URL]
+        return 'Unauthorized' in \
+               subprocess.check_output(subcmd).decode("utf-8")
+
+    def _get_elastic_admin_pass(self, file_path):
+        if not os.path.exists(file_path):
+            return
+
+        with open(file_path, 'r') as f:
+            for line in f.readlines():
+                if line.split(':')[0].strip() == 'elasticsearch_password':
+                    return line.split(':')[1].strip()
 
     def test_managesf_is_secure(self):
         """Test if managesf config.py file is not world readable"""
@@ -63,7 +82,15 @@ class TestGateway(Base):
             subpaths.append("/paste/")
         if "kibana" in services:
             elastic_url = '%s/elasticsearch' % config.GATEWAY_URL
-            data = json.loads(urllib.request.urlopen(elastic_url).read())
+            if self._check_if_auth_required(config.GATEWAY_URL):
+                admin_password = self._get_elastic_admin_pass(
+                    elasticsearch_credential_file)
+                data = json.loads(
+                    requests.get(elastic_url,
+                                 auth=HTTPBasicAuth('admin',
+                                                    admin_password)).text)
+            else:
+                data = json.loads(urllib.request.urlopen(elastic_url).read())
             if data['version']['number'] == '2.4.6':
                 subpaths.append("/app/kibana")
             else:
@@ -180,17 +207,32 @@ class TestGateway(Base):
     def test_kibana_accessible(self):
         """ Test if Kibana is accessible on gateway host
         """
+        opendistro = False
         elastic_url = '%s/elasticsearch' % config.GATEWAY_URL
-        data = json.loads(urllib.request.urlopen(elastic_url).read())
+        if self._check_if_auth_required(config.GATEWAY_URL):
+            opendistro = True
+            admin_password = self._get_elastic_admin_pass(
+                    elasticsearch_credential_file)
+            data = json.loads(
+                requests.get(elastic_url,
+                             auth=HTTPBasicAuth('admin', admin_password)).text)
+        else:
+            data = json.loads(urllib.request.urlopen(elastic_url).read())
+
         if data['version']['number'] == '2.4.6':
             url = config.GATEWAY_URL + "/app/kibana"
         else:
             url = config.GATEWAY_URL + "/analytics/app/kibana"
 
-        if int(data['version']['number'].split('.')[0]) >= 7:
-            kibana_title = '<title>Elastic</title>'
+        if not opendistro:
+            if int(data['version']['number'].split('.')[0]) >= 7:
+                kibana_title = '<title>Elastic</title>'
+            else:
+                kibana_title = '<title>Kibana</title>'
         else:
-            kibana_title = '<title>Kibana</title>'
+            # NOTE: Opendisto HTML content does not provide <title>.
+            # Search the content to ensure that is working
+            kibana_title = 'action="/auth/login/"'
 
         # Without SSO cookie. Note that auth is no longer enforced
 
