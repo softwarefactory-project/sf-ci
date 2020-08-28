@@ -40,7 +40,20 @@ class TestLogExportedInElasticSearch(Base):
     def copy_request_script(self, index, newhash):
         newhash = newhash.rstrip()
         elastic_url = '%s/elasticsearch' % config.GATEWAY_URL
-        data = json.loads(urllib.request.urlopen(elastic_url).read())
+        try:
+            data = json.loads(urllib.request.urlopen(elastic_url).read())
+        except urllib.error.HTTPError as e:
+            if e.code == 401:
+                password_mgr = urllib.request.HTTPPasswordMgrWithDefaultRealm()
+                # FIXME: Change admin credentials when admin password is
+                # generated.
+                password_mgr.add_password(None, elastic_url, 'admin', 'admin')
+                handler = urllib.request.HTTPBasicAuthHandler(password_mgr)
+                opener = urllib.request.build_opener(handler)
+                opener.open(elastic_url)
+                urllib.request.install_opener(opener)
+                data = json.loads(urllib.request.urlopen(elastic_url).read())
+
         if data['version']['number'] == '2.4.6':
             extra_headers = " -H 'kbn-version:4.5.4'"
         else:
@@ -63,6 +76,12 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
     def find_index(self):
         subcmd = ["curl", "-s",
                   "%s/elasticsearch/_cat/indices" % config.GATEWAY_URL]
+
+        # FIXME: replace admin password with new generated
+        if 'Unauthorized' in subprocess.check_output(subcmd).decode("utf-8"):
+            subcmd.append("--user")
+            subcmd.append("admin:admin")
+
         # A logstash index is created by day
         today_str = datetime.datetime.utcnow().strftime('%Y.%m.%d')
         # Here we fetch the index name, but also we wait for
