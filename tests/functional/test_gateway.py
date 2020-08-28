@@ -180,17 +180,37 @@ class TestGateway(Base):
     def test_kibana_accessible(self):
         """ Test if Kibana is accessible on gateway host
         """
+        opendistro = False
         elastic_url = '%s/elasticsearch' % config.GATEWAY_URL
-        data = json.loads(urllib.request.urlopen(elastic_url).read())
+        try:
+            data = json.loads(urllib.request.urlopen(elastic_url).read())
+        except urllib.error.HTTPError as e:
+            if e.code == 401:
+                opendistro = True
+                password_mgr = urllib.request.HTTPPasswordMgrWithDefaultRealm()
+                # FIXME: Change admin credentials when admin password is
+                # generated.
+                password_mgr.add_password(None, elastic_url, 'admin', 'admin')
+                handler = urllib.request.HTTPBasicAuthHandler(password_mgr)
+                opener = urllib.request.build_opener(handler)
+                opener.open(elastic_url)
+                urllib.request.install_opener(opener)
+                data = json.loads(urllib.request.urlopen(elastic_url).read())
+
         if data['version']['number'] == '2.4.6':
             url = config.GATEWAY_URL + "/app/kibana"
         else:
             url = config.GATEWAY_URL + "/analytics/app/kibana"
 
-        if int(data['version']['number'].split('.')[0]) >= 7:
-            kibana_title = '<title>Elastic</title>'
+        if not opendistro:
+            if int(data['version']['number'].split('.')[0]) >= 7:
+                kibana_title = '<title>Elastic</title>'
+            else:
+                kibana_title = '<title>Kibana</title>'
         else:
-            kibana_title = '<title>Kibana</title>'
+            # NOTE: Opendisto HTML content does not provide <title>.
+            # Search the content to ensure that is working
+            kibana_title = 'action="/auth/login/"'
 
         # Without SSO cookie. Note that auth is no longer enforced
 
