@@ -15,6 +15,7 @@
 import config
 import datetime
 import json
+import os
 import random
 import string
 import subprocess
@@ -24,6 +25,8 @@ import urllib.request
 from utils import Base, skipIfServiceMissing
 from utils import set_private_key
 from utils import GerritGitUtils
+
+elasticsearch_credential_file = '/etc/software-factory/elasticsearch.yml'
 
 
 class TestLogExportedInElasticSearch(Base):
@@ -37,10 +40,41 @@ class TestLogExportedInElasticSearch(Base):
             config.ADMIN_USER, priv_key_path,
             config.USERS[config.ADMIN_USER]['email'])
 
+    def _check_if_auth_required(self, gateway):
+        subcmd = ["curl", "-s",
+                  "%s/elasticsearch/_cat/indices" % config.GATEWAY_URL]
+        return 'Unauthorized' in \
+               subprocess.check_output(subcmd).decode("utf-8")
+
+    def _get_elastic_admin_pass(self, file_path):
+        if not os.path.exists(file_path):
+            return
+
+        with open(file_path, 'r') as f:
+            for line in f.readlines():
+                if line.split(':')[0].strip() == 'admin':
+                    return line.split(':')[1].strip()
+
     def copy_request_script(self, index, newhash):
         newhash = newhash.rstrip()
         elastic_url = '%s/elasticsearch' % config.GATEWAY_URL
-        data = json.loads(urllib.request.urlopen(elastic_url).read())
+
+        user = 'admin'
+        password = self._get_elastic_admin_pass(elasticsearch_credential_file)
+        additional_params = ''
+
+        if self._check_if_auth_required(config.GATEWAY_URL):
+            password_mgr = urllib.request.HTTPPasswordMgrWithDefaultRealm()
+            password_mgr.add_password(None, elastic_url, user, password)
+            handler = urllib.request.HTTPBasicAuthHandler(password_mgr)
+            opener = urllib.request.build_opener(handler)
+            opener.open(elastic_url)
+            urllib.request.install_opener(opener)
+            data = json.loads(urllib.request.urlopen(elastic_url).read())
+            additional_params = "--user %s:%s" % (user, password)
+        else:
+            data = json.loads(urllib.request.urlopen(elastic_url).read())
+
         if data['version']['number'] == '2.4.6':
             extra_headers = " -H 'kbn-version:4.5.4'"
         else:
@@ -55,14 +89,21 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
               ]
           }
       }
-}'
+}' %s
 """
         with open('/tmp/test_request.sh', 'w') as fd:
-            fd.write(content % (elastic_url, index, extra_headers, newhash))
+            fd.write(content % (elastic_url, index, extra_headers, newhash,
+                                additional_params))
 
     def find_index(self):
         subcmd = ["curl", "-s",
                   "%s/elasticsearch/_cat/indices" % config.GATEWAY_URL]
+
+        if self._check_if_auth_required(config.GATEWAY_URL):
+            subcmd.append("--user")
+            subcmd.append("admin:%s" % self._get_elastic_admin_pass(
+                elasticsearch_credential_file))
+
         # A logstash index is created by day
         today_str = datetime.datetime.utcnow().strftime('%Y.%m.%d')
         # Here we fetch the index name, but also we wait for
