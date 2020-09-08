@@ -175,7 +175,7 @@ class TestGerrit(Base):
         """ Test if correct Gerrit version is running
         """
         gu = get_gerrit_utils("admin")
-        self.assertIn("2.1", gu.get("config/server/version"))
+        self.assertIn(".", gu.get("config/server/version"))
 
     def test_gitweb_access(self):
         """ Test if gitweb access works correctly
