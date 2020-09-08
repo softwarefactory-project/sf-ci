@@ -96,7 +96,7 @@ class TestGateway(Base):
         for url in urls:
             resp = requests.get(url)
             self.assertEqual(resp.status_code, 200)
-            self.assertTrue('<title>Gerrit Code Review</title>' in resp.text)
+            self.assertTrue('Gerrit Code Review' in resp.text)
 
         # URL that requires login - fails with Unauthorized
         url = config.GATEWAY_URL + "/r/a/projects/?"
