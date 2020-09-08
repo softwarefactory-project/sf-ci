@@ -74,7 +74,7 @@ class TestProjectReplication(Base):
         if change_sha:
             logger.info("Waiting for config-update on %s" % change_sha)
             self.ju.wait_for_config_update(change_sha)
-            ret = run(['grep', 'test_project',
+            ret = run(['sudo', 'grep', 'test_project',
                        '/etc/gerrit/replication.config'])
             if ret.returncode == 0:
                 return
