@@ -13,6 +13,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+
 import config
 import json
 import requests
@@ -110,7 +111,8 @@ class TestUserdata(Base):
         self.assertTrue(int(d.status_code) < 400, d.status_code)
         # make sure the user does not exist anymore
         subprocess.Popen([
-            "sudo", "/usr/share/sf-config/scripts/delete-gerrit-user.sh",
+            "sudo", "env", "EMAIL=funk@mothership.com",
+            "/usr/share/sf-config/scripts/delete-gerrit-user.sh",
             "bootsy", "--batch"]).wait()
         time.sleep(1)
         self.assertFalse(self.gu.is_account_active('bootsy'))
@@ -127,12 +129,14 @@ class TestUserdata(Base):
         gerrit_id = self.gu.get_account('freddie').get('_account_id')
         del_url = config.GATEWAY_URL +\
             '/manage/services_users/?username=freddie'
-        auth_cookie = config.USERS[config.ADMIN_USER]['auth_cookie']
+        auth_cookie = get_cookie(
+            "admin", config.USERS[config.ADMIN_USER]['password'])
         d = requests.delete(del_url,
                             cookies={'auth_pubtkt': auth_cookie})
         self.assertTrue(int(d.status_code) < 400, d.status_code)
         subprocess.Popen([
-            "sudo", "/usr/share/sf-config/scripts/delete-gerrit-user.sh",
+            "sudo", "env", "EMAIL=mrbadguy@queen.com",
+            "/usr/share/sf-config/scripts/delete-gerrit-user.sh",
             "freddie", "--batch"]).wait()
         time.sleep(1)
         self.assertFalse(self.gu.is_account_active('freddie'))
