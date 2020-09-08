@@ -88,7 +88,7 @@ class TestRepoxplorer(Base):
         self.assertEqual(resp.status_code, 200)
         return resp.json()
 
-    @skipIfServiceMissing('repoxplorer')
+    @skipIfServiceMissing('repoxplorer2')
     def test_repoxplorer_accessible(self):
         """ Test if RepoXplorer is accessible on gateway hosts
         """
@@ -97,7 +97,7 @@ class TestRepoxplorer(Base):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('Welcome on RepoXplorer' in resp.text)
 
-    @skipIfServiceMissing('repoxplorer')
+    @skipIfServiceMissing('repoxplorer2')
     def test_repoxplorer_data_indexed(self):
         """ Test if RepoXplorer has indexed the config repository
         """
@@ -108,7 +108,7 @@ class TestRepoxplorer(Base):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(len(resp.json()[2]) > 0)
 
-    @skipIfServiceMissing('repoxplorer')
+    @skipIfServiceMissing('repoxplorer2')
     def test_repoxplorer_displayed_top_menu(self):
         """ Test if RepoXplorer link is displayed in the top menu
         """
@@ -118,7 +118,7 @@ class TestRepoxplorer(Base):
         self.assertTrue('href="/repoxplorer/"' in resp.text,
                         'repoxplorer not present as a link')
 
-    @skipIfServiceMissing('repoxplorer')
+    @skipIfServiceMissing('repoxplorer2')
     def test_repoxplorer_config_from_resources(self):
         """ Test if RepoXPlorer is reconfigured from new resources
         """

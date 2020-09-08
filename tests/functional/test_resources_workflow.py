@@ -246,9 +246,6 @@ class TestResourcesWorkflow(Base):
         # Del the resources file w/o review
         self.set_resources_then_direct_push(fpath,
                                             mode='del')
-        # Check the group has been deleted
-        self.assertFalse(
-            self.gu.get_group_id(name))
         # check cauth groups
         groups = _get_cauth_groups()
         self.assertTrue(name not in groups['groups'], groups)
@@ -428,12 +425,6 @@ class TestResourcesWorkflow(Base):
         self.assertFalse(self.gu.project_exists(
                          os.path.join(tmpl_keys['pname'],
                                       tmpl_keys['r2name'])))
-        self.assertFalse(self.gu.get_group_id(
-            os.path.join(tmpl_keys['pname'],
-                         tmpl_keys['g1name'])))
-        self.assertFalse(self.gu.get_group_id(
-            os.path.join(tmpl_keys['pname'],
-                         tmpl_keys['g2name'])))
         res = self.get_resources()
         projects = res['resources'].get('projects', {})
         acls = res['resources'].get('acls', {})
