@@ -44,23 +44,27 @@
         - run-backup-create
         - run-health-check
         - run-firehose-listener
-        - run-functional-tests
-        - check-firehose-events
 
-    - name: Erase the system
-      include_role:
-        name: run-erase
+    - name: Generate a failure
+      command: false
 
-    - name: Install sfconfig package
-      include_role:
-        name: install-sfconfig
-
-    - name: Restore the backup
-      include_role:
-        name: run-sfconfig
-      vars:
-        sfconfig_args: --recover
-
+#        - run-functional-tests
+#        - check-firehose-events
+#
+#    - name: Erase the system
+#      include_role:
+#        name: run-erase
+#
+#    - name: Install sfconfig package
+#      include_role:
+#        name: install-sfconfig
+#
+#    - name: Restore the backup
+#      include_role:
+#        name: run-sfconfig
+#      vars:
+#        sfconfig_args: --recover
+#
 #    - name: Validate backup recovery
 #      include_role:
 #        name: run-checker

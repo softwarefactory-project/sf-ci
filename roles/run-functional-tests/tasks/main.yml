@@ -7,6 +7,10 @@
     state: absent
   become: yes
 
+- name: Set debug log level to Gerrit
+  command: ssh gerrit gerrit logging set-level debug
+  become: yes
+
 - name: Start functional tests
   command: >
     {{ sf_ci }}/scripts/create_ns.sh env
