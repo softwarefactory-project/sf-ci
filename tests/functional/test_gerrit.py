@@ -171,12 +171,6 @@ class TestGerrit(Base):
         self.assertEqual(len(reviewers), 1)
         self.assertEqual(reviewers[0], config.ADMIN_USER)
 
-    def test_gerrit_version(self):
-        """ Test if correct Gerrit version is running
-        """
-        gu = get_gerrit_utils("admin")
-        self.assertIn("2.1", gu.get("config/server/version"))
-
     def test_gitweb_access(self):
         """ Test if gitweb access works correctly
         """
