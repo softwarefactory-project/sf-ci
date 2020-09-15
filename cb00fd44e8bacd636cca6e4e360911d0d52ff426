@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f3d7e622_55004958",
+        "filename": "tests/functional/test_gerrit.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2020-09-15T12:29:22Z",
+      "side": 1,
+      "message": "I don\u0027t think this test is relevant anymore. Let\u0027s remove it.",
+      "revId": "cb00fd44e8bacd636cca6e4e360911d0d52ff426",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
