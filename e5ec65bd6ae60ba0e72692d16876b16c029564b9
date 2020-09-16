@@ -16,6 +16,24 @@
       "revId": "e5ec65bd6ae60ba0e72692d16876b16c029564b9",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f23a0cf_963a2f99",
+        "filename": "tests/functional/test_resources_workflow.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2020-09-16T14:45:50Z",
+      "side": 0,
+      "message": "Because group can no longer be removed online. I guess we should do like for userdata and call the pynotedb delete-group function.",
+      "parentUuid": "2abe5725_da16c231",
+      "revId": "e5ec65bd6ae60ba0e72692d16876b16c029564b9",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }

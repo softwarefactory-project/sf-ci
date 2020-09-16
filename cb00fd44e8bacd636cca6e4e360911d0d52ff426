@@ -16,6 +16,24 @@
       "revId": "cb00fd44e8bacd636cca6e4e360911d0d52ff426",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "379af2d4_d0caa633",
+        "filename": "tests/functional/test_gerrit.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2020-09-16T14:45:50Z",
+      "side": 1,
+      "message": "Well it (poorly) test the server api is available.",
+      "parentUuid": "f3d7e622_55004958",
+      "revId": "cb00fd44e8bacd636cca6e4e360911d0d52ff426",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
     }
   ]
 }
