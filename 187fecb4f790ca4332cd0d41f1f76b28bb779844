@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4f8d2f40_84ec4895",
+        "filename": "tests/functional/test_gateway.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-09-21T13:50:46Z",
+      "side": 1,
+      "message": "not required",
+      "range": {
+        "startLine": 207,
+        "startChar": 0,
+        "endLine": 208,
+        "endChar": 24
+      },
+      "revId": "187fecb4f790ca4332cd0d41f1f76b28bb779844",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
