@@ -2,16 +2,22 @@
 - name: Set kibana backup directory
   set_fact:
     backup_dest: /var/lib/software-factory/backup/kibana
-    username: admin
-    password: admin
 
 - name: Gather the rpm package facts
   package_facts:
     manager: auto
 
-- name: Check if opendistroforelasticsearch is installed
-  set_fact:
-    additional_params: "--user {{ username }} --password {{ password }}"
+- name: Set credentials if Opendistro
+  block:
+    - name: Get Opendistro admin password
+      shell: |
+        awk '/elasticsearch_password/ {print $2}' /var/lib/software-factory/bootstrap-data/secrets.yaml
+      register: elk_kibanaserver_pass
+      when: elasticsearch_password is not defined
+
+    - name: Set proper facts for Opendistro
+      set_fact:
+        additional_params: "--user admin --password {{ elasticsearch_password | default(elk_kibanaserver_pass.stdout) | default('admin') }}"
   when: "'opendistroforelasticsearch' in ansible_facts.packages"
 
 - name: Ensure that Kibana backup_dest dir exist
