@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f3a52a66_800b23b3",
+        "filename": "roles/health-check/kibana-backup-restore/tasks/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2020-09-22T09:22:32Z",
+      "side": 1,
+      "message": "Could this list of password be stored as Ansible variables instead ?",
+      "revId": "17c638cec89efb3872623b74d2d342d9bbd27d22",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
