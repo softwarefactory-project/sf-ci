@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a689e9af_e68a2ea6",
+        "filename": "tests/functional/test_gateway.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2020-09-24T14:59:43Z",
+      "side": 1,
+      "message": "why does elasticsearch has a special credential file?",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 34,
+        "endChar": 29
+      },
+      "revId": "e8e2f658d542b66bd6bd1aaeee3607b9d71e7353",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
