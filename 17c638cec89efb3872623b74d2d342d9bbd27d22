@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "511b8996_33f41215",
+        "filename": "roles/health-check/kibana-backup-restore/tasks/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2020-09-25T07:49:28Z",
+      "side": 1,
+      "message": "I see that patch as a deps to your main opendistro patch. I think this should be the other way around -\u003e This one depends on 19145.",
+      "revId": "17c638cec89efb3872623b74d2d342d9bbd27d22",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f256efb0_08f7840e",
+        "filename": "roles/health-check/kibana-backup-restore/tasks/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2020-09-25T07:49:28Z",
+      "side": 1,
+      "message": "Get Opendistro admin password ?",
+      "revId": "17c638cec89efb3872623b74d2d342d9bbd27d22",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f3a52a66_800b23b3",
         "filename": "roles/health-check/kibana-backup-restore/tasks/main.yml",
         "patchSetId": 1
@@ -31,6 +65,23 @@
       "side": 1,
       "message": "It is as a \"elasticsearch_admin_password\".\nI didn\u0027t know if it will be available here",
       "parentUuid": "f3a52a66_800b23b3",
+      "revId": "17c638cec89efb3872623b74d2d342d9bbd27d22",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a871c3a9_33718c05",
+        "filename": "roles/health-check/kibana-backup-restore/tasks/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2020-09-25T07:49:28Z",
+      "side": 1,
+      "message": "This name does not reflect what the task do.",
       "revId": "17c638cec89efb3872623b74d2d342d9bbd27d22",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
