@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "89e5e3b6_67f68989",
+        "filename": "roles/health-check/check-curator/tasks/main.yml",
+        "patchSetId": 13
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2020-09-25T07:59:17Z",
+      "side": 1,
+      "message": "This does not reflect what the task do.",
+      "revId": "e8e2f658d542b66bd6bd1aaeee3607b9d71e7353",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a689e9af_e68a2ea6",
         "filename": "tests/functional/test_gateway.py",
         "patchSetId": 13
@@ -19,6 +36,23 @@
         "endLine": 34,
         "endChar": 29
       },
+      "revId": "e8e2f658d542b66bd6bd1aaeee3607b9d71e7353",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e9a8131e_ed540533",
+        "filename": "tests/functional/test_gateway.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2020-09-25T07:59:17Z",
+      "side": 1,
+      "message": "Probably less code by using python-requests: https://requests.readthedocs.io/en/master/user/authentication/#basic-authentication",
       "revId": "e8e2f658d542b66bd6bd1aaeee3607b9d71e7353",
       "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
       "unresolved": false
