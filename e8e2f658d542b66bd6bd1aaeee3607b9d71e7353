@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "50cfe24f_25e180d8",
+        "filename": "roles/health-check/check-curator/tasks/main.yml",
+        "patchSetId": 13
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-09-25T16:27:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "89e5e3b6_67f68989",
+      "revId": "e8e2f658d542b66bd6bd1aaeee3607b9d71e7353",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a689e9af_e68a2ea6",
         "filename": "tests/functional/test_gateway.py",
         "patchSetId": 13
@@ -53,6 +71,30 @@
       "writtenOn": "2020-09-25T08:00:36Z",
       "side": 1,
       "message": "+1, asked the same question into the main patch. I won\u0027t block on it btw.",
+      "parentUuid": "a689e9af_e68a2ea6",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 34,
+        "endChar": 29
+      },
+      "revId": "e8e2f658d542b66bd6bd1aaeee3607b9d71e7353",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1429f148_beb31b12",
+        "filename": "tests/functional/test_gateway.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-09-25T16:27:13Z",
+      "side": 1,
+      "message": "Done",
       "parentUuid": "a689e9af_e68a2ea6",
       "range": {
         "startLine": 34,
