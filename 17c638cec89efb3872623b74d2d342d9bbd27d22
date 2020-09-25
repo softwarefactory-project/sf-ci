@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "87cd799a_333833ef",
+        "filename": "roles/health-check/kibana-backup-restore/tasks/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-09-25T16:38:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "511b8996_33f41215",
+      "revId": "17c638cec89efb3872623b74d2d342d9bbd27d22",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f256efb0_08f7840e",
         "filename": "roles/health-check/kibana-backup-restore/tasks/main.yml",
         "patchSetId": 1
