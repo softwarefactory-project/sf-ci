@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "827b4a1f_19413968",
+        "filename": "roles/health-check/kibana-backup-restore/tasks/main.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 385
+      },
+      "writtenOn": "2020-09-28T08:39:27Z",
+      "side": 1,
+      "message": "this fact has \u0027-\u0027 chars and is incorrect, so it will be better to get the password directly from file.",
+      "range": {
+        "startLine": 20,
+        "startChar": 55,
+        "endLine": 20,
+        "endChar": 77
+      },
+      "revId": "b080fa96afa8041e179e0866db621a0630895c11",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
