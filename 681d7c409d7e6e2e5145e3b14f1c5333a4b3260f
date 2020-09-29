@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c8779a93_31410e28",
+        "filename": "roles/health-check/check-curator/tasks/main.yml",
+        "patchSetId": 15
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2020-09-29T16:42:32Z",
+      "side": 1,
+      "message": "It doesn\u0027t seems right to get this password from sfconfig, shouldn\u0027t it be pulled from the group vars?",
+      "revId": "681d7c409d7e6e2e5145e3b14f1c5333a4b3260f",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
