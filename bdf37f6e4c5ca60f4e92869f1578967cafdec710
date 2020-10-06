@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "eec7354e_76291370",
+        "filename": "roles/health-check/kibana-backup-restore/tasks/main.yml",
+        "patchSetId": 4
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-10-06T09:39:10Z",
+      "side": 1,
+      "message": "Does this double default filter work? I have never seen it before.",
+      "range": {
+        "startLine": 20,
+        "startChar": 81,
+        "endLine": 20,
+        "endChar": 137
+      },
+      "revId": "bdf37f6e4c5ca60f4e92869f1578967cafdec710",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
