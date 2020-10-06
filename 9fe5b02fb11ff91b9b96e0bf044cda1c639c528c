@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "85c7eea1_78c75957",
+        "filename": "roles/health-check/check-curator/tasks/main.yml",
+        "patchSetId": 17
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-10-06T09:37:22Z",
+      "side": 1,
+      "message": "this should be elastic_admin_pass.stdout, otherwise it will try to use the whole dict.",
+      "range": {
+        "startLine": 20,
+        "startChar": 44,
+        "endLine": 20,
+        "endChar": 62
+      },
+      "revId": "9fe5b02fb11ff91b9b96e0bf044cda1c639c528c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cf06c81_0aee5b6d",
+        "filename": "roles/health-check/check-curator/tasks/main.yml",
+        "patchSetId": 17
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 200
+      },
+      "writtenOn": "2020-10-06T09:37:22Z",
+      "side": 1,
+      "message": "same here",
+      "range": {
+        "startLine": 21,
+        "startChar": 39,
+        "endLine": 21,
+        "endChar": 57
+      },
+      "revId": "9fe5b02fb11ff91b9b96e0bf044cda1c639c528c",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
