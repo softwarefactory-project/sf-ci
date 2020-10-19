@@ -109,16 +109,6 @@ class TestRepoxplorer(Base):
         self.assertTrue(len(resp.json()[2]) > 0)
 
     @skipIfServiceMissing('repoxplorer')
-    def test_repoxplorer_displayed_top_menu(self):
-        """ Test if RepoXplorer link is displayed in the top menu
-        """
-        url = config.GATEWAY_URL + "/topmenu.html"
-        resp = requests.get(url)
-        self.assertEqual(resp.status_code, 200)
-        self.assertTrue('href="/repoxplorer/"' in resp.text,
-                        'repoxplorer not present as a link')
-
-    @skipIfServiceMissing('repoxplorer')
     def test_repoxplorer_config_from_resources(self):
         """ Test if RepoXPlorer is reconfigured from new resources
         """
