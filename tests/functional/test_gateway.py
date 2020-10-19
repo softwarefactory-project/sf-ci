@@ -14,15 +14,12 @@
 
 import config
 import json
-import shlex
 import urllib.request
 
 from utils import Base
 from utils import skipIfServiceMissing
-from utils import services
 from utils import ManageSfUtils
 from utils import skipIfProvisionVersionLesserThan
-from utils import ssh_run_cmd
 from utils import GerritClient
 
 from requests.auth import HTTPBasicAuth
@@ -50,32 +47,6 @@ class TestGateway(Base):
         """Test if managesf config.py file is not world readable"""
         url = "%s/cauth/config.py" % config.GATEWAY_URL
         self._url_is_not_world_readable(url)
-
-    def test_topmenu_links_shown(self):
-        """ Test if all service links are shown in topmenu
-        """
-        subpaths = ["/r/", "/docs/"]
-        if "zuul" in services:
-            subpaths.append("/zuul/")
-        if "etherpad" in services:
-            subpaths.append("/etherpad/")
-        if "lodgeit" in services:
-            subpaths.append("/paste/")
-        if "kibana" in services:
-            elastic_url = '%s/elasticsearch' % config.GATEWAY_URL
-            data = json.loads(urllib.request.urlopen(elastic_url).read())
-            if data['version']['number'] == '2.4.6':
-                subpaths.append("/app/kibana")
-            else:
-                subpaths.append("/analytics")
-        if "repoxplorer" in services:
-            subpaths.append("/repoxplorer/")
-        url = config.GATEWAY_URL + "/topmenu.html"
-        resp = requests.get(url)
-        self.assertEqual(resp.status_code, 200)
-        for subpath in subpaths:
-            self.assertTrue(('href="%s' % subpath) in resp.text,
-                            '%s not present as a link' % subpath)
 
     @skipIfProvisionVersionLesserThan("2.4.0")
     def test_dashboard_data(self):
@@ -242,70 +213,9 @@ class TestGateway(Base):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('<title>New Paste | LodgeIt!</title>' in resp.text)
 
-    def test_css_js_for_topmenu_accessible(self):
-        """ Test if css/js for topmenu are accessible on gateway host
-        """
-        url = config.GATEWAY_URL + "/static/js/jquery.min.js"
-        resp = requests.get(url)
-        self.assertEqual(resp.status_code, 200)
-        self.assertTrue("jQuery" in resp.content.decode('utf-8'))
-
-        paths = ('js/bootstrap.min.js', 'css/bootstrap.min.css')
-        for p in paths:
-            url = config.GATEWAY_URL + "/static/bootstrap/%s" % p
-            resp = requests.get(url)
-            self.assertEqual(resp.status_code, 200)
-
-    @skipIfServiceMissing('lodgeit')
-    def test_static_dir_for_paste_accessible(self):
-        """ Test if static dir for paste is accessible on gateway host
-        """
-        url = config.GATEWAY_URL + "/static/lodgeit/jquery.js"
-        resp = requests.get(url)
-        self.assertEqual(resp.status_code, 200)
-        self.assertTrue("jQuery v1" in resp.content.decode('utf-8'))
-
     def test_docs_accessible(self):
         """ Test if Sphinx docs are accessible on gateway host
         """
         url = config.GATEWAY_URL + "/docs/index.html"
         resp = requests.get(url)
         self.assertEqual(resp.status_code, 200)
-
-    def test_welcome_accessible(self):
-        """ Test if Dashboard is accessible on gateway host
-        """
-        url = config.GATEWAY_URL + "/sf/welcome.html"
-
-        resp = requests.get(url)
-        self.assertEqual(resp.status_code, 200)
-        self.assertTrue('<body ng-app="sfWelcome"' in resp.text)
-
-    def test_default_redirect(self):
-        """ Test if default redirect forwards user to Gerrit
-        """
-        url = "https://%s/" % config.GATEWAY_HOST
-        resp = requests.get(url)
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.url,
-                         "https://%s/sf/welcome.html" % config.GATEWAY_HOST)
-
-        self.assertEqual(resp.history[0].status_code, 302)
-        self.assertEqual(resp.history[0].url,
-                         "https://%s/" % config.GATEWAY_HOST)
-
-    def test_static_files_are_not_cached(self):
-        """Make sure files in the 'static' dir are not cached"""
-        script = "topmenu.js"
-        url = "https://%s/static/js/%s" % (config.GATEWAY_HOST, script)
-        js = requests.get(url).text
-        # add a comment at the end of the js
-        cmd = "echo '// this is a useless comment' >> /var/www/static/js/%s"
-        ssh_run_cmd(config.SERVICE_PRIV_KEY_PATH,
-                    "root", config.GATEWAY_HOST,
-                    shlex.split(cmd % script))
-        newjs = requests.get(url).text
-        self.assertTrue(len(newjs) > len(js),
-                        "New js is %s" % newjs)
-        self.assertTrue("useless comment" in newjs,
-                        "New js has no useless comment !")
