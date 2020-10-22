@@ -126,6 +126,10 @@
     description: install, deploy and configure a minimal keycloak.
     run: playbooks/keycloak/test-deploy.yaml
     post-run: playbooks/keycloak/post.yaml
+    allowed-jobs:
+      - software-factory/keycloak-github-ssh-key-attribute-mapper
+      - software-factory/keycloak-event-listener-mqtt
+      - software-factory/keycloak-distgit
     nodeset:
       nodes:
         - name: server
@@ -135,6 +139,10 @@
     parent: base
     description: build a jar with maven
     run: playbooks/keycloak/maven-build.yaml
+    allowed-jobs:
+      - software-factory/keycloak-github-ssh-key-attribute-mapper
+      - software-factory/keycloak-event-listener-mqtt
+      - software-factory/keycloak-distgit
     nodeset:
       nodes:
         - name: builder
