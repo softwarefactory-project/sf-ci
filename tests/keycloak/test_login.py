@@ -34,16 +34,16 @@ class LoginTest(unittest.TestCase):
     def tearDown(self):
         self.driver.close()
 
-    # def test_user_login(self):
-    #     self.driver.get('http://localhost:8080/auth/realms/test/account')
-    #     self.driver.find_element_by_name("username").send_keys('testuser')
-    #     pwd = self.driver.find_element_by_name("password")
-    #     pwd.send_keys('testpassword')
-    #     pwd.submit()
-    #     time.sleep(5)
-    #     user_details_title = '<title>Keycloak Account Management</title>'
-    #     self.assertTrue(user_details_title in self.driver.page_source,
-    #                     self.driver.page_source)
+    def test_user_login(self):
+        self.driver.get('http://localhost:8080/auth/realms/test/account')
+        self.driver.find_element_by_name("username").send_keys('testuser')
+        pwd = self.driver.find_element_by_name("password")
+        pwd.send_keys('testpassword')
+        pwd.submit()
+        time.sleep(5)
+        user_details_title = '<title>Keycloak Account Management</title>'
+        self.assertTrue(user_details_title in self.driver.page_source,
+                        self.driver.page_source)
 
     def test_github_login(self):
         gh_login = os.getenv('GH_USER')
@@ -55,30 +55,35 @@ class LoginTest(unittest.TestCase):
         while 'github.com' not in self.driver.current_url:
             time.sleep(0.5)
             if limit > 120:
-                break
+                self.assertTrue(False, 'Github redirection did not work')
             limit += 1
-        self.driver.find_element_by_id('login_field').send_keys(gh_login)
-        pwd = self.driver.find_element_by_name("password")
-        pwd.send_keys(gh_pass)
-        pwd.submit()
-        # wait for the authorization screen if necessary
-        try:
-            authorize = self.driver.find_element_by_id(
-                'js-oauth-authorize-btn')
-            authorize.click()
-        except NoSuchElementException:
-            # wait for redirection to keycloak
-            pass
-        while 'localhost:8080' not in self.driver.current_url:
-            time.sleep(0.5)
-            if limit > 120:
-                break
-            limit += 1
-        # User info update form
-        self.driver.find_element_by_id('firstName').send_keys('GitHub')
-        self.driver.find_element_by_id('lastName').send_keys('TestAccount')
-        self.driver.find_element_by_id('lastName').submit()
-        time.sleep(5)
-        user_details_title = '<title>Keycloak Account Management</title>'
-        self.assertTrue(user_details_title in self.driver.page_source,
-                        self.driver.page_source)
+        # Proceed only if GH_USER and GH_PASSWORD are set
+        if gh_login and gh_pass:
+            self.driver.find_element_by_id('login_field').send_keys(gh_login)
+            pwd = self.driver.find_element_by_name("password")
+            pwd.send_keys(gh_pass)
+            pwd.submit()
+            # wait for the authorization screen if necessary
+            try:
+                authorize = self.driver.find_element_by_id(
+                    'js-oauth-authorize-btn')
+                authorize.click()
+            except NoSuchElementException:
+                # wait for redirection to keycloak
+                pass
+            while 'localhost:8080' not in self.driver.current_url:
+                time.sleep(0.5)
+                if limit > 120:
+                    break
+                limit += 1
+            # User info update form
+            self.driver.find_element_by_id('firstName').send_keys('GitHub')
+            self.driver.find_element_by_id('lastName').send_keys('TestAccount')
+            self.driver.find_element_by_id('lastName').submit()
+            time.sleep(5)
+            user_details_title = '<title>Keycloak Account Management</title>'
+            self.assertTrue(user_details_title in self.driver.page_source,
+                            self.driver.page_source)
+        else:
+            # Redirection successful
+            self.assertTrue(True)
