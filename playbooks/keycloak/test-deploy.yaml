@@ -263,15 +263,15 @@
     # The secret being exposed here is not a big deal. The authorized callback URL for this app is localhost, thus greatly limiting attack surfaces.
     - name: Create a github identity provider
       command: |
-        /opt/jboss/keycloak/bin/kcadm.sh create identity-provider/instances
+        "/opt/jboss/keycloak/bin/kcadm.sh create identity-provider/instances
             -r test
             -s alias=github
             -s providerId=github
             -s enabled=true
             -s 'config.useJwksUrl="true"'
-            -s config.clientId=fbf3c0514eb3b0180911
-            -s config.clientSecret=ad79036c04f777d149e5c66a365f53a75a8cd65d
-            --no-config --server http://localhost:8080/auth --realm master --user admin --password admin
+            -s config.clientId={{ github_client.clientId }}
+            -s config.clientSecret={{ github_client.clientSecret }}
+            --no-config --server http://localhost:8080/auth --realm master --user admin --password admin"
 
     - name: Create the SSH key mapper
       command: |

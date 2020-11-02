@@ -130,9 +130,11 @@
       nodes:
         - name: server
           label: cloud-centos-7
-    # secrets:
-    #   - name: github_user
-    #     secret: github-login-test
+    secrets:
+      # - name: github_user
+      #   secret: github-login-test
+      - name: github_client
+        secret: github-client-secret
 - job:
     name: maven-build
     parent: base
