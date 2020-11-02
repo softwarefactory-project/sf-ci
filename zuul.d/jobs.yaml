@@ -1,4 +1,36 @@
 ---
+- secret:
+    name: github-login-test
+    data:
+      username: test-kc-gh-provider
+      password: !encrypted/pkcs1-oaep
+        - OpGd3vAIYgOORexAc4oJtUH3t3ruMMLAnvep8voQQJgzE2nSoY+R4s470H5oPK895LEtz
+          Mka2hX1ghgnzZzrQtUvA8ZmEky40O/f99U7E3zA/otmOFDlBmswoQe1vwwEFcRsn3FXH8
+          SaA+7v8y4uisU5p2JqwhsNdeZBd8Mmx1cXsu/4NPiewxLYua/48kjfJFByl5FaLI8ACVg
+          w58xojN8QYCB5dVoe6Rom0hkEJrMdxWkOgLmX3nXSa6qC76vMVR+Go4Sp5OF/GmwgL26q
+          y3HVXlah5L/kS1lyQFaf1HnFimMivL7jKlDm5s0qP94tP+NqPDnSlgzIlBptjxNfE1cFp
+          zbVqzEqvgaPJG2L1AMSSSf1leKAVI/CdV+H+LOaAEPWy0ZAr+yh1uE1juY4y5CJzgtE/j
+          4jEEx5+JhDyE8HvC3804kPRHtLABvqLZPv01z5MfvO1EXM/9vt3fKiCaPr0hOIWIyDR6W
+          G59lX+T3Uc6jaYAh4UASARFGBNehTkfnlXDDBpMGcz2XHmwD2wncmTYMukpUzpLdqCtBV
+          fvzctm8dv+pKTrc7PXfk4J7SIeYIZ7bR9ujZIbZ1yGJ0jgLcSCtHxtWQkHtgNXdbmCBX4
+          Un7m9jeu0A2WPK2ygJC1qx0MDNn5nVsiPLfaWctAU25tWcoqi7ZlDH+0ReEwYA=
+
+- secret:
+    name: github-client-secret
+    data:
+      clientId: ad79036c04f777d149e5c66a365f53a75a8cd65d
+      clientSecret: !encrypted/pkcs1-oaep
+        - YQj/w85SyNCQgbHKDF0DtG+SrGu7BEPFS8NA5/NGUNF+wyCp7AwVVaA/5qqIjNsfrmLhk
+          jMw4aoz07gqTIdPXGz9GSOcdp7qaTTNysMTs4FCcNXamaOLEJZ2Z7TGim5wYPDvC3CnlK
+          1eYq4sTVDxoaltwq+/Z5cB+qzwAzcsFBFsskF6P+/fCs0aX0ueqQpYQURSRQCP1o6KuT0
+          B1QopvXBuBQ23BlUsB/3MDZ/JwpRyc+taA2CmgjqdqX4t4fN4jikH+MiIS0G9PBipQZ5m
+          Q0Qm4DI3cHS6gxJMUN5WI5xymPWI+TsDwrcnrkSBtqa+QkKtnzuLnPxmMEG1QWKpK6/eI
+          3AS4LPOGAQ+qvTCftNIKC3yfY4AzpQEuWpVE2Ss3icSR8mUbnvRVc1uOLozYHBN4AiTCf
+          Y/YUSSfSS/JcjVmlq+0v6VGMDAE1KgSiFdbC+MMtX1VIiECbnO1/g5O/C8iZJSHHmurA0
+          8YvmE253qHBKV0s0bs7QiOPNWy1NqiyFXcR0JYU/P9JeGNda9ILCB8wxrrZeyElVFVDSu
+          5rCizFA612nzIaginO/W75Zk2U4O4QjK5dWn7S+KbUHZ4xt9Dqcx9qSowlC0kIvgscX9c
+          Ccay+BHbP4TqTeGiCQr5QwnH6IbS19PANO+vwP97RTU88GPcqspSOl/SY520IQ=
+
 - job:
     name: sf-ci
     parent: base
@@ -130,9 +162,11 @@
       nodes:
         - name: server
           label: cloud-centos-7
-    # secrets:
-    #   - name: github_user
-    #     secret: github-login-test
+    secrets:
+      # - name: github_user
+      #   secret: github-login-test
+      - name: github_client
+        secret: github-client-secret
 - job:
     name: maven-build
     parent: base
