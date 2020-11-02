@@ -269,9 +269,12 @@
             -s providerId=github
             -s enabled=true
             -s 'config.useJwksUrl="true"'
-            -s config.clientId=fbf3c0514eb3b0180911
-            -s config.clientSecret=ad79036c04f777d149e5c66a365f53a75a8cd65d
+            -s config.clientId=aaaa
+            -s config.clientSecret=bbb
             --no-config --server http://localhost:8080/auth --realm master --user admin --password admin
+
+# -s config.clientId= {{ github_client_secret.clientId }}
+# -s config.clientSecret={{ github_client_secret.clientSecret }}
 
     - name: Create the SSH key mapper
       command: |
@@ -309,8 +312,8 @@
       shell: "nosetests -sv {{ sf_ci_dir }}/tests/keycloak/test_login.py"
       environment:
         DISPLAY: ":99"
-        # GH_USER: "{{ github_user.username }}"
-        # GH_PASSWORD: "{{ github_user.password }}"
+        # GH_USER: "{{ github_login_test.username }}"
+        # GH_PASSWORD: "{{ github_login_test.password }}"
 
     # - name: retrieve github user info
     #   command: >
