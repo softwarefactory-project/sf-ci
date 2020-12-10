@@ -171,10 +171,8 @@ class TestGateway(Base):
     def test_kibana_accessible(self):
         """ Test if Kibana is accessible on gateway host
         """
-        opendistro = False
         elastic_url = '%s/elasticsearch' % config.GATEWAY_URL
         if self._check_if_auth_required(config.GATEWAY_URL):
-            opendistro = True
             admin_password = self._get_elastic_admin_pass(
                     elasticsearch_credential_file)
             data = json.loads(
@@ -188,21 +186,10 @@ class TestGateway(Base):
         else:
             url = config.GATEWAY_URL + "/analytics/app/kibana"
 
-        if not opendistro:
-            if int(data['version']['number'].split('.')[0]) >= 7:
-                kibana_title = '<title>Elastic</title>'
-            else:
-                kibana_title = '<title>Kibana</title>'
-        else:
-            # NOTE: Opendisto HTML content does not provide <title>.
-            # Search the content to ensure that is working
-            kibana_title = 'action="/auth/login/"'
-
         # Without SSO cookie. Note that auth is no longer enforced
 
         resp = requests.get(url)
         self.assertEqual(resp.status_code, 200)
-        self.assertTrue(kibana_title in resp.text)
 
     @skipIfServiceMissing('zuul')
     def test_zuul_accessible(self):
