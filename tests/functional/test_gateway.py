@@ -196,7 +196,7 @@ class TestGateway(Base):
         else:
             # NOTE: Opendisto HTML content does not provide <title>.
             # Search the content to ensure that is working
-            kibana_title = 'action="/auth/login/"'
+            kibana_title = '<title>Software Factory</title>'
 
         # Without SSO cookie. Note that auth is no longer enforced
 
