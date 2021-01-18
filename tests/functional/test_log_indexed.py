@@ -27,12 +27,13 @@ from utils import set_private_key
 from utils import GerritGitUtils
 
 elasticsearch_credential_file = \
-        '/var/lib/software-factory/bootstrap-data/secrets.yaml'
+    '/var/lib/software-factory/bootstrap-data/secrets.yaml'
 
 
 class TestLogExportedInElasticSearch(Base):
     """ Functional tests to verify job logs are exported in ElasticSearch
     """
+
     def setUp(self):
         super(TestLogExportedInElasticSearch, self).setUp()
         priv_key_path = set_private_key(
@@ -56,7 +57,41 @@ class TestLogExportedInElasticSearch(Base):
                 if line.split(':')[0].strip() == 'elasticsearch_password':
                     return line.split(':')[1].strip()
 
-    def copy_request_script(self, index, newhash):
+    def create_request_script_for_logstash(
+            self, index, newhash, elastic_url, extra_headers,
+            additional_params):
+        content = """
+curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
+      "query": {
+          "bool": {
+              "must": [
+                  { "match": { "build_name": "config-update" } },
+                  { "match": { "build_newrev": "%s" } }
+              ]
+          }
+      }
+}' %s
+""" % (elastic_url, index, extra_headers, newhash, additional_params)
+        return content
+
+    def create_request_script_for_zuul_exporter(
+            self, index, newhash, elastic_url, extra_headers,
+            additional_params):
+        content = """
+curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
+      "query": {
+          "bool": {
+              "must": [
+                  { "match": { "job_name": "config-update" } },
+                  { "match": { "newrev": "%s" } }
+              ]
+          }
+      }
+}' %s
+""" % (elastic_url, index, extra_headers, newhash, additional_params)
+        return content
+
+    def copy_request_script(self, index, newhash, create_script):
         newhash = newhash.rstrip()
         elastic_url = '%s/elasticsearch' % config.GATEWAY_URL
 
@@ -80,23 +115,12 @@ class TestLogExportedInElasticSearch(Base):
             extra_headers = " -H 'kbn-version:4.5.4'"
         else:
             extra_headers = " -H 'Content-Type: application/json'"
-        content = """
-curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
-      "query": {
-          "bool": {
-              "must": [
-                  { "match": { "build_name": "config-update" } },
-                  { "match": { "build_newrev": "%s" } }
-              ]
-          }
-      }
-}' %s
-"""
+        content = create_script(
+            index, newhash, elastic_url, extra_headers, additional_params)
         with open('/tmp/test_request.sh', 'w') as fd:
-            fd.write(content % (elastic_url, index, extra_headers, newhash,
-                                additional_params))
+            fd.write(content)
 
-    def find_index(self):
+    def find_index(self, prefix):
         subcmd = ["curl", "-s",
                   "%s/elasticsearch/_cat/indices" % config.GATEWAY_URL]
 
@@ -114,15 +138,15 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
             outlines = subprocess.check_output(
                 subcmd).decode("utf-8").split('\n')
             indexes = list(filter(
-                lambda l: l.find('logstash-%s' % today_str) >= 0,
+                lambda l: l.find('%s-%s' % (prefix, today_str)) >= 0,
                 outlines))
             if indexes:
                 break
             time.sleep(1)
         self.assertEqual(
             len(indexes), 1,
-            "No logstash index has been found for today logstash-%s (%s)" % (
-                today_str, str(indexes)))
+            "No %s index has been found for today logstash-%s (%s)" % (
+                prefix, today_str, str(indexes)))
         index = indexes[0].split()[2]
         return index
 
@@ -153,14 +177,29 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
         return head
 
     @skipIfServiceMissing('job-logs-gearman-worker')
-    def test_log_indexation(self):
-        """ Test job log are exported in Elasticsearch
+    def test_zuul_job_console_log_indexation(self):
+        """ Test job console logs are exported in Elasticsearch
         """
         head = self.direct_push_in_config_repo(
             'ssh://%s@%s:29418' % (
                 config.ADMIN_USER,
                 config.GATEWAY_HOST))
-        index = self.find_index()
-        self.copy_request_script(index, head)
+        index = self.find_index("logstash")
+        self.copy_request_script(
+            index, head, self.create_request_script_for_logstash)
         log = self.verify_logs_exported()
         self.assertEqual(log['_source']["build_name"], "config-update")
+
+    @skipIfServiceMissing('elasticsearch')
+    def test_zuul_job_indexation(self):
+        """ Test job logs are exported in Elasticsearch
+        """
+        head = self.direct_push_in_config_repo(
+            'ssh://%s@%s:29418' % (
+                config.ADMIN_USER,
+                config.GATEWAY_HOST))
+        index = self.find_index("zuul.local")
+        self.copy_request_script(
+            index, head, self.create_request_script_for_zuul_exporter)
+        log = self.verify_logs_exported()
+        self.assertEqual(log['_source']["job_name"], "config-update")
