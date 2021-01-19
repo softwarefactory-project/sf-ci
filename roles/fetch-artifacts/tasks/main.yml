@@ -2,6 +2,16 @@
 - name: Remove empty directories
   command: "find {{ artifacts }} -type d -empty -delete"
 
+- name: Dump journalctl error logs to the file
+  shell: "journalctl -xe --since='1day ago' | tee {{ artifacts }}/journalctl-error.log"
+  become: true
+  no_log: true
+
+- name: Dump journalctl all logs to the file
+  shell: "journalctl --since='1day ago' | tee {{ artifacts }}/journalctl.log"
+  become: true
+  no_log: true
+
 - name: Fetch artifacts
   synchronize:
     src: "{{ artifacts }}/"
