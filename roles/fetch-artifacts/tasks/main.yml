@@ -2,6 +2,16 @@
 - name: Remove empty directories
   command: "find {{ artifacts }} -type d -empty -delete"
 
+- name: Compress and replace files
+  shell: |
+    for f in $(find {{ artifacts }} -name "*.{{ item }}"); do tar cvzf $f.{{ item }}.gz $f; rm $f; done
+  loop:
+    - txt
+    - yaml
+    - yml
+    - log
+    - conf
+
 - name: Fetch artifacts
   synchronize:
     src: "{{ artifacts }}/"
