@@ -2,6 +2,11 @@
 - name: Remove empty directories
   command: "find {{ artifacts }} -type d -empty -delete"
 
+- name: Dump journalctl all logs to the file
+  shell: |
+    journalctl --output short --no-pager --since='1 day ago' > {{ artifacts }}/journalctl.log
+  become: true
+
 - name: Fetch artifacts
   synchronize:
     src: "{{ artifacts }}/"
@@ -20,6 +25,14 @@
   synchronize:
     src: /var/log/nodepool
     dest: "{{ zuul.executor.log_root }}/nodepool"
+    mode: pull
+  no_log: True
+  become: yes
+
+- name: Fetch journalctl log file
+  synchronize:
+    src: /tmp/journalctl.log
+    dest: "{{ zuul.executor.log_root }}/logs"
     mode: pull
   no_log: True
   become: yes
