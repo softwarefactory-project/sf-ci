@@ -2,6 +2,9 @@
 - name: Remove empty directories
   command: "find {{ artifacts }} -type d -empty -delete"
 
+- name: Compress and replace files
+  shell: "find {{ artifacts }} -type f -regextype posix-extended -regex '.*.(txt|yaml|yml|log|conf)$' -exec gzip '{}' + ;"
+
 - name: Fetch artifacts
   synchronize:
     src: "{{ artifacts }}/"
