@@ -101,13 +101,17 @@
       vars:
         instance: tenant
 
-    - name: Add gerrit connection in sfconfig.yaml
+    - name: Configure sfconfig
       include_role:
         name: configure-sfconfig
       vars:
         sf_main_instance: true
         static_hostname_ip: '{{ tenant_ip }}'
         static_hostname_fqdn: tenant.sftests.com
+        add_component:
+          - component: elasticsearch
+          - component: repoxplorer
+          - component: hound
 
     - name: Run sfconfig to apply configuration
       include_role:
