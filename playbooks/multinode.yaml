@@ -108,6 +108,13 @@
         sf_main_instance: true
         static_hostname_ip: '{{ tenant_ip }}'
         static_hostname_fqdn: tenant.sftests.com
+        add_component:
+          - component: gerrit
+            insertafter: cauth
+          - component: gitweb
+          - component: elasticsearch
+          - component: repoxplorer
+          - component: hound
 
     - name: Run sfconfig to apply configuration
       include_role:
