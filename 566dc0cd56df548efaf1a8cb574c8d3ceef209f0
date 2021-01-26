@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0739747b_e3425977",
+        "filename": "playbooks/multinode.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 68
+      },
+      "writtenOn": "2021-01-26T10:57:23Z",
+      "side": 1,
+      "message": "I\u0027m not sure that task name is accurate?",
+      "range": {
+        "startLine": 104,
+        "startChar": 4,
+        "endLine": 104,
+        "endChar": 50
+      },
+      "revId": "566dc0cd56df548efaf1a8cb574c8d3ceef209f0",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
