@@ -7,3 +7,9 @@ zuul_default_retry_attempts: 3
 
 # Enable using hypervisor role on the install-server
 enable_insecure_workers: true
+
+# NOTE(dpawlik): Logstash in 7.10 require more memory as previous version.
+elasticsearch_maximum_heap_size: 512m
+elasticsearch_minimum_heap_size: 128m
+logstash_maximum_heap_size: 512m
+logstash_minimum_heap_size: 128m
