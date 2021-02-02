@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "56a62ab4_dd2e9cd4",
+        "filename": "roles/fetch-artifacts/tasks/main.yml",
+        "patchSetId": 13
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2021-02-02T16:00:29Z",
+      "side": 1,
+      "message": "nit: you can use multiple `-name` attribute to match all the files in one find.",
+      "range": {
+        "startLine": 7,
+        "startChar": 43,
+        "endLine": 7,
+        "endChar": 63
+      },
+      "revId": "425df47a855b9cd7b411b593835e00bbc8a0e8be",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fc2c35c8_d3d92f8e",
+        "filename": "roles/fetch-artifacts/tasks/main.yml",
+        "patchSetId": 13
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2021-02-02T16:00:29Z",
+      "side": 1,
+      "message": "why not using gzip directly?",
+      "range": {
+        "startLine": 7,
+        "startChar": 69,
+        "endLine": 7,
+        "endChar": 77
+      },
+      "revId": "425df47a855b9cd7b411b593835e00bbc8a0e8be",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
