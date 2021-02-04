@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e155aa0d_84df93b3",
+        "filename": "roles/fetch-artifacts/tasks/main.yml",
+        "patchSetId": 17
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 7
+      },
+      "writtenOn": "2021-02-04T14:05:22Z",
+      "side": 1,
+      "message": "perhaps add a `-or -name \"messages\"`, otherwise the file we wanted to compress is not compressed :)",
+      "range": {
+        "startLine": 6,
+        "startChar": 38,
+        "endLine": 6,
+        "endChar": 40
+      },
+      "revId": "75ad2e9fba8447d613f2b5d754f99cec6bb9ad97",
+      "serverId": "6c1dc8ef-8b94-40e4-bd83-c2359d45ecc0",
+      "unresolved": false
+    }
+  ]
+}
