@@ -1,5 +1,7 @@
 ---
 - hosts: install-server
+  vars:
+    add_k1s_hypervisor: true
   tasks:
     - name: Prepare instance
       include_role:
@@ -32,14 +34,6 @@
     - name: Update sfconfig package
       include_role:
         name: install-sfconfig
-
-    # Remove next two tasks once sf-3.5 is released
-    - name: Activate hypervisor-k1s role in arch.yaml
-      become: yes
-      lineinfile:
-        path: /etc/software-factory/arch.yaml
-        insertafter: '      - nodepool-launcher'
-        line: '      - hypervisor-k1s'
 
     - name: Run sfconfig upgrade
       include_role:
