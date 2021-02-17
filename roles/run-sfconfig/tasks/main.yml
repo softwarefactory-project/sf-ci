@@ -18,6 +18,24 @@
   command: 'sfconfig {{ sfconfig_args }}'
   become: yes
 
+- name: Create /etc/containers
+  file:
+    name: /etc/containers
+    state: directory
+  become: yes
+
+- name: Configure /etc/containers/registries.conf
+  copy:
+    content: |
+      [registries.search]
+      registries = ['registry.fedoraproject.org', 'registry.centos.org', 'docker.io']
+      [registries.insecure]
+      registries = []
+      [registries.block]
+      registries = []
+    dest: /etc/containers/registries.conf
+  become: yes
+
 - name: Store package list
   include_tasks: store_packages_list.yml
 
