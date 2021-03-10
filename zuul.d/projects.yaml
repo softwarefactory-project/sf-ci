@@ -10,12 +10,6 @@
       jobs:
         - linters:
             nodeset: fedora-latest-pod
-    periodic:
-      jobs:
-        - sf-deploy-stable:
-            branches: master
-        - sf-deploy-stable-cr:
-            branches: master
     experimental:
       jobs:
         - sf-rpm-build
