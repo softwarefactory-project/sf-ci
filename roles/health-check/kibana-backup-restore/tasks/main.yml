@@ -59,12 +59,12 @@
 
 - name: Run restore script for dashboard
   command: |
-    /usr/local/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --restore-file {{ backup_dest }}/dashboard.ndjson {{ additional_params | default('') }} restore
+    /usr/local/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --file {{ backup_dest }}/dashboard.ndjson {{ additional_params | default('') }} restore
   register: restore_dashboard
 
 - name: Run restore script for visualization
   command: |
-    /usr/local/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --restore-file {{ backup_dest }}/visualization.ndjson {{ additional_params | default('') }} restore
+    /usr/local/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --file {{ backup_dest }}/visualization.ndjson {{ additional_params | default('') }} restore
   register: restore_visualization
 
 - name: Ensure that restore was OK
