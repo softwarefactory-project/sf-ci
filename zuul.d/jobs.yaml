@@ -71,7 +71,7 @@
     run: playbooks/upgrade.yaml
     vars:
       sf_arch: minimal
-      sf_version: 3.5
+      sf_version: 3.6
       show_hidden_logs: false
 
 - job:
@@ -81,7 +81,7 @@
     run: playbooks/upgrade.yaml
     vars:
       sf_arch: allinone
-      sf_version: 3.5
+      sf_version: 3.6
       show_hidden_logs: false
 
 - job:
@@ -107,7 +107,7 @@
     run: playbooks/stable.yaml
     vars:
       sf_arch: allinone
-      sf_version: 3.5
+      sf_version: 3.6
       centos_cr: false
 
 - job:
@@ -117,7 +117,7 @@
     run: playbooks/stable.yaml
     vars:
       sf_arch: allinone
-      sf_version: 3.5
+      sf_version: 3.6
       centos_cr: true
 
 - job:
