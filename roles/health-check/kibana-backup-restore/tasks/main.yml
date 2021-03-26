@@ -29,18 +29,6 @@
   command: |
     /usr/local/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --backup-dir {{ backup_dest }} {{ additional_params | default('') }} backup
 
-- name: Get content of current backup
-  command: |
-    cat {{ backup_dest }}/backup.ndjson
-  register: backup_files_output
-
-- name: Fail if there are more than index objects in backup
-  fail:
-    msg: "Backup files should be empty!"
-  when:
-    - "'visualization' in backup_files_output.stdout"
-    - "'dashboard' in backup_files_output.stdout"
-
 - name: Copy example ndjson files
   copy:
     src: "{{ item }}"
@@ -48,6 +36,7 @@
   loop:
     - dashboard.ndjson
     - visualization.ndjson
+    - index-pattern.ndjson
 
 - name: Ensure that example file exists
   file:
@@ -56,6 +45,12 @@
   loop:
     - dashboard.ndjson
     - visualization.ndjson
+    - index-pattern.ndjson
+
+- name: Run restore script for index-pattern
+  command: |
+    /usr/local/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --restore-file {{ backup_dest }}/index-pattern.ndjson {{ additional_params | default('') }} restore
+  register: restore_index_pattern
 
 - name: Run restore script for dashboard
   command: |
@@ -73,6 +68,7 @@
   when:
     - "{{ restore_dashboard.stdout | json_query('success') }}"
     - "{{ restore_visualization.stdout | json_query('success') }}"
+    - "{{ restore_index_pattern.stdout | json_query('success') }}"
 
 - name: Rename files before backup
   command: |
@@ -80,10 +76,30 @@
   loop:
     - dashboard.ndjson
     - visualization.ndjson
+    - index-pattern.ndjson
+
+# FIXME: After restoring Index pattern with the script, Kibana does not refresh
+# all objects. So far, only restart or manual index-pattern creation works.
+- name: Restart Kibana service
+  systemd:
+    name: kibana
+    state: restarted
+
+- name: Check if Kibana service is alive
+  wait_for:
+    host: "{{ kibana_host }}"
+    port: 5601
+    timeout: 300
+    delay: 20
 
 - name: Create new backup of Kibana objects
   command: |
     /usr/local/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --backup-dir {{ backup_dest }} {{ additional_params | default('') }} backup
+
+- name: Get content of new backup - index pattern
+  command: |
+    cat {{ backup_dest }}/index-pattern.ndjson
+  register: dashboard_new
 
 - name: Get content of new backup - dashboard
   command: |
@@ -101,3 +117,4 @@
   when:
     - "'dashboard' not in dashboard_new.stdout"
     - "'visualization' not in visualization_new.stdout"
+    - "'index' not in index_pattern_new.stdout"
