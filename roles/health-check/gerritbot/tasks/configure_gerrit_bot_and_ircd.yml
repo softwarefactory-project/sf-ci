@@ -1,13 +1,32 @@
-- name: Start fake_ircd service
+- name: Prepare irc server with SSL support
   block:
-    - name: Setup fake_ircd.py
-      copy:
-        src: fake_ircd.py
-        dest: /usr/local/bin/fake_ircd.py
-        mode: 0755
+    - name: Check if miniircd is already there
+      stat:
+        path: /tmp/miniircd
+      register: _miniircd_dir
 
-    - name: Start fake irc server
-      command: /usr/local/bin/fake_ircd.py --daemon
+    - name: Clone miniircd
+      shell: |
+        git clone https://github.com/jrosdahl/miniircd -b v2.1 /tmp/miniircd
+      when: not _miniircd_dir.stat.exists
+
+    - name: Gen self signed certs
+      shell: >
+        openssl req -newkey rsa:2048 -nodes -keyout host.key \
+          -subj "/C=PL/ST=Dolnoslaskie/L=Wroclaw/O=SF/OU=SF/CN=sftests.com/emailAddress=null@sftests.com" && \
+        openssl req -new -sha512 -key host.key -nodes -out host.reqcert \
+          -subj "/C=PL/ST=Dolnoslaskie/L=Wroclaw/O=SF/OU=SF/CN=sftests.com/emailAddress=null@sftests.com" && \
+        openssl req -x509 -sha512 -days 1095 -key host.key -in host.reqcert -out host.cert
+      args:
+        chdir: /tmp/miniircd
+      when: not _miniircd_dir.stat.exists
+
+    - name: Start miniircd server
+      shell: |
+        ./miniircd --ssl-cert-file host.cert --ssl-key-file host.key \
+          --debug --log-file /var/log/fakeircd.log --setuid root --daemon
+      args:
+        chdir: /tmp/miniircd
 
 - name: Setup gerritbot and start service
   block:
@@ -32,8 +51,3 @@
       wait_for:
         path: /var/log/gerritbot/gerritbot.log
         search_regex: "INFO gerritbot{{':'}} Start watching Gerrit event stream."
-
-    - name: Wait for gerritbot to connect to irc
-      wait_for:
-        path: /var/log/gerritbot/gerritbot.log
-        search_regex: "INFO gerritbot{{':'}} Identified with IRC server."

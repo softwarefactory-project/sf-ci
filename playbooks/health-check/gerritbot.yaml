@@ -26,7 +26,7 @@
         name: health-check/gerritbot
         tasks_from: ircd_get_logs
       vars:
-        ircd_logs_pattern: "PRIVMSG .irc-channel-health-check .*ed config.* Test gerritbot notif .*http"
+        ircd_logs_pattern: "PRIVMSG .irc-channel-health-check .*ed config.*"
 
 - hosts: install-server
   tasks:
@@ -50,7 +50,7 @@
         name: health-check/gerritbot
         tasks_from: ircd_get_logs
       vars:
-        ircd_logs_pattern: "PRIVMSG .irc-channel-health-check .Merged config.* Change gerritbot channel  http..."
+        ircd_logs_pattern: "PRIVMSG .irc-channel-health-check .Merged config.*"
 
 - hosts: install-server
   tasks:
@@ -68,7 +68,7 @@
         name: health-check/gerritbot
         tasks_from: ircd_get_logs
       vars:
-        ircd_logs_pattern: "PRIVMSG .{{ channel_name }} .*ed config.* Create new fake config change .*http"
+        ircd_logs_pattern: "PRIVMSG .{{ channel_name }} .*ed config.* Create new fake config change"
 
     - name: Kill fake_ircd daemon
       include_role:
