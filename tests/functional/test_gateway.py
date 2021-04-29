@@ -235,6 +235,19 @@ class TestGateway(Base):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('<title>New Paste | LodgeIt!</title>' in resp.text)
 
+    @skipIfServiceMissing('lodgeit')
+    def test_paste_captcha(self):
+        """ Test if captcha in Paste service is accessible
+        """
+        url = config.GATEWAY_URL + "/paste/_captcha.png"
+        resp = requests.get(
+            url,
+            cookies=dict(
+                auth_pubtkt=config.USERS[config.USER_1]['auth_cookie']))
+        self.assertEqual(resp.status_code, 200)
+        # Check if image header "PNG" will be in response
+        self.assertTrue('PNG' in resp.text)
+
     def test_docs_accessible(self):
         """ Test if Sphinx docs are accessible on gateway host
         """
