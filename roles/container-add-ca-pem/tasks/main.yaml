@@ -1,0 +1,27 @@
+---
+- name: "Check if {{ item }} container exists"
+  command: "podman container exists {{ item }}"
+  ignore_errors: yes
+  register: _container_exists
+  changed_when: no
+  failed_when: _container_exists.rc not in [0, 1]
+  become: true
+
+# on debian container, ca extension needs to be '.crt' or
+# update-ca-certificates won't load it
+- name: "Copy CA on {{ item }} container"
+  command: >-
+    podman cp /etc/pki/ca-trust/source/anchors/tenant.pem
+    {{ item }}:/usr/local/share/ca-certificates/tenant.crt
+  when: _container_exists.rc == 0
+  become: true
+
+- name: "Update ca certificate on {{ item }}"
+  command: "podman exec -ti {{ item }} update-ca-certificates"
+  when: _container_exists.rc == 0
+  become: true
+
+- name: "Ensure ca-bundle symlink exists on {{ item }}"
+  command: "podman exec -ti {{ item }} ln -s /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-bundle.crt"
+  when: _container_exists.rc == 0
+  become: true

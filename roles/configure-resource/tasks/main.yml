@@ -1,9 +1,5 @@
 - name: Add tenant resource
   block:
-    - name: Check if config update
-      include_role:
-        name: wait_for_config_update
-
     - name: Add tenant gerrit connection
       blockinfile:
         path: /root/config/resources/tenant.sftests.com.yaml
