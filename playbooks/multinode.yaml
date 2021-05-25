@@ -39,7 +39,6 @@
       vars:
         add_component:
           - component: elasticsearch
-          - component: repoxplorer
           - component: hound
 
     - name: Run sfconfig
@@ -81,7 +80,6 @@
             insertafter: cauth
           - component: gitweb
           - component: elasticsearch
-          - component: repoxplorer
           - component: hound
         sf_tenant_instance: true
         static_hostname_ip: '{{ master_ip }}'
@@ -110,7 +108,6 @@
         static_hostname_fqdn: tenant.sftests.com
         add_component:
           - component: elasticsearch
-          - component: repoxplorer
           - component: hound
 
     - name: Run sfconfig to apply configuration
@@ -163,9 +160,3 @@
       vars:
         service_uri: 'http://managesf.tenant.sftests.com:6080/api/v1/search?q=TestHello&i=nope&files=&repos=ichiban-compute'
         service_until_condition: _result.json['Results']['ichiban-compute']['FilesWithMatch'] == 1
-
-    - name: Validate project is present on RepoXplorer
-      include_role:
-        name: health-check/validate_project
-      vars:
-        service_uri: 'http://repoxplorer.tenant.sftests.com:20002/api/v1/commits/commits?pid=ichiban-cloud'
