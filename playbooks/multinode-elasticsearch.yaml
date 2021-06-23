@@ -1,0 +1,139 @@
+---
+- hosts: elk
+  become: true
+  vars:
+    fqdn: elasticsearch.sftests.com
+    internal_users:
+      - user: "admin"
+        role: "admin"
+        password: "admin"
+      - user: "kibanaserver"
+        role: "kibanauser"
+        password: "kibanaserver"
+    users:
+      - user: "admin"
+        role: "admin"
+        password: "admin"
+        tenant: "sftests.com"
+      - user: "logstash"
+        role: "admin"
+        password: "logstash"
+        tenant: "sftests.com"
+      - user: "curator"
+        role: "admin"
+        password: "curator"
+        tenant: "sftests.com"
+      - user: "kibana"
+        role: "readonly"
+        password: "kibana"
+        tenant: "sftests.com"
+      - user: "zuul"
+        role: "admin"
+        password: "zuul"
+        tenant: "sftests.com"
+  tasks:
+    - name: Install rsync package
+      become: true
+      package:
+        name: rsync
+        state: present
+
+    - name: Set hostname
+      hostname:
+        name: "{{ fqdn }}"
+
+    - name: Setup ES stack
+      include_role:
+        name: "{{ zuul.projects['softwarefactory-project.io/software-factory/ansible-role-elastic-recheck'].src_dir }}"
+        tasks_from: main.yaml
+
+- hosts: master
+  tasks:
+    - set_fact:
+        elk_ip: "{{ hostvars['elk']['ansible_default_ipv4']['address'] }}"
+
+- hosts: elk
+  tasks:
+    - set_fact:
+        master_ip: "{{ hostvars['master']['ansible_default_ipv4']['address'] }}"
+
+- hosts: master
+  vars:
+    add_k1s_hypervisor: true
+  tasks:
+    - name: Prepare instance
+      include_role:
+        name: '{{ item }}'
+      loop:
+        - prepare-test-env
+        - install-ci-repository
+        - check-bubblewrap
+        - install-sfconfig
+
+    - name: Configure sfconfig
+      include_role:
+        name: configure-sfconfig
+      vars:
+        sf_arch: allinone
+        static_hostname_ip: '{{ elk_ip }}'
+        static_hostname_fqdn: elasticsearch.sftests.com
+        remove_component:
+          - component: elasticsearch
+          - component: kibana
+
+    - name: Configure external_elasticsearch users
+      include_role:
+        name: configure-external-elasticsearch-host
+      vars:
+        kibana_host_url: "http://elasticsearch.sftests.com:5601"
+        elasticsearch_host: "https://elasticsearch.sftests.com:9200"
+        cacert_path: /etc/elasticsearch/certs/localCA.pem
+        suffix: sftests_com
+        users:
+          admin_sftests_com:
+            role: admin
+            password: admin
+          logstash_sftests_com:
+            role: logstash
+            password: logstash
+          curator_sftests_com:
+            role: admin
+            password: curator
+          # Readonly user
+          kibana_sftests_com:
+            role: readonly
+            password: kibana
+          zuul_sftests_com:
+            role: zuul
+            password: zuul
+        elasticsearch_connections:
+          - name: elastic_sftest_com
+            username: zuul_sftests_com
+            password: zuul
+            host: elasticsearch.sftests.com
+            port: 9200
+            use_ssl: true
+            ca_certs: "{{ cacert_path }}"
+            index: "zuul"
+
+    - name: Fetch master CA pem file and elasticsearch certs
+      include_role:
+        name: fetch-ca-pem
+      vars:
+        instance: elk
+        sf_deployment: false
+
+    - name: Run sfconfig
+      include_role:
+        name: run-sfconfig
+      vars:
+        sfconfig_args: --provision-demo --enable-insecure-workers
+
+    - name: Run functional tests and health-check
+      include_role:
+        name: '{{ item }}'
+      loop:
+        - setup-test-env
+        - run-provisioner
+        - run-health-check
+        - run-functional-tests

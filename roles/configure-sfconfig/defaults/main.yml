@@ -1,4 +1,5 @@
 add_component: []
+remove_component: []
 unsupported_components: []
 add_k1s_hypervisor: false
 static_hostname_ip:

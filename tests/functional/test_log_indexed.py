@@ -21,13 +21,15 @@ import string
 import subprocess
 import time
 import urllib.request
+import yaml
 
-from utils import Base, skipIfServiceMissing
+from utils import Base, skipIfServiceMissing, skipReason
 from utils import set_private_key
 from utils import GerritGitUtils
 
 elasticsearch_credential_file = \
     '/var/lib/software-factory/bootstrap-data/secrets.yaml'
+sfconfig_file = '/etc/software-factory/sfconfig.yaml'
 
 
 class TestLogExportedInElasticSearch(Base):
@@ -56,6 +58,22 @@ class TestLogExportedInElasticSearch(Base):
             for line in f.readlines():
                 if line.split(':')[0].strip() == 'elasticsearch_password':
                     return line.split(':')[1].strip()
+
+    def _get_ext_elastic_creds(self):
+        if not os.path.exists(sfconfig_file):
+            return
+        with open(sfconfig_file, 'r') as ext_users:
+            parsed_file = yaml.safe_load(ext_users)
+            if 'external_elasticsearch' in parsed_file:
+                return parsed_file['external_elasticsearch']
+
+    def _get_ext_elastic_admin_pass(self, username):
+        ext_creds = self._get_ext_elastic_creds()
+        if not ext_creds.get('users'):
+            return
+        for user, creds in ext_creds['users'].items():
+            if user == username:
+                return creds.get('password')
 
     def create_request_script_for_logstash(
             self, index, newhash, elastic_url, extra_headers,
@@ -95,8 +113,14 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
         newhash = newhash.rstrip()
         elastic_url = '%s/elasticsearch' % config.GATEWAY_URL
 
-        user = 'admin'
-        password = self._get_elastic_admin_pass(elasticsearch_credential_file)
+        if self._get_ext_elastic_creds():
+            user = 'admin_sftests_com'
+            password = self._get_ext_elastic_admin_pass(user)
+        else:
+            user = 'admin'
+            password = self._get_elastic_admin_pass(
+                elasticsearch_credential_file)
+
         additional_params = ''
 
         if self._check_if_auth_required(config.GATEWAY_URL):
@@ -120,17 +144,30 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
         with open('/tmp/test_request.sh', 'w') as fd:
             fd.write(content)
 
-    def find_index(self, prefix):
+    def find_index(self, prefix, include_suffix=True):
         subcmd = ["curl", "-s",
                   "%s/elasticsearch/_cat/indices" % config.GATEWAY_URL]
 
-        if self._check_if_auth_required(config.GATEWAY_URL):
-            subcmd.append("--user")
-            subcmd.append("admin:%s" % self._get_elastic_admin_pass(
-                elasticsearch_credential_file))
-
         # A logstash index is created by day
         today_str = datetime.datetime.utcnow().strftime('%Y.%m.%d')
+        index_name = '%s-%s' % (prefix, today_str)
+
+        if self._check_if_auth_required(config.GATEWAY_URL):
+            external_elasticsearch = self._get_ext_elastic_creds()
+            if external_elasticsearch:
+                user = 'admin_sftests_com'
+                admin_password = self._get_ext_elastic_admin_pass(user)
+                if include_suffix:
+                    es_suffix = external_elasticsearch.get('suffix')
+                    index_name = '%s-%s-%s' % (prefix, es_suffix, today_str)
+            else:
+                user = 'admin'
+                admin_password = self._get_elastic_admin_pass(
+                    elasticsearch_credential_file)
+
+            subcmd.append("--user")
+            subcmd.append("%s:%s" % (user, admin_password))
+
         # Here we fetch the index name, but also we wait for
         # it to appears in ElasticSearch for 5 mins
         index = []
@@ -138,7 +175,7 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
             outlines = subprocess.check_output(
                 subcmd).decode("utf-8").split('\n')
             indexes = list(filter(
-                lambda l: l.find('%s-%s' % (prefix, today_str)) >= 0,
+                lambda l: l.find(index_name) >= 0,
                 outlines))
             if indexes:
                 break
@@ -199,6 +236,25 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
                 config.ADMIN_USER,
                 config.GATEWAY_HOST))
         index = self.find_index("zuul.local")
+        self.copy_request_script(
+            index, head, self.create_request_script_for_zuul_exporter)
+        log = self.verify_logs_exported()
+        self.assertEqual(log['_source']["job_name"], "config-update")
+
+    def test_zuul_job_indexation_external_elasticsearch(self):
+        """ Test job logs are exported in external Elasticsearch
+        """
+        if not self._get_ext_elastic_creds():
+            return skipReason("There is no configuration set for "
+                              "external_elasticsearch. Skipping.")
+        head = self.direct_push_in_config_repo(
+            'ssh://%s@%s:29418' % (
+                config.ADMIN_USER,
+                config.GATEWAY_HOST))
+        # NOTE: zuul is including the tenant into the
+        # index name. More info:
+        # https://zuul-ci.org/docs/zuul/reference/drivers/elasticsearch.html
+        index = self.find_index("zuul.local", False)
         self.copy_request_script(
             index, head, self.create_request_script_for_zuul_exporter)
         log = self.verify_logs_exported()

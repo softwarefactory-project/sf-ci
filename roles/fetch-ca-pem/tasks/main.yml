@@ -4,6 +4,30 @@
     dest: '/etc/pki/ca-trust/source/anchors/{{ instance }}.pem'
   delegate_to: '{{ instance }}'
   become: yes
+  when: sf_deployment | default(true)
+
+- name: Get pem from Elasticsearch instance
+  become: yes
+  block:
+    - name: Create elasticsearch cert dir required by logstash
+      file:
+        path: /etc/elasticsearch/certs
+        state: directory
+        recurse: true
+
+    - name: Get localCA pem
+      synchronize:
+        src: /etc/elasticsearch/certs/localCA.pem
+        dest: /etc/pki/ca-trust/source/anchors/elasticsearch.pem
+      delegate_to: '{{ instance }}'
+
+    - name: Synchronize other certificates required by Logstash
+      synchronize:
+        src: /etc/elasticsearch/certs/localCA.pem
+        dest: /etc/elasticsearch/certs/localCA.pem
+        recursive: true
+      delegate_to: '{{ instance }}'
+  when: "not sf_deployment | default(true) "
 
 - name: Update ca trust
   command: update-ca-trust

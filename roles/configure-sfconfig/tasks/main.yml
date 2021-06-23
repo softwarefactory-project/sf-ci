@@ -22,6 +22,14 @@
       loop: '{{ add_component }}'
       when: add_component
 
+    - name: Remove extra components in arch.yaml
+      lineinfile:
+        path: /etc/software-factory/arch.yaml
+        line: '      - {{ item.component }}'
+        state: absent
+      loop: '{{ remove_component }}'
+      when: remove_component
+
     - name: Fix default nodeset to pod-fedora
       replace:
         path: /etc/software-factory/sfconfig.yaml
@@ -59,4 +67,5 @@
 
     - include_tasks: configure-tenant-instance.yml
       when: sf_tenant_instance
+
   become: yes

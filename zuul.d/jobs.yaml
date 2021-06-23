@@ -142,3 +142,26 @@
       nodes:
         - name: builder
           label: cloud-centos-7
+
+- job:
+    name: sf-ci-functional-external-elk
+    description: The sf functional tests of the Elasticsearch multitenants
+    parent: sf-ci-multinode
+    run: playbooks/multinode-elasticsearch.yaml
+    required-projects:
+      - software-factory/ansible-role-elastic-recheck
+    vars:
+      show_hidden_logs: false
+    nodeset:
+        nodes:
+          - name: master
+            label: cloud-centos-7
+          - name: elk
+            label: cloud-centos-7
+        groups:
+          - name: switch
+            nodes:
+              - master
+          - name: peers
+            nodes:
+              - elk

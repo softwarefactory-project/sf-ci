@@ -15,9 +15,11 @@
 import config
 import json
 import urllib.request
+import yaml
 
 from utils import Base
 from utils import skipIfServiceMissing
+from utils import skipReason
 from utils import ManageSfUtils
 from utils import skipIfProvisionVersionLesserThan
 from utils import GerritClient
@@ -28,8 +30,9 @@ import os
 import requests
 import subprocess
 
-elasticsearch_credential_file = \
-        '/var/lib/software-factory/bootstrap-data/secrets.yaml'
+bootstrap_dir = '/var/lib/software-factory/bootstrap-data'
+elasticsearch_credential_file = '%s/secrets.yaml' % bootstrap_dir
+sfconfig_file = '/etc/software-factory/sfconfig.yaml'
 
 
 class TestGateway(Base):
@@ -57,6 +60,27 @@ class TestGateway(Base):
             for line in f.readlines():
                 if line.split(':')[0].strip() == 'elasticsearch_password':
                     return line.split(':')[1].strip()
+
+    def _get_ext_elastic_creds(self):
+        if not os.path.exists(sfconfig_file):
+            return
+        with open(sfconfig_file, 'r') as ext_users:
+            parsed_file = yaml.safe_load(ext_users)
+            if 'external_elasticsearch' in parsed_file:
+                return parsed_file['external_elasticsearch']
+
+    def _get_ext_elastic_admin_pass(self, username):
+        ext_creds = self._get_ext_elastic_creds()
+        if not ext_creds.get('users'):
+            return
+        for user, creds in ext_creds['users'].items():
+            if user == username:
+                return creds.get('password')
+
+    def _is_kibana_external(self, file_path):
+        with open(file_path, 'r') as sf_config:
+            parsed_file = yaml.safe_load(sf_config)
+            return parsed_file.get('kibana', {})
 
     def test_managesf_is_secure(self):
         """Test if managesf config.py file is not world readable"""
@@ -171,13 +195,18 @@ class TestGateway(Base):
     def test_kibana_accessible(self):
         """ Test if Kibana is accessible on gateway host
         """
+        if self._is_kibana_external(sfconfig_file):
+            return skipReason("Skipping test due external Kibana host is "
+                              "configured")
+
         elastic_url = '%s/elasticsearch' % config.GATEWAY_URL
         if self._check_if_auth_required(config.GATEWAY_URL):
             admin_password = self._get_elastic_admin_pass(
-                    elasticsearch_credential_file)
+                elasticsearch_credential_file)
             data = json.loads(
                 requests.get(elastic_url,
-                             auth=HTTPBasicAuth('admin', admin_password)).text)
+                             auth=HTTPBasicAuth('admin', admin_password)
+                             ).text)
         else:
             data = json.loads(urllib.request.urlopen(elastic_url).read())
 
@@ -187,7 +216,40 @@ class TestGateway(Base):
             url = config.GATEWAY_URL + "/analytics/app/kibana"
 
         # Without SSO cookie. Note that auth is no longer enforced
+        resp = requests.get(url)
+        self.assertEqual(resp.status_code, 200)
 
+    def test_kibana_accessible_ext_host(self):
+        """ Test if Kibana on external host is accessible on gateway host
+        """
+        if not self._is_kibana_external(sfconfig_file):
+            return skipReason("Skipping test due external Kibana host is not "
+                              "configured")
+        elastic_url = '%s/elasticsearch' % config.GATEWAY_URL
+        verify = True
+        if self._check_if_auth_required(config.GATEWAY_URL):
+            user = 'admin'
+            if self._get_ext_elastic_creds():
+                user = 'admin_sftests_com'
+                admin_password = self._get_ext_elastic_admin_pass(user)
+                verify = False
+            else:
+                admin_password = self._get_elastic_admin_pass(
+                        elasticsearch_credential_file)
+
+            data = json.loads(
+                requests.get(elastic_url,
+                             auth=HTTPBasicAuth(user, admin_password),
+                             verify=verify).text)
+        else:
+            data = json.loads(urllib.request.urlopen(elastic_url).read())
+
+        if data['version']['number'] == '2.4.6':
+            url = config.GATEWAY_URL + "/app/kibana"
+        else:
+            url = config.GATEWAY_URL + "/analytics/app/kibana"
+
+        # Without SSO cookie. Note that auth is no longer enforced
         resp = requests.get(url)
         self.assertEqual(resp.status_code, 200)
 

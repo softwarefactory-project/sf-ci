@@ -1,0 +1,50 @@
+---
+- name: Configure external_elasticsearch and kibana
+  become: true
+  block:
+    - name: Uncomment external_elasticsearch parameter
+      lineinfile:
+        path: /etc/software-factory/sfconfig.yaml
+        regexp: '^#external_elasticsearch:$'
+        line: 'external_elasticsearch:'
+
+    - name: Uncomment kibana parameter
+      lineinfile:
+        path: /etc/software-factory/sfconfig.yaml
+        regexp: '^#kibana:$'
+        line: 'kibana:'
+
+    - name: Configure credentials to connect to remote Elasticsearch host
+      blockinfile:
+        path: /etc/software-factory/sfconfig.yaml
+        insertafter: '^external_elasticsearch:$'
+        marker: "# {mark} ANSIBLE MANAGED BLOCK elasticsearch_external"
+        block: |2
+            host: "{{ elasticsearch_host }}"
+            cacert_path: "{{ cacert_path }}"
+            suffix: "{{ suffix }}"
+            users:
+              {{ users | to_nice_yaml(indent=2) | indent(4, False) }}
+
+    - name: Configure external Kibana
+      blockinfile:
+        path: /etc/software-factory/sfconfig.yaml
+        insertafter: '^kibana:$'
+        marker: "# {mark} ANSIBLE MANAGED BLOCK kibana external"
+        block: |2
+            host_url: "{{ kibana_host_url }}"
+
+    - name: Configure Zuul elasticsearch_connections
+      blockinfile:
+        path: /etc/software-factory/sfconfig.yaml
+        insertafter: '  elasticsearch_connections: \[\]$'
+        marker: "# {mark} ANSIBLE MANAGED BLOCK elasticsearch_connections"
+        block: |2
+            elasticsearch_connections:
+              {{ elasticsearch_connections | to_nice_yaml(indent=2) | indent(4, False) }}
+
+    - name: Remove empty elasticsearch_connections
+      lineinfile:
+        path: /etc/software-factory/sfconfig.yaml
+        regexp: '  elasticsearch_connections: \[\]$'
+        state: absent

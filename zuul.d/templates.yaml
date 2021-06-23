@@ -16,6 +16,14 @@
         - sf-ci-upgrade-allinone:
             dependencies:
               - sf-rpm-build
+        - sf-ci-functional-external-elk:
+            dependencies:
+              - sf-rpm-build
+            files:
+              - ^ansible/roles/sf-elasticsearch/.*$
+              - ^ansible/roles/sf-kibana/.*$
+              - ^ansible/roles/sf-logstash/.*$
+              - ^defaults/sfconfig.yaml$
         - sf-tenants:
             dependencies:
               - sf-rpm-build
@@ -35,11 +43,20 @@
         - sf-ci-upgrade-allinone:
             dependencies:
               - sf-rpm-build
+        - sf-ci-functional-external-elk:
+            dependencies:
+              - sf-rpm-build
+            files:
+              - ^ansible/roles/sf-elasticsearch/.*$
+              - ^ansible/roles/sf-kibana/.*$
+              - ^ansible/roles/sf-logstash/.*$
+              - ^defaults/sfconfig.yaml$
         - wait-for-changes-ahead:
             dependencies:
               - sf-ci-functional-minimal
               - sf-ci-upgrade-minimal
               - sf-ci-functional-allinone
+              - sf-ci-functional-external-elk
               - sf-ci-upgrade-allinone
 
 - project-template:

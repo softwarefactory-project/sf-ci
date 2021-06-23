@@ -86,6 +86,10 @@ def skipIfServicePresent(service):
                   'This instance of SF is running %s' % service)
 
 
+def skipReason(reason):
+    return skip("%s" % reason)
+
+
 def get_module_version(module):
     m = module
     if not isinstance(m, str):
