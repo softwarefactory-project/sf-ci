@@ -7,13 +7,7 @@
         - sf-ci-functional-minimal:
             dependencies:
               - sf-rpm-build
-        - sf-ci-upgrade-minimal:
-            dependencies:
-              - sf-rpm-build
         - sf-ci-functional-allinone:
-            dependencies:
-              - sf-rpm-build
-        - sf-ci-upgrade-allinone:
             dependencies:
               - sf-rpm-build
         - sf-tenants:
@@ -26,21 +20,13 @@
         - sf-ci-functional-minimal:
             dependencies:
               - sf-rpm-build
-        - sf-ci-upgrade-minimal:
-            dependencies:
-              - sf-rpm-build
         - sf-ci-functional-allinone:
-            dependencies:
-              - sf-rpm-build
-        - sf-ci-upgrade-allinone:
             dependencies:
               - sf-rpm-build
         - wait-for-changes-ahead:
             dependencies:
               - sf-ci-functional-minimal
-              - sf-ci-upgrade-minimal
               - sf-ci-functional-allinone
-              - sf-ci-upgrade-allinone
 
 - project-template:
     name: sf-ci-jobs-light
@@ -54,13 +40,9 @@
         - sf-ci-functional-allinone:
             dependencies:
               - sf-rpm-build
-        - sf-ci-upgrade-allinone:
-            dependencies:
-              - sf-rpm-build
         - wait-for-changes-ahead:
             dependencies:
               - sf-ci-functional-allinone
-              - sf-ci-upgrade-allinone
 
 - project-template:
     name: sf-ci-no-jobs
