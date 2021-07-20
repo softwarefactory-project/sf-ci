@@ -113,7 +113,7 @@
             host: elasticsearch.sftests.com
             port: 9200
             use_ssl: true
-            ca_certs: "{{ cacert_path }}"
+            ca_certs: /etc/zuul/ssl/elasticsearch.pem
             index: "zuul"
 
     - name: Fetch master CA pem file and elasticsearch certs

@@ -9,24 +9,24 @@
 - name: Get pem from Elasticsearch instance
   become: yes
   block:
-    - name: Create elasticsearch cert dir required by logstash
+    - name: Create cert directories
       file:
-        path: /etc/elasticsearch/certs
+        path: "{{ item }}"
         state: directory
         recurse: true
+      loop:
+        - /etc/elasticsearch/certs
+        - /etc/zuul/ssl
 
-    - name: Get localCA pem
+    - name: Get elasticsearch CA
       synchronize:
         src: /etc/elasticsearch/certs/localCA.pem
-        dest: /etc/pki/ca-trust/source/anchors/elasticsearch.pem
+        dest: "{{ item }}"
       delegate_to: '{{ instance }}'
-
-    - name: Synchronize other certificates required by Logstash
-      synchronize:
-        src: /etc/elasticsearch/certs/localCA.pem
-        dest: /etc/elasticsearch/certs/localCA.pem
-        recursive: true
-      delegate_to: '{{ instance }}'
+      loop:
+        - /etc/pki/ca-trust/source/anchors/elasticsearch.pem
+        - /etc/elasticsearch/certs/localCA.pem
+        - /etc/zuul/ssl/elasticsearch.pem
   when: "not sf_deployment | default(true) "
 
 - name: Update ca trust
