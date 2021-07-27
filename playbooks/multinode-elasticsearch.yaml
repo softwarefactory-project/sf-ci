@@ -42,6 +42,13 @@
       hostname:
         name: "{{ fqdn }}"
 
+    - name: Ensure that correct hostname is set in hosts file
+      become: true
+      lineinfile:
+        dest: '/etc/hosts'
+        regexp: "^{{ fqdn }}.+$"
+        line: "{{ ansible_host }} {{ inventory_hostname_short }} {{ fqdn }}"
+
     - name: Setup ES stack
       include_role:
         name: "{{ zuul.projects['softwarefactory-project.io/software-factory/ansible-role-elastic-recheck'].src_dir }}"
