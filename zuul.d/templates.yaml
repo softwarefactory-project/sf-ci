@@ -53,11 +53,12 @@
               - ^defaults/sfconfig.yaml$
         - wait-for-changes-ahead:
             dependencies:
-              - sf-ci-functional-minimal
-              - sf-ci-upgrade-minimal
-              - sf-ci-functional-allinone
-              - sf-ci-functional-external-elk
-              - sf-ci-upgrade-allinone
+              - name: sf-ci-functional-minimal
+              - name: sf-ci-upgrade-minimal
+              - name: sf-ci-functional-allinone
+              - name: sf-ci-functional-external-elk
+                soft: true
+              - name: sf-ci-upgrade-allinone
 
 - project-template:
     name: sf-ci-jobs-light
