@@ -80,7 +80,7 @@ class TestGateway(Base):
     def _is_kibana_external(self, file_path):
         with open(file_path, 'r') as sf_config:
             parsed_file = yaml.safe_load(sf_config)
-            return parsed_file.get('kibana', {})
+            return parsed_file.get('kibana', {}).get('host_url')
 
     def test_managesf_is_secure(self):
         """Test if managesf config.py file is not world readable"""
