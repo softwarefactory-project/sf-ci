@@ -24,6 +24,8 @@
               - ^ansible/roles/sf-kibana/.*$
               - ^ansible/roles/sf-logstash/.*$
               - ^defaults/sfconfig.yaml$
+              - ^playbooks/multinode-elasticsearch.yaml$
+              - ^roles/configure-external-elasticsearch-host/.*$
         - sf-tenants:
             dependencies:
               - sf-rpm-build
@@ -51,6 +53,8 @@
               - ^ansible/roles/sf-kibana/.*$
               - ^ansible/roles/sf-logstash/.*$
               - ^defaults/sfconfig.yaml$
+              - ^playbooks/multinode-elasticsearch.yaml$
+              - ^roles/configure-external-elasticsearch-host/.*$
         - wait-for-changes-ahead:
             dependencies:
               - name: sf-ci-functional-minimal

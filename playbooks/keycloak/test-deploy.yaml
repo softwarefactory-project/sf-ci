@@ -36,6 +36,7 @@
       when: "item.stat.exists"
       loop: "{{ pom_stats.results }}"
 
+    # FIXME: Use install-ci-repository role in the future.
     - name: Install sf-rpm-build artifact repository
       yum_repository:
         name: sf-rpm-build

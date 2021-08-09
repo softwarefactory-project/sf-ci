@@ -1,23 +1,35 @@
 ---
-- name: Install sfinfo repo
-  command: >
-    ./software-factory/sfinfo/zuul_rpm_setup.py
-        --distro-info ./software-factory/sfinfo/sf-{{ zuul.branch }}.yaml
-        {{ sfinfo_setup_args }}
-  args:
-    chdir: "{{ sfnamespace_path }}"
-  become: yes
+- name: Install SF master repository if there is no pre-build
+  become: true
+  yum_repository:
+    name: sf-master
+    description: SF master repository
+    baseurl: https://softwarefactory-project.io/kojifiles/repos/sf-master-el7/
+    gpgcheck: no
+  when: buildset_artifacts_url is not defined
 
-- name: Rename the zuul-built.repo as if it was sf-release so that sf-config does not install the repository
-  command: mv /etc/yum.repos.d/zuul-built.repo /etc/yum.repos.d/sf-release.repo
-  become: yes
+- name: Configure CI repo when buildset_artifacts_url
+  block:
+    - name: Install sfinfo repo
+      command: >
+        ./software-factory/sfinfo/zuul_rpm_setup.py
+            --distro-info ./software-factory/sfinfo/sf-{{ zuul.branch }}.yaml
+            {{ sfinfo_setup_args }}
+      args:
+        chdir: "{{ sfnamespace_path }}"
+      become: yes
 
-- name: Temporary fix the koji-url to use the vexxhost instance directly
-  command: sed -e "s#https://softwarefactory-project.io/k#http://38.102.83.102/k#" -i /etc/yum.repos.d/sf-release.repo
-  become: yes
+    - name: Rename the zuul-built.repo as if it was sf-release so that sf-config does not install the repository
+      command: mv /etc/yum.repos.d/zuul-built.repo /etc/yum.repos.d/sf-release.repo
+      become: yes
 
-- name: Setup /etc/sf-release file
-  copy:
-    content: "master"
-    dest: /etc/sf-release
-  become: yes
+    - name: Temporary fix the koji-url to use the vexxhost instance directly
+      command: sed -e "s#https://softwarefactory-project.io/k#http://38.102.83.102/k#" -i /etc/yum.repos.d/sf-release.repo
+      become: yes
+
+    - name: Setup /etc/sf-release file
+      copy:
+        content: "master"
+        dest: /etc/sf-release
+      become: yes
+  when: buildset_artifacts_url is defined and buildset_artifacts_url
