@@ -33,6 +33,7 @@
         marker: "# {mark} ANSIBLE MANAGED BLOCK kibana external"
         block: |2
             host_url: "{{ kibana_host_url }}"
+            readonly_user_autologin: "{{ readonly_user_autologin }}"
 
     - name: Configure Zuul elasticsearch_connections
       blockinfile:
