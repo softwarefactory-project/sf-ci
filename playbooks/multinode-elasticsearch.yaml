@@ -16,11 +16,11 @@
         password: "admin"
         tenant: "sftests.com"
       - user: "logstash"
-        role: "admin"
+        role: "logstash"
         password: "logstash"
         tenant: "sftests.com"
       - user: "curator"
-        role: "admin"
+        role: "curator"
         password: "curator"
         tenant: "sftests.com"
       - user: "kibana"
@@ -87,6 +87,7 @@
         remove_component:
           - component: elasticsearch
           - component: kibana
+          - component: logstash
 
     - name: Configure external_elasticsearch users
       include_role:
@@ -104,7 +105,7 @@
             role: logstash
             password: logstash
           curator_sftests_com:
-            role: admin
+            role: curator
             password: curator
           # Readonly user
           kibana_sftests_com:
@@ -122,6 +123,8 @@
             use_ssl: true
             ca_certs: /etc/zuul/ssl/elasticsearch.pem
             index: "zuul"
+        logstash_host: elasticsearch.sftests.com
+        logstash_port: 9999
 
     - name: Fetch master CA pem file and elasticsearch certs
       include_role:

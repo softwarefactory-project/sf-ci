@@ -48,3 +48,12 @@
         path: /etc/software-factory/sfconfig.yaml
         regexp: '  elasticsearch_connections: \[\]$'
         state: absent
+
+    - name: Configure external Logstash
+      blockinfile:
+        path: /etc/software-factory/sfconfig.yaml
+        insertafter: '^logstash:$'
+        marker: "# {mark} ANSIBLE MANAGED BLOCK logstash external"
+        block: |2
+            host: "{{ logstash_host }}"
+            port: "{{ logstash_port }}"
