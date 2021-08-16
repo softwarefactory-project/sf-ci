@@ -23,6 +23,7 @@ from utils import skipReason
 from utils import ManageSfUtils
 from utils import skipIfProvisionVersionLesserThan
 from utils import GerritClient
+from utils import is_present
 
 from requests.auth import HTTPBasicAuth
 
@@ -252,6 +253,30 @@ class TestGateway(Base):
         # Without SSO cookie. Note that auth is no longer enforced
         resp = requests.get(url)
         self.assertEqual(resp.status_code, 200)
+
+    def test_kibana_without_autologin(self):
+        """ Test if kibana user can not be automatically logged to Kibana
+        """
+        if (not self._is_kibana_external(sfconfig_file) and
+                not is_present('kibana')):
+            return skipReason("Skipping test due Kibana is not configured")
+
+        url = config.GATEWAY_URL + "/analytics/app/kibana"
+        resp = requests.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue('nextUrl' in resp.url)
+
+    def test_kibana_autologin(self):
+        """ Test if kibana user can be automatically logged to Kibana
+        """
+        if (not self._is_kibana_external(sfconfig_file) and
+                not is_present('kibana')):
+            return skipReason("Skipping test due Kibana is not configured")
+
+        url = config.GATEWAY_URL + "/analytics_autologin/app/kibana_overview"
+        resp = requests.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertFalse('nextUrl' in resp.url)
 
     @skipIfServiceMissing('zuul')
     def test_zuul_accessible(self):

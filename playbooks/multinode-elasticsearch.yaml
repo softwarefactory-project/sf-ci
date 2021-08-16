@@ -27,6 +27,7 @@
         role: "readonly"
         password: "kibana"
         tenant: "sftests.com"
+        autologin: "basic"
       - user: "zuul"
         role: "admin"
         password: "zuul"
@@ -94,6 +95,7 @@
         name: configure-external-elasticsearch-host
       vars:
         kibana_host_url: "http://elasticsearch.sftests.com:5601"
+        readonly_user_autologin: "basic"
         elasticsearch_host: "https://elasticsearch.sftests.com:9200"
         cacert_path: /etc/elasticsearch/certs/localCA.pem
         suffix: sftests_com
