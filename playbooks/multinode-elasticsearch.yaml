@@ -3,6 +3,10 @@
   become: true
   vars:
     fqdn: elasticsearch.sftests.com
+    tenant_configuration:
+      sftests.com:
+        logstash_input_port: 9998
+        kibana_autologin: "basic"
     internal_users:
       - user: "admin"
         role: "admin"
@@ -19,6 +23,8 @@
         role: "logstash"
         password: "logstash"
         tenant: "sftests.com"
+        # NOTE: remove after merging:
+        # https://softwarefactory-project.io/r/c/software-factory/ansible-role-elastic-recheck/+/22512
         input_port: 9998
       - user: "curator"
         role: "curator"
@@ -28,6 +34,8 @@
         role: "readonly"
         password: "kibana"
         tenant: "sftests.com"
+        # NOTE: remove after merging:
+        # https://softwarefactory-project.io/r/c/software-factory/ansible-role-elastic-recheck/+/22512
         autologin: "basic"
       - user: "zuul"
         role: "admin"
