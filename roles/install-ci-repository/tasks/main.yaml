@@ -32,4 +32,4 @@
         content: "master"
         dest: /etc/sf-release
       become: yes
-  when: buildset_artifacts_url is defined and buildset_artifacts_url
+  when: buildset_artifacts_url is defined
