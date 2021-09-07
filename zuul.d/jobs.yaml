@@ -157,7 +157,7 @@
           - name: master
             label: cloud-centos-7
           - name: elk
-            label: cloud-centos-7
+            label: cloud-centos-8
         groups:
           - name: switch
             nodes:
