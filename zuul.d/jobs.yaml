@@ -31,6 +31,12 @@
         nodes:
           - name: master
             label: cloud-centos-7
+          - name: zs
+            label: cloud-centos-7
+          - name: ze
+            label: cloud-centos-7
+          - name: zm
+            label: cloud-centos-7
           - name: tenant
             label: cloud-centos-7
         groups:
@@ -39,9 +45,13 @@
               - master
           - name: peers
             nodes:
+              - zs
+              - ze
+              - zm
               - tenant
     vars:
       sf_version: master
+      multinode: true
       logclassify_logserver_dir: logs/
       logclassify_debug: true
       logclassify_report: true

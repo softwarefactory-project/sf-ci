@@ -8,6 +8,27 @@
     - set_fact:
         tenant_ip: '{{ host_tenant_ip.stdout }}'
 
+    - name: Get zs ip in /etc/hosts files (configured by multinode parent)
+      command: awk '/zs/ {print $1}' /etc/hosts
+      register: host_zs_ip
+
+    - set_fact:
+        zs_ip: '{{ host_zs_ip.stdout }}'
+
+    - name: Get ze ip in /etc/hosts files (configured by multinode parent)
+      command: awk '/ze/ {print $1}' /etc/hosts
+      register: host_ze_ip
+
+    - set_fact:
+        ze_ip: '{{ host_ze_ip.stdout }}'
+
+    - name: Get zm ip in /etc/hosts files (configured by multinode parent)
+      command: awk '/zm/ {print $1}' /etc/hosts
+      register: host_zm_ip
+
+    - set_fact:
+        zm_ip: '{{ host_zm_ip.stdout }}'
+
 - hosts: tenant
   tasks:
     - name: Get master ip in /etc/hosts files (configured by multinode parent)
@@ -37,6 +58,7 @@
       include_role:
         name: configure-sfconfig
       vars:
+        sf_arch: multinode
         add_component:
           - component: elasticsearch
           - component: hound
@@ -89,9 +111,7 @@
       include_role:
         name: run-sfconfig
 
-- hosts: master
-  vars:
-    add_k1s_hypervisor: true
+- hosts: zs,ze
   tasks:
     - name: Fetch tenant CA pem file
       include_role:
@@ -107,10 +127,21 @@
         - zuul-scheduler
         - zuul-web
 
+- hosts: master
+  vars:
+    add_k1s_hypervisor: true
+  tasks:
+    - name: Fetch tenant CA pem file
+      include_role:
+        name: fetch-ca-pem
+      vars:
+        instance: tenant
+
     - name: Configure sfconfig
       include_role:
         name: configure-sfconfig
       vars:
+        sf_arch: multinode
         sf_main_instance: true
         static_hostname_ip: '{{ tenant_ip }}'
         static_hostname_fqdn: tenant.sftests.com
@@ -136,25 +167,11 @@
       vars:
         sfconfig_args: --skip-install
 
-# this should not be needed but zuul didn't reconfigure when
-# base, config-check and config-update are added in the last
-# commit of the tenant/config.
-- hosts: master
+- hosts: zs
   tasks:
-    - name: Check if /bin/zuul-scheduler exists
-      stat:
-        path: /bin/zuul-scheduler
-      register: _is_file
-
-    - name: Set zuul scheduler mode
-      command: /bin/zuul-scheduler full-reconfigure
-      become: true
-      when: _is_file.stat.exists
-
-    - name: Set zuul scheduler mode
+    - name: Force zuul scheduler to full-reconfigure
       command: podman exec -ti zuul-scheduler zuul-scheduler full-reconfigure
       become: true
-      when: not _is_file.stat.exists
 
 - hosts: tenant
   tasks:

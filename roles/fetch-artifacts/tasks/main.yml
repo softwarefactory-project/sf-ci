@@ -21,11 +21,3 @@
     dest: "{{ zuul.executor.log_root }}/job-logs"
     mode: pull
   no_log: True
-
-- name: Fetch nodepool launcher logs
-  synchronize:
-    src: /var/log/nodepool
-    dest: "{{ zuul.executor.log_root }}/nodepool"
-    mode: pull
-  no_log: True
-  become: yes

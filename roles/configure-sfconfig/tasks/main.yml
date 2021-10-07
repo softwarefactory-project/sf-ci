@@ -6,6 +6,13 @@
         src: "/usr/share/sf-config/refarch/{{ sf_arch }}.yaml"
         dest: /etc/software-factory/arch.yaml
         remote_src: true
+      when: sf_arch != "multinode"
+
+    - name: Install SF multinode architecture file
+      template:
+        src: multinode_arch.yaml.j2
+        dest: /etc/software-factory/arch.yaml
+      when: sf_arch == "multinode"
 
     - name: Activate hypervisor-k1s role in arch.yaml
       lineinfile:

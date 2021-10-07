@@ -1,5 +1,4 @@
 ---
-# TODO: when job works, ensure get-logs works with slave instance
 - hosts: install-server:master
   tasks:
     - name: Collect artifacts

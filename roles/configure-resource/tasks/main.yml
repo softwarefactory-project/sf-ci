@@ -24,10 +24,4 @@
     - name: Check if config update
       include_role:
         name: wait_for_config_update
-
-    - name: Ensure tenant tenant is present on zuul main.yml
-      wait_for:
-        path: /etc/zuul/main.yaml
-        search_regex: 'tenant'
-        timeout: 600
   become: true

@@ -18,7 +18,7 @@
           - name: pod-fedora
 
         extra-labels:
-          - provider: managed-k1s-provider-managesf
+          - provider: {{ "managed-k1s-provider-zs" if (multinode is defined and multinode) else "managed-k1s-provider-managesf" }}
             pool: main
             labels:
               - name: pod-fedora

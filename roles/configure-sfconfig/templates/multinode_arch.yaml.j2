@@ -1,0 +1,30 @@
+---
+description: "Minimal Software Factory deployment"
+inventory:
+  - name: managesf
+    roles:
+      - install-server
+      - mysql
+      - zookeeper
+      - gateway
+      - cauth
+      - gerrit
+      - managesf
+      - logserver
+
+  - name: zs
+    ip: {{ zs_ip }}
+    roles:
+      - zuul-scheduler
+      - zuul-web
+      - nodepool-launcher
+
+  - name: ze
+    ip: {{ ze_ip }}
+    roles:
+      - zuul-executor
+
+  - name: zm
+    ip: {{ zm_ip }}
+    roles:
+      - zuul-merger
