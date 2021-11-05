@@ -35,6 +35,15 @@
       vars:
         sfconfig_args: --skip-install --provision-demo
 
+    - name: Wait for scheduler reconfiguration
+      register: _zuul_status
+      retries: '900'
+      until: '''json'' in _zuul_status and _zuul_status.json and ''periodic'' in _zuul_status.content'
+      uri:
+        return_content: 'yes'
+        status_code: '200'
+        url: 'http://managesf.sftests.com:9000/api/tenant/local/pipelines'
+
     - name: Run functional tests and health-check
       include_role:
         name: '{{ item }}'

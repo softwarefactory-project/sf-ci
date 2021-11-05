@@ -30,13 +30,6 @@
       retries: 120
       delay: 2
 
-    - name: Ensure ara-report exists
-      uri:
-        url: "{{ _job_logs.json[0]['log_url'] }}/ara-report/ansible.sqlite"
-        return_content: no
-        status_code: 200
-        validate_certs: no
-
     - name: Add good YAML file
       template:
         src: "{{ item.src }}.j2"

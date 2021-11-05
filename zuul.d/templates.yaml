@@ -10,25 +10,25 @@
         - sf-ci-upgrade-minimal:
             dependencies:
               - sf-rpm-build
-        - sf-ci-functional-allinone:
-            dependencies:
-              - sf-rpm-build
-        - sf-ci-upgrade-allinone:
-            dependencies:
-              - sf-rpm-build
-        - sf-ci-functional-external-elk:
-            dependencies:
-              - sf-rpm-build
-            files:
-              - ^ansible/roles/sf-elasticsearch/.*$
-              - ^ansible/roles/sf-kibana/.*$
-              - ^ansible/roles/sf-logstash/.*$
-              - ^defaults/sfconfig.yaml$
-              - ^playbooks/multinode-elasticsearch.yaml$
-              - ^roles/configure-external-elasticsearch-host/.*$
-        - sf-tenants:
-            dependencies:
-              - sf-rpm-build
+        # - sf-ci-functional-allinone:
+        #     dependencies:
+        #       - sf-rpm-build
+        # - sf-ci-upgrade-allinone:
+        #     dependencies:
+        #       - sf-rpm-build
+        # - sf-ci-functional-external-elk:
+        #     dependencies:
+        #       - sf-rpm-build
+        #     files:
+        #       - ^ansible/roles/sf-elasticsearch/.*$
+        #       - ^ansible/roles/sf-kibana/.*$
+        #       - ^ansible/roles/sf-logstash/.*$
+        #       - ^defaults/sfconfig.yaml$
+        #       - ^playbooks/multinode-elasticsearch.yaml$
+        #       - ^roles/configure-external-elasticsearch-host/.*$
+        # - sf-tenants:
+        #     dependencies:
+        #       - sf-rpm-build
     gate:
       queue: sf-master
       jobs:

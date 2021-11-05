@@ -23,24 +23,6 @@
   when: not zuul_success | default(false) | bool
   register: _ara_database
 
-- name: Grab ara report
-  block:
-    - name: Ensure ara-report directory exists
-      file:
-        path: "{{ artifacts }}/ara-report"
-        state: directory
-      become: yes
-
-    - name: Copy the ansible.sqlite database
-      copy:
-        src: /var/lib/software-factory/ansible/ara/ansible.sqlite
-        dest: "{{ artifacts }}/ara-report/ansible.sqlite"
-        remote_src: yes
-      become: yes
-  when:
-    - not zuul_success | default(false) | bool
-    - _ara_database.stat.exists
-
 - name: Ensure artifacts are owned by user
   file:
     path: "{{ artifacts }}"
