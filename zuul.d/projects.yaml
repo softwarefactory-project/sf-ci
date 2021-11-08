@@ -5,11 +5,11 @@
     check:
       jobs:
         - linters:
-            nodeset: fedora-latest-pod
+            nodeset: linters-pod
     gate:
       jobs:
         - linters:
-            nodeset: fedora-latest-pod
+            nodeset: linters-pod
     experimental:
       jobs:
         - sf-rpm-build
