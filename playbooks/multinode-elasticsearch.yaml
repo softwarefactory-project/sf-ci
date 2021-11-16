@@ -64,6 +64,10 @@
         name: "{{ zuul.projects['softwarefactory-project.io/software-factory/ansible-role-elastic-recheck'].src_dir }}"
         tasks_from: main.yaml
 
+    - name: Run functional tests
+      include_role:
+        name: run-opensearch-tox
+
 - hosts: master
   tasks:
     - set_fact:
