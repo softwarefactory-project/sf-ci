@@ -27,6 +27,8 @@ from utils import JobUtils
 from utils import create_random_str
 from utils import get_gerrit_utils
 from utils import ssh_run_cmd
+from utils import get_auth_params
+from utils import is_present
 
 
 class TestResourcesWorkflow(Base):
@@ -105,9 +107,10 @@ class TestResourcesWorkflow(Base):
         self.assertEqual(note, expected_note)
 
     def get_resources(self):
-        gateau = config.USERS[config.ADMIN_USER]['auth_cookie']
+        params = get_auth_params(config.ADMIN_USER,
+                                 config.USERS[config.ADMIN_USER]['password'])
         resp = requests.get("%s/manage/v2/resources/" % config.GATEWAY_URL,
-                            cookies={'auth_pubtkt': gateau})
+                            **params)
         return resp.json()
 
     def test_validate_wrong_resource_workflow(self):
@@ -174,6 +177,7 @@ class TestResourcesWorkflow(Base):
                                                mode='del',
                                                msg=msg)
 
+    # TODO Implement groups handling in keycloak
     def test_CUD_group(self):
         """ Check resources - ops on group work as expected """
         fpath = "resources/%s.yaml" % create_random_str()
@@ -200,13 +204,24 @@ class TestResourcesWorkflow(Base):
         # check cauth groups
 
         def _get_cauth_groups():
-            out, err = ssh_run_cmd(
-                config.SERVICE_PRIV_KEY_PATH,
-                "root", config.GATEWAY_HOST,
-                shlex.split("cat /etc/cauth/groups.yaml"))
+            out, err = ssh_run_cmd(config.SERVICE_PRIV_KEY_PATH,
+                                   "root",
+                                   config.GATEWAY_HOST,
+                                   shlex.split("cat /etc/cauth/groups.yaml"))
             return yaml.safe_load(out)
 
-        groups = _get_cauth_groups()
+        def _get_keycloak_groups():
+            raise NotImplementedError('Keycloak does not support groups yet')
+
+        def _get_groups():
+            if is_present('keycloak'):
+                return _get_keycloak_groups()
+            elif is_present('cauth'):
+                return _get_cauth_groups()
+            else:
+                raise Exception('Unknown SSO service')
+
+        groups = _get_groups()
         self.assertTrue(name in groups['groups'], groups)
         self.assertTrue(config.USERS['user2']['email'] in
                         groups['groups'][name]['members'], groups)
@@ -233,8 +248,8 @@ class TestResourcesWorkflow(Base):
         self.assertIn(config.USERS['user4']['email'], members)
         self.assertIn(config.USERS['user2']['email'], members)
         self.assertNotIn(config.USERS['user3']['email'], members)
-        # check cauth groups
-        groups = _get_cauth_groups()
+        # check SSO groups
+        groups = _get_groups()
         self.assertTrue(name in groups['groups'], groups)
         self.assertTrue(config.USERS['user2']['email'] in
                         groups['groups'][name]['members'], groups)
@@ -249,8 +264,8 @@ class TestResourcesWorkflow(Base):
         # Check the group has been deleted
         self.assertFalse(
             self.gu.get_group_id(name))
-        # check cauth groups
-        groups = _get_cauth_groups()
+        # check SSO groups
+        groups = _get_groups()
         self.assertTrue(name not in groups['groups'], groups)
 
     def test_CD_repo(self):
@@ -452,7 +467,8 @@ class TestResourcesWorkflow(Base):
 
     def test_GET_resources(self):
         """ Check resources - GET resources works as expected"""
-        cookies = dict(auth_pubtkt=config.USERS[config.USER_1]['auth_cookie'])
+        params = get_auth_params(config.USER_1,
+                                 config.USERS[config.USER_1]['password'])
         ret = requests.get("%s/manage/v2/resources/" % config.GATEWAY_URL,
-                           cookies=cookies)
+                           **params)
         self.assertIn('resources', ret.json())

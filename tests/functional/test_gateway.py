@@ -29,7 +29,6 @@ from requests.auth import HTTPBasicAuth
 
 import os
 import requests
-import subprocess
 
 bootstrap_dir = '/var/lib/software-factory/bootstrap-data'
 elasticsearch_credential_file = '%s/secrets.yaml' % bootstrap_dir
@@ -48,10 +47,8 @@ class TestGateway(Base):
         self.assertTrue(resp.status_code > 399, resp.status_code)
 
     def _check_if_auth_required(self, gateway):
-        subcmd = ["curl", "-s",
-                  "%s/elasticsearch/_cat/indices" % config.GATEWAY_URL]
-        return 'Unauthorized' in \
-               subprocess.check_output(subcmd).decode("utf-8")
+        resp = requests.get("%s/elasticsearch/_cat/indices" % gateway)
+        return resp.status_code == 401
 
     def _get_elastic_admin_pass(self, file_path):
         if not os.path.exists(file_path):
@@ -121,9 +118,16 @@ class TestGateway(Base):
 
         # Authenticated URL that requires login
         url = config.GATEWAY_URL + "/r/a/projects/?"
-        resp = requests.get(
-            url,
-            auth=HTTPBasicAuth("user2", config.USERS["user2"]["api_key"]))
+        if is_present("cauth"):
+            resp = requests.get(
+                url,
+                auth=HTTPBasicAuth("user2", config.USERS["user2"]["api_key"]))
+        elif is_present("keycloak"):
+            resp = requests.get(
+                url,
+                auth=HTTPBasicAuth("user2", config.USERS["user2"]["password"]))
+        else:
+            raise Exception("This deployment has no SSO?!")
         self.assertEqual(resp.status_code, 200)
         # /r/a/projects returns JSON list of projects
         self.assertTrue('All-Users' in resp.text)
@@ -139,8 +143,9 @@ class TestGateway(Base):
             resp = requests.get(url, allow_redirects=False)
             self.assertEqual(resp.status_code, 404)
 
-    def test_gerrit_api_accessible(self):
-        """ Test if Gerrit API is accessible on gateway hosts
+    @skipIfServiceMissing("cauth")
+    def test_gerrit_api_accessible_cauth(self):
+        """ Test if Gerrit API is accessible on gateway hosts (SSO: cauth)
         """
         m = ManageSfUtils(config.GATEWAY_URL)
         url = config.GATEWAY_URL + "/r/a/"
@@ -156,6 +161,22 @@ class TestGateway(Base):
         m.delete_gerrit_api_password("user3")
         a = GerritClient(url, auth=auth)
         self.assertRaises(RuntimeError, a.get_account, "user3")
+
+        a = GerritClient(url, auth=HTTPBasicAuth("admin", "password"))
+        self.assertRaises(RuntimeError, a.get_account, 'john')
+
+    @skipIfServiceMissing("keycloak")
+    def test_gerrit_api_accessible_keycloak(self):
+        """ Test if Gerrit API is accessible on gateway hosts (SSO: keycloak)
+        """
+        url = config.GATEWAY_URL + "/r/a/"
+
+        a = GerritClient(url, auth=HTTPBasicAuth("admin", "password"))
+        self.assertRaises(RuntimeError, a.get_account, config.USER_1)
+
+        auth = HTTPBasicAuth("user3", config.USERS["user3"]["password"])
+        a = GerritClient(url, auth=auth)
+        self.assertTrue(a.get_account("user3"))
 
         a = GerritClient(url, auth=HTTPBasicAuth("admin", "password"))
         self.assertRaises(RuntimeError, a.get_account, 'john')
@@ -264,7 +285,10 @@ class TestGateway(Base):
         url = config.GATEWAY_URL + "/analytics/app/kibana"
         resp = requests.get(url)
         self.assertEqual(resp.status_code, 200)
-        self.assertTrue('nextUrl' in resp.url)
+        # if keycloak is used, there is an extra redirection.
+        self.assertTrue(
+            'nextUrl' in resp.url
+            or 'nextUrl' in resp.history[-1].url)
 
     def test_kibana_autologin(self):
         """ Test if kibana user can be automatically logged to Kibana

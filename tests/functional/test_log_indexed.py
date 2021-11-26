@@ -17,19 +17,23 @@ import datetime
 import json
 import os
 import random
+import requests
 import string
 import subprocess
 import time
 import urllib.request
 import yaml
 
-from utils import Base, skipIfServiceMissing, skipReason
+from utils import Base, skipIfServiceMissing, skipReason, is_present
 from utils import set_private_key
 from utils import GerritGitUtils
 
 elasticsearch_credential_file = \
     '/var/lib/software-factory/bootstrap-data/secrets.yaml'
 sfconfig_file = '/etc/software-factory/sfconfig.yaml'
+
+
+# TODO move all HTTP queries to requests, instead of creating cURL scripts.
 
 
 class TestLogExportedInElasticSearch(Base):
@@ -45,18 +49,38 @@ class TestLogExportedInElasticSearch(Base):
             config.USERS[config.ADMIN_USER]['email'])
 
     def _check_if_auth_required(self, gateway):
-        subcmd = ["curl", "-s",
-                  "%s/elasticsearch/_cat/indices" % config.GATEWAY_URL]
-        return 'Unauthorized' in \
-               subprocess.check_output(subcmd).decode("utf-8")
+        resp = requests.get("%s/elasticsearch/_cat/indices" % gateway)
+        return resp.status_code == 401
 
-    def _get_elastic_admin_pass(self, file_path):
+    def _get_elastic_access_token(self, username):
+        client_secret = self._get_elastic_credential(
+            elasticsearch_credential_file,
+            credential='keycloak_elasticsearch_client_secret'
+        )
+        req = requests.post(
+            '%s/auth/realms/SF/protocol/'
+            'openid-connect/token' % config.GATEWAY_URL,
+            data={
+                'username': username,
+                'password': config.USERS[username]['password'],
+                'client_id': 'elasticsearch',
+                'grant_type': 'password',
+                'client_secret': client_secret,
+            }
+        )
+        try:
+            return req.json()['access_token']
+        except Exception:
+            req.raise_for_status()
+
+    def _get_elastic_credential(self, file_path,
+                                credential='elasticsearch_password'):
         if not os.path.exists(file_path):
             return
 
         with open(file_path, 'r') as f:
             for line in f.readlines():
-                if line.split(':')[0].strip() == 'elasticsearch_password':
+                if line.split(':')[0].strip() == credential:
                     return line.split(':')[1].strip()
 
     def _get_ext_elastic_creds(self):
@@ -118,20 +142,30 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
             password = self._get_ext_elastic_admin_pass(user)
         else:
             user = 'admin'
-            password = self._get_elastic_admin_pass(
+            password = self._get_elastic_credential(
                 elasticsearch_credential_file)
 
         additional_params = ''
 
         if self._check_if_auth_required(config.GATEWAY_URL):
-            password_mgr = urllib.request.HTTPPasswordMgrWithDefaultRealm()
-            password_mgr.add_password(None, elastic_url, user, password)
-            handler = urllib.request.HTTPBasicAuthHandler(password_mgr)
-            opener = urllib.request.build_opener(handler)
-            opener.open(elastic_url)
-            urllib.request.install_opener(opener)
-            data = json.loads(urllib.request.urlopen(elastic_url).read())
-            additional_params = "--user %s:%s" % (user, password)
+            if is_present('keycloak') and user == 'admin':
+                token = self._get_elastic_access_token(user)
+                data = requests.get(
+                    elastic_url,
+                    headers={
+                        'Authorization': 'Bearer %s' % token,
+                    }
+                ).json()
+                additional_params = '-H "Authorization: Bearer %s"' % token
+            else:
+                password_mgr = urllib.request.HTTPPasswordMgrWithDefaultRealm()
+                password_mgr.add_password(None, elastic_url, user, password)
+                handler = urllib.request.HTTPBasicAuthHandler(password_mgr)
+                opener = urllib.request.build_opener(handler)
+                opener.open(elastic_url)
+                urllib.request.install_opener(opener)
+                data = json.loads(urllib.request.urlopen(elastic_url).read())
+                additional_params = "--user %s:%s" % (user, password)
         else:
             data = json.loads(urllib.request.urlopen(elastic_url).read())
 
@@ -160,13 +194,27 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
                 if include_suffix:
                     es_suffix = external_elasticsearch.get('suffix')
                     index_name = '%s-%s-%s' % (prefix, es_suffix, today_str)
+                auth_args = [
+                    '--user',
+                    '%s:%s' % (user, admin_password)
+                ]
             else:
-                user = 'admin'
-                admin_password = self._get_elastic_admin_pass(
-                    elasticsearch_credential_file)
+                if is_present('keycloak'):
+                    token = self._get_elastic_access_token('admin')
+                    auth_args = [
+                        '-H',
+                        'Authorization: Bearer %s' % token
+                    ]
+                else:
+                    user = 'admin'
+                    admin_password = self._get_elastic_credential(
+                        elasticsearch_credential_file)
+                    auth_args = [
+                        '--user',
+                        '%s:%s' % (user, admin_password)
+                    ]
 
-            subcmd.append("--user")
-            subcmd.append("%s:%s" % (user, admin_password))
+            subcmd += auth_args
 
         # Here we fetch the index name, but also we wait for
         # it to appears in ElasticSearch for 5 mins
