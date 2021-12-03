@@ -1,0 +1,18 @@
+---
+- name: Install basic packages
+  become: true
+  package:
+    name: python3-pip
+    state: present
+
+- name: Install tox package
+  become: true
+  pip:
+    name: tox
+    state: present
+
+- name: Run tox command - Zuul
+  vars:
+    project_dir: "{{ zuul.projects['softwarefactory-project.io/software-factory/ansible-role-elastic-recheck'].src_dir }}"
+  shell: /usr/local/bin/tox -c "{{ project_dir }}/tox.ini"
+  when: zuul is defined
