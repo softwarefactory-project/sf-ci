@@ -4,27 +4,20 @@
     name: rh-nodejs10-npm
     state: present
 
-- name: Gather the rpm package facts
-  package_facts:
-    manager: auto
-
-- name: Add required params for Opendistro Elasticsearch
-  block:
-    - name: Get Elasticsearch admin password
-      shell: |
-        awk '/elasticsearch_password/ {print $2}' /var/lib/software-factory/bootstrap-data/secrets.yaml
-      register: elastic_admin_pass
-
-    - name: Set proper facts for Opendistro
-      set_fact:
-        additional_params: "--auth admin:{{ elastic_admin_pass.stdout }}"
-        elastic_url: "https://admin:{{ elastic_admin_pass.stdout }}@{{ fqdn }}:9200"
-  when: "'opendistroforelasticsearch' in ansible_facts.packages"
-
 - name: Install makelogs
   shell: |
     source scl_source enable rh-nodejs10 ;
     npm install -g "@elastic/makelogs"
+
+- name: Get Elasticsearch admin password
+  shell: |
+    awk '/elasticsearch_password/ {print $2}' /var/lib/software-factory/bootstrap-data/secrets.yaml
+  register: elastic_admin_pass
+
+- name: Set proper facts for Opendistro and Opensearch
+  set_fact:
+    additional_params: "--auth admin:{{ elastic_admin_pass.stdout }}"
+    elastic_url: "https://admin:{{ elastic_admin_pass.stdout }}@{{ fqdn }}:9200"
 
 - name: Generate logs for testindex prefix
   shell: |
@@ -32,6 +25,31 @@
     makelogs {{ additional_params | default('') }} \
       --url {{ elastic_url | default("http://{{ fqdn }}:9200") }} \
       -d 100 --verbose --reset --indexPrefix testindex-
+
+- name: Create curator configuration directory
+  file:
+    path: "{{ curator_config_dir | default('/etc/logstash/curator.d') }}"
+    state: directory
+    recurse: true
+    owner: "{{ curator_uid | default('1000') }}"
+    group: "{{ curator_gid | default('1000') }}"
+
+# NOTE: It can be remove in the future when
+# https://softwarefactory-project.io/r/c/software-factory/sf-config/+/23317
+# is merged
+- name: Move curator config to new directory
+  block:
+    - name: check if config file exists
+      stat:
+        path: /etc/logstash/curator.yml
+      register: _legacy_curator_config
+
+    - name: Copy config to new directory
+      copy:
+        src: /etc/logstash/curator.yml
+        dest: "{{ curator_config_dir | default('/etc/logstash/curator.d') }}/curator.yml"
+        remote_src: true
+      when: _legacy_curator_config.stat.exists
 
 - name: Create delete-other-indexes.yml file
   copy:
@@ -49,11 +67,40 @@
               kind: prefix
               value: '^(logstash-|opendistro|\.opendistro).*$'
               exclude: true
-    dest: delete-other-indexes.yml
+    dest: "{{ curator_config_dir | default('/etc/logstash/curator.d') }}/delete-other-indexes.yml"
+    mode: "0644"
+    owner: "{{ curator_uid | default('1000') }}"
+    group: "{{ curator_gid | default('1000') }}"
+
+- name: Check if curator binary exists
+  stat:
+    path: /bin/curator
+  register: _curator_bin
+
+- name: Set curator command - package installed
+  set_fact:
+    curator_command: >-
+      LC_ALL=en_US.UTF-8 /bin/curator
+      --config /etc/logstash/curator.yml {{ curator_config_dir | default('/etc/logstash/curator.d') }}/delete-other-indexes.yml
+  when: _curator_bin.stat.exists
+
+- name: Set curator command - container version
+  vars:
+    curator_image: quay.rdoproject.org/software-factory/curator:5.7
+  set_fact:
+    curator_command: >-
+      podman run
+      --net host
+      --rm
+      --user {{ curator_uid | default('1000') }}:{{ curator_gid | default('1000') }}
+      -v {{ curator_config_dir | default('/etc/logstash/curator.d') }}/curator.yml:/.curator/curator.yml:z
+      -v {{ curator_config_dir | default('/etc/logstash/curator.d') }}/delete-other-indexes.yml:/curator/delete-other-indexes.yml:z
+      -v /etc/logstash/certs/localCA.pem:/etc/opensearch/certs/localCA.pem:z
+      {{ curator_image }} /curator/delete-other-indexes.yml
+  when: not _curator_bin.stat.exists
 
 - name: Executing create_index curator rule
-  shell: |
-    LC_ALL=en_US.UTF-8 /bin/curator --config /etc/logstash/curator.yml delete-other-indexes.yml
+  shell: "{{ curator_command}}"
   register: other_index
 
 - name: Check if outpus is wrong for delete-other-indexes
@@ -91,11 +138,13 @@
               direction: older
               unit: seconds
               unit_count: 1
-    dest: delete-old-indices.yml
+    dest: "{{ curator_config_dir | default('/etc/logstash/curator.d') }}/delete-other-indexes.yml"
+    mode: "0644"
+    owner: "{{ curator_uid | default('1000') }}"
+    group: "{{ curator_gid | default('1000') }}"
 
 - name: Executing create_index curator rule
-  shell: |
-    LC_ALL=en_US.UTF-8 /bin/curator --config /etc/logstash/curator.yml delete-other-indexes.yml
+  shell: "{{ curator_command }}"
   register: old_indices
 
 - name: Check if outpus is wrong for delete-old-indices
