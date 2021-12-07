@@ -1,0 +1,20 @@
+- attributes:
+    description: ''
+    hits: 0
+    kibanaSavedObjectMeta:
+      searchSourceJSON: '{"query":{"query":"","language":"kuery"},"filter":[]}'
+    optionsJSON: '{"useMargins":true,"hidePanelTitles":false}'
+    panelsJSON: '[{"version":"1.2.0","gridData":{"x":0,"y":0,"w":24,"h":15,"i":"9113555f-f315-4300-beb6-f66ca20b51fc"},"panelIndex":"9113555f-f315-4300-beb6-f66ca20b51fc","embeddableConfig":{},"panelRefName":"panel_0"}]'
+    timeRestore: false
+    title: testdashboard
+    version: 1
+  id: 9aade7f0-5802-11ec-a00b-5992f405f815
+  migrationVersion:
+    dashboard: 7.9.3
+  references:
+  - id: 927bab80-5802-11ec-a00b-5992f405f815
+    name: panel_0
+    type: visualization
+  type: dashboard
+  updated_at: '2021-12-08T08:41:14.991Z'
+  version: WzQ0LDFd

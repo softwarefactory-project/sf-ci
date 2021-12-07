@@ -7,17 +7,22 @@
   package_facts:
     manager: auto
 
-- name: Set credentials if Opendistro
-  block:
-    - name: Get Opendistro admin password
-      shell: |
-        awk '/elasticsearch_password/ {print $2}' /var/lib/software-factory/bootstrap-data/secrets.yaml
-      register: elk_kibanaserver_pass
-      when: elasticsearch_password is not defined
+- name: Get available service facts
+  service_facts:
 
-    - name: Set proper facts for Opendistro
-      set_fact:
-        additional_params: "--user admin --password {{ elasticsearch_password | default(elk_kibanaserver_pass.stdout) | default('admin') }}"
+- name: Get Opendistro or Opensearch admin password
+  shell: |
+    awk '/elasticsearch_password/ {print $2}' /var/lib/software-factory/bootstrap-data/secrets.yaml
+  register: elk_kibanaserver_pass
+  when: elasticsearch_password is not defined
+
+- name: Set proper facts for Opendistro or Opensearch
+  set_fact:
+    additional_params: "--user admin --password {{ elasticsearch_password | default(elk_kibanaserver_pass.stdout) | default('admin') }}"
+
+- name: Determine if Elasticsearch distro is Opendistro
+  set_fact:
+    opendistro_elk: true
   when: "'opendistroforelasticsearch' in ansible_facts.packages"
 
 - name: Ensure that Kibana backup_dest dir exist
@@ -25,96 +30,8 @@
     path: "{{ backup_dest }}"
     state: directory
 
-- name: Backup all Kibana objects
-  command: |
-    /usr/local/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --backup-dir {{ backup_dest }} {{ additional_params | default('') }} backup
+- include_tasks: opensearch.yml
+  when: opendistro_elk is not defined
 
-- name: Copy example ndjson files
-  copy:
-    src: "{{ item }}"
-    dest: "{{ backup_dest }}/"
-  loop:
-    - dashboard.ndjson
-    - visualization.ndjson
-    - index-pattern.ndjson
-
-- name: Ensure that example file exists
-  file:
-    path: "{{ backup_dest }}/{{ item }}"
-    state: file
-  loop:
-    - dashboard.ndjson
-    - visualization.ndjson
-    - index-pattern.ndjson
-
-- name: Run restore script for index-pattern
-  command: |
-    /usr/local/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --restore-file {{ backup_dest }}/index-pattern.ndjson {{ additional_params | default('') }} restore
-  register: restore_index_pattern
-
-- name: Run restore script for dashboard
-  command: |
-    /usr/local/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --restore-file {{ backup_dest }}/dashboard.ndjson {{ additional_params | default('') }} restore
-  register: restore_dashboard
-
-- name: Run restore script for visualization
-  command: |
-    /usr/local/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --restore-file {{ backup_dest }}/visualization.ndjson {{ additional_params | default('') }} restore
-  register: restore_visualization
-
-- name: Ensure that restore was OK
-  fail:
-    msg: "Failing on restoring dashboard or visualization"
-  when:
-    - "{{ restore_dashboard.stdout | json_query('success') }}"
-    - "{{ restore_visualization.stdout | json_query('success') }}"
-    - "{{ restore_index_pattern.stdout | json_query('success') }}"
-
-- name: Rename files before backup
-  command: |
-    mv {{ backup_dest }}/{{ item }} {{ backup_dest }}/{{ item }}-old
-  loop:
-    - dashboard.ndjson
-    - visualization.ndjson
-    - index-pattern.ndjson
-
-# FIXME: After restoring Index pattern with the script, Kibana does not refresh
-# all objects. So far, only restart or manual index-pattern creation works.
-- name: Restart Kibana service
-  systemd:
-    name: kibana
-    state: restarted
-
-- name: Check if Kibana service is alive
-  wait_for:
-    host: "{{ kibana_host }}"
-    port: 5601
-    timeout: 300
-    delay: 20
-
-- name: Create new backup of Kibana objects
-  command: |
-    /usr/local/bin/kibana-backup.py --kibana-url "http://{{ kibana_host }}:5601" --backup-dir {{ backup_dest }} {{ additional_params | default('') }} backup
-
-- name: Get content of new backup - index pattern
-  command: |
-    cat {{ backup_dest }}/index-pattern.ndjson
-  register: dashboard_new
-
-- name: Get content of new backup - dashboard
-  command: |
-    cat {{ backup_dest }}/dashboard.ndjson
-  register: dashboard_new
-
-- name: Get content of new backup - visualization
-  command: |
-    cat {{ backup_dest }}/visualization.ndjson
-  register: visualization_new
-
-- name: Fail if there are not required words in new backup
-  fail:
-    msg: "New backup file can be broken!"
-  when:
-    - "'dashboard' not in dashboard_new.stdout"
-    - "'visualization' not in visualization_new.stdout"
-    - "'index' not in index_pattern_new.stdout"
+- include_tasks: opendistro.yml
+  when: opendistro_elk is defined and opendistro_elk
