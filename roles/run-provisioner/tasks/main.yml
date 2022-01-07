@@ -1,4 +1,5 @@
----
+- command: "logger --tag ci-sfconfig provisioner: starting"
+
 - name: Run data provisionner
   command: python3 provisioner.py
   environment:
@@ -6,3 +7,5 @@
   args:
     chdir: "{{ sf_ci }}/tests/functional/provisioner"
   become: yes
+
+- command: "logger --tag ci-sfconfig provisioner: done"

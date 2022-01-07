@@ -23,17 +23,23 @@
       include_role:
         name: run-sfconfig
 
+    - command: "logger --tag ci-sfconfig first sfconfig: completed"
+
     - name: Update hostname and fqdn to sftests.com
       include_role:
         name: configure-fqdn
       vars:
         domain: sftests.com
 
+    - command: "logger --tag ci-sfconfig fqdn changed"
+
     - name: Run sfconfig to update the deployment fqdn
       include_role:
         name: run-sfconfig
       vars:
         sfconfig_args: --skip-install --provision-demo
+
+    - command: "logger --tag ci-sfconfig second sfconfig: completed"
 
     - name: Wait for scheduler reconfiguration
       register: _zuul_status
