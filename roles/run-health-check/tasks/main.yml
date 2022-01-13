@@ -1,3 +1,5 @@
+- command: "logger --tag ci-sfconfig health-check: starting"
+
 - name: Execute health-check
   shell: >-
     ANSIBLE_ROLES_PATH={{ sf_ci }}/roles ansible-playbook -i /var/lib/software-factory/ansible/hosts
@@ -5,3 +7,5 @@
     {{ sf_ci }}/playbooks/health-check/{{ health_check_name|default('sf-health-check') }}.yaml
   register: health_check
   become: yes
+
+- command: "logger --tag ci-sfconfig health-check: done"
