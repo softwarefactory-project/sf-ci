@@ -634,6 +634,8 @@ class JobUtils(Tool):
         r = requests.get(base_url)
         if r.status_code == 404:
             base_url = "%s/zuul/local/builds" % config.GATEWAY_URL
+        # TODO when zuul > 4.6, use the "complete=1" param
+        # to ensure we only get completed builds.
         job_url = "?job_name=config-update&newrev=%s" % revision
         logger.debug(
             "Waiting for config-update using %s" % (base_url + job_url))
@@ -650,10 +652,13 @@ class JobUtils(Tool):
                         job_log_url = "%s/job-output.txt.gz" % (
                             j[0]['log_url'])
                         result = j[0]['result']
-                    if return_result and result:
-                        return result
-                    if job_log_url:
+                    if return_result:
+                        if result is not None:
+                            return result
+                    if result and job_log_url:
                         return requests.get(job_log_url).text
+                    logger.debug("Build was added to SQL reporter, "
+                                 "but has not completed yet")
                 time.sleep(1)
         except Exception:
             logger.exception("Retry%d: Couldn't get %s: %s" % (
