@@ -15,7 +15,6 @@
 import os
 import shutil
 import time
-import requests
 import config
 import logging
 
@@ -170,17 +169,3 @@ class TestGerrit(Base):
         reviewers = gu2.get_reviewers(change_id)
         self.assertEqual(len(reviewers), 1)
         self.assertEqual(reviewers[0], config.ADMIN_USER)
-
-    def test_gitweb_access(self):
-        """ Test if gitweb access works correctly
-        """
-        pname = 'p_%s' % create_random_str()
-        self.create_project(pname)
-
-        # Test anonymous access to a repo
-        url = "%s/r/gitweb?p=%s.git" % (config.GATEWAY_URL, pname)
-        expected_title = "%s.git/summary" % pname
-
-        resp = requests.get(url)
-        self.assertTrue(resp.url.endswith('/r/gitweb?p=%s.git' % pname))
-        self.assertTrue(expected_title in resp.text)
