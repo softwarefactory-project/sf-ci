@@ -19,16 +19,15 @@
         - /usr/share/sf-config/scripts/submit_and_wait.py --delay 1200 --failure
       when: bad_project_status is changed
 
-    - name: Fetch logs url
+    - name: Get bad job FAILURE result
       uri:
         url: "https://{{ fqdn }}/zuul/api/tenant/local/builds?job_name=linters&project=tdpw/python-readerlib"
         return_content: yes
-        status_code: "200,404"
-        validate_certs: no
-      register: _job_logs
-      until: "'json' in _job_logs and _job_logs.json"
-      retries: 120
-      delay: 2
+        body_format: json
+      register: _result
+      until: _result.json != [] and _result.json[0]["result"] == 'FAILURE'
+      retries: 180
+      delay: 30
 
     - name: Add good YAML file
       template:
