@@ -198,7 +198,7 @@
           - name: master
             label: cloud-centos-7
           - name: elk
-            label: cloud-centos-8
+            label: cloud-centos-8-stream
         groups:
           - name: switch
             nodes:
