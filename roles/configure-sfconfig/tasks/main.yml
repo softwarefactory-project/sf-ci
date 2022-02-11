@@ -64,6 +64,25 @@
           loop: '{{ unsupported_components }}'
       when: unsupported_components
 
+    - name: Add dummy third party authenticator
+      block:
+        - name: Remove default value for external_authenticators in sfconfig.yaml
+          lineinfile:
+            path: /etc/software-factory/sfconfig.yaml
+            regexp: '^  external_authenticators:.*'
+            line: '  external_authenticators:'
+
+        - name: add zuul authenticator
+          blockinfile:
+            path: /etc/software-factory/sfconfig.yaml
+            insertafter: '^  external_authenticators:$'
+            marker: "# {mark} ANSIBLE MANAGED BLOCK external_authenticator"
+            block: |2
+                - name: "dummy_sso"
+                  realm: dummy_sso
+                  issuer_id: https://keycloak/auth/realms/dummy
+                  client_id: zuul_dummy
+
     - include_tasks: configure-static-hostname.yml
       when:
         - static_hostname_ip is defined

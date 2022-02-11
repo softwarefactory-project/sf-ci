@@ -22,6 +22,7 @@ from utils import skipIfServiceMissing
 from utils import skipReason
 from utils import ManageSfUtils
 from utils import skipIfProvisionVersionLesserThan
+from utils import skipIf
 from utils import GerritClient
 from utils import is_present
 
@@ -321,6 +322,36 @@ class TestGateway(Base):
         resp = requests.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn('capabilities', resp.text)
+
+    @skipIfServiceMissing('zuul')
+    @skipIf(
+        config.groupvars['zuul'].get('external_authenticators', []) == [],
+        'No external authenticator set'
+    )
+    def test_zuul_third_party_authenticator(self):
+        """ Test if Zuul authenticators are correctly set
+        """
+        url = config.GATEWAY_URL + "/zuul/api/info"
+        resp = requests.get(url)
+        self.assertEqual(resp.status_code, 200)
+        zuul_info = resp.json()
+        self.assertTrue('info' in zuul_info, zuul_info)
+        self.assertTrue('capabilities' in zuul_info['info'], zuul_info)
+        self.assertTrue('auth' in zuul_info['info']['capabilities'],
+                        zuul_info)
+        zuul_auth = zuul_info['info']['capabilities']['auth']
+        self.assertTrue('realms' in zuul_auth, zuul_info)
+        self.assertTrue('dummy_sso' in zuul_auth['realms'], zuul_info)
+        for k, v in [
+            ('authority', 'https://keycloak/auth/realms/dummy'),
+            ('client_id', 'zuul_dummy'),
+            ('driver', 'OpenIDConnect'),
+        ]:
+            self.assertEqual(
+                v,
+                zuul_auth['realms']['dummy_sso'][k],
+                zuul_auth
+            )
 
     @skipIfServiceMissing('etherpad')
     def test_etherpad_accessible(self):

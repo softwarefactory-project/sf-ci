@@ -61,7 +61,10 @@ def is_on_master():
 
 
 def is_sf_version_over(version):
-    return cmp_version(config.groupvars['sf_version'], version)
+    return (
+        is_on_master()
+        or cmp_version(config.groupvars['sf_version'], version)
+    )
 
 
 def is_present(service):
@@ -92,6 +95,11 @@ def skipIfServiceMissing(service):
 def skipIfServicePresent(service):
     return skipIf(service in services,
                   'This instance of SF is running %s' % service)
+
+
+def skipIfSoftwareFactoryVersionLowerThan(version):
+    return skipIf(not is_sf_version_over(version),
+                  'This version of SF is lower than %s' % version)
 
 
 def skipReason(reason):
