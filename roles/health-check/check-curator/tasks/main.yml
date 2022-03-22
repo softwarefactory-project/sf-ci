@@ -85,18 +85,8 @@
   when: _curator_bin.stat.exists
 
 - name: Set curator command - container version
-  vars:
-    curator_image: quay.rdoproject.org/software-factory/curator:5.7
   set_fact:
-    curator_command: >-
-      podman run
-      --net host
-      --rm
-      --user {{ curator_uid | default('1000') }}:{{ curator_gid | default('1000') }}
-      -v {{ curator_config_dir | default('/etc/logstash/curator.d') }}/curator.yml:/.curator/curator.yml:z
-      -v {{ curator_config_dir | default('/etc/logstash/curator.d') }}/delete-other-indexes.yml:/curator/delete-other-indexes.yml:z
-      -v /etc/logstash/certs/localCA.pem:/etc/opensearch/certs/localCA.pem:z
-      {{ curator_image }} /curator/delete-other-indexes.yml
+    curator_command: /usr/local/bin/curator.sh /etc/curator/delete-other-indexes.yml
   when: not _curator_bin.stat.exists
 
 - name: Executing create_index curator rule
