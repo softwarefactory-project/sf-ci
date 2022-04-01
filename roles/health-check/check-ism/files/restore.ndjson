@@ -1,0 +1,2 @@
+{"attributes":{"title":"logstash-*"},"id":"someuuid","migrationVersion":{"index-pattern":"7.6.0"},"references":[],"type":"index-pattern","updated_at":"2022-04-05T07:10:10.761Z","version":"WzI3LDNd"}
+{"exportedCount":1,"missingRefCount":0,"missingReferences":[]}

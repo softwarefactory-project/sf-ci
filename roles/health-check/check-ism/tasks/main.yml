@@ -1,0 +1,90 @@
+---
+# NOTE: Remove that condition after moving to ISM
+- name: Check if job should use curator
+  stat:
+    path: "{{ curator_config_dir | default('/etc/logstash/curator.d') }}"
+  register: _curator_config_dir
+
+- name: Check ISM functionality
+  block:
+    # NOTE: move to the Opensearch package when none service
+    # will have python elasticsearch as dependency.
+    - name: Ensure that needed packages are already installed
+      yum:
+        name:
+          - rh-nodejs10-npm
+          - python3-elasticsearch
+        state: present
+
+    - name: Install makelogs
+      shell: |
+        source scl_source enable rh-nodejs10 ;
+        npm install -g "@elastic/makelogs"
+
+    - name: Get Elasticsearch admin password
+      shell: |
+        awk '/elasticsearch_password/ {print $2}' /var/lib/software-factory/bootstrap-data/secrets.yaml
+      register: elastic_admin_pass
+
+    - name: Set proper facts for Opendistro and Opensearch
+      set_fact:
+        additional_params: "--auth admin:{{ elastic_admin_pass.stdout }}"
+        elastic_url: "https://admin:{{ elastic_admin_pass.stdout }}@{{ fqdn }}:9200"
+
+    - name: Generate logs for logstash-healthcheck prefix - 1 day earlier and 10 next days
+      shell: |
+        source scl_source enable rh-nodejs10 ;
+        makelogs {{ additional_params | default('') }} \
+          --url {{ elastic_url | default("http://{{ fqdn }}:9200") }} \
+          -d '1/10' --verbose --reset --indexPrefix logstash-healthcheck-
+
+    - name: Generate logs for logstash-healthcheck- prefix - 1 day earlier and 10 next days
+      shell: |
+        source scl_source enable rh-nodejs10 ;
+        makelogs {{ additional_params | default('') }} \
+          --url {{ elastic_url | default("http://{{ fqdn }}:9200") }} \
+          -d 1/10 --verbose --no-reset --indexPrefix logstash-healthcheck-
+
+    - name: Copy logstash- saved object
+      copy:
+        src: restore.ndjson
+        dest: /tmp/restore.ndjson
+
+    - name: Restore index pattern for logstash-
+      shell: |
+        /usr/local/bin/kibana-backup.py \
+          --user admin \
+          --password {{ elastic_admin_pass.stdout }} \
+          --restore-file /tmp/restore.ndjson  \
+          --insecure \
+          restore
+
+    - name: Check if there are ISM policy ongoing
+      uri:
+        url: "https://0.0.0.0:9200/_plugins/_ism/explain?pretty"
+        user: "admin"
+        password: "{{ elastic_admin_pass.stdout }}"
+        force_basic_auth: true
+        method: GET
+        validate_certs: false
+        status_code: "200"
+        return_content: true
+      register: _ism_policy
+      until: "'logstash-healthcheck-' in _ism_policy.content"
+      retries: 30
+      delay: 10
+
+  always:
+    - name: Copy cleanup indices script
+      copy:
+        src: cleanup-indices.py
+        dest: /tmp/cleanup-indices.py
+        mode: '0755'
+
+    - name: Cleanup zuul and logstash indices
+      shell: |
+        /tmp/cleanup-indices.py --username admin \
+          --password {{ elastic_admin_pass.stdout}} \
+          --insecure
+
+  when: not _curator_config_dir.stat.exists

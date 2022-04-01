@@ -26,10 +26,6 @@
         # NOTE: remove after merging:
         # https://softwarefactory-project.io/r/c/software-factory/ansible-role-elastic-recheck/+/22512
         input_port: 9998
-      - user: "curator"
-        role: "curator"
-        password: "curator"
-        tenant: "sftests.com"
       - user: "kibana"
         role: "readonly"
         password: "kibana"
@@ -119,9 +115,6 @@
           logstash_sftests_com:
             role: logstash
             password: logstash
-          curator_sftests_com:
-            role: curator
-            password: curator
           # Readonly user
           kibana_sftests_com:
             role: readonly

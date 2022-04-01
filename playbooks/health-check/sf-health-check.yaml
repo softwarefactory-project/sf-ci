@@ -11,8 +11,8 @@
   import_playbook: gerritbot.yaml
   when: '"gerritbot" in roles'
 
-- name: Run health-check curator
-  import_playbook: curator.yaml
+- name: Run health-check ISM
+  import_playbook: ism.yaml
   when: '"elasticsearch" in roles'
 
 - name: Run health-check kibana
