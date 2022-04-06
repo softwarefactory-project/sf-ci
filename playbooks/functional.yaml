@@ -9,7 +9,6 @@
       loop:
         - prepare-test-env
         - install-ci-repository
-        - check-bubblewrap
         - install-sfconfig
         - configure-sfconfig
 
