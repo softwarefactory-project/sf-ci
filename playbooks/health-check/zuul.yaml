@@ -1,4 +1,9 @@
 ---
+- hosts: zuul-scheduler
+  tasks:
+    - name: Attempt a run of zuul-client
+      shell: /bin/zuul-client builds --tenant local
+
 - hosts: install-server
   remote_user: root
   tasks:
