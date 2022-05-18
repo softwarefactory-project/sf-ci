@@ -2,6 +2,8 @@
 - hosts: elk
   become: true
   vars:
+    # NOTE: the hide_sensitive_logs is set to false in Zuul CI jobs.
+    hide_sensitive_logs: false
     fqdn: elasticsearch.sftests.com
     tenant_configuration:
       sftests.com:
