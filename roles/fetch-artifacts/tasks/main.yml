@@ -1,19 +1,33 @@
 ---
-- name: Remove empty directories
-  command: "find {{ artifacts }} -type d -empty -delete"
+- name: Check if artifacts dir exists and is not empty
+  stat:
+    path: "{{ artifacts }}/*"
+  register: _artifacts_dir
 
-- name: Compress and replace files
-  shell: |
-    find {{ artifacts }} -type f {{ regex }} -exec gzip '{}' + ;
-  vars:
-    regex: "\\( -regextype posix-extended -regex '.*.(txt|yaml|yml|log|conf)$' -o -name 'messages' \\)"
+- name: Check if www logs dir exists and is not empty
+  stat:
+    path: "/var/www/logs/*"
+  register: _www_dir
 
-- name: Fetch artifacts
-  synchronize:
-    src: "{{ artifacts }}/"
-    dest: "{{ zuul.executor.log_root }}/logs"
-    mode: pull
-  become: yes
+- name: Prepare artifacts dir
+  block:
+    - name: Remove empty directories
+      command: "find {{ artifacts }} -type d -empty -delete"
+
+    - name: Compress and replace files
+      shell: |
+        find {{ artifacts }} -type f {{ regex }} -exec gzip '{}' + ;
+      vars:
+        regex: "\\( -regextype posix-extended -regex '.*.(txt|yaml|yml|log|conf)$' -o -name 'messages' \\)"
+
+    - name: Fetch artifacts
+      synchronize:
+        src: "{{ artifacts }}/"
+        dest: "{{ zuul.executor.log_root }}/logs"
+        mode: pull
+      become: yes
+
+  when: _artifacts_dir.stat.exists
 
 - name: Fetch job artifacts
   synchronize:
@@ -21,3 +35,4 @@
     dest: "{{ zuul.executor.log_root }}/job-logs"
     mode: pull
   no_log: True
+  when: _www_dir.stat.exists

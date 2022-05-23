@@ -4,7 +4,7 @@ local_repo_path: ""
 func_test_case: "tests/functional"
 
 # workspace (use default(, true) to set default when env lookup return '')
-workspace: "./"
+# workspace: "./"
 
 # sfconfig.yaml customization
 sf_domain: "sftests.com"
@@ -12,7 +12,7 @@ sf_domain: "sftests.com"
 # TODO find why it was duplicated in playbooks
 # sf_ci: "{{ workspace }}"
 # sf_user: "centos"
-artifacts: "{{ workspace }}/artifacts"
+artifacts: "./zuul-output/artifacts"
 home: "/home/{{ sf_user }}"
 
 # Get sfinfo location
