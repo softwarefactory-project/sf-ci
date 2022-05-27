@@ -13,6 +13,7 @@
 # under the License.
 
 import json
+import jwt
 import os
 import re
 import unittest
@@ -159,7 +160,37 @@ def get_jwt(username, password):
                                     'grant_type': 'password',
                                     'username': username,
                                     'password': password})
-    return resp.json().get('access_token')
+    if resp.json().get('access_token'):
+        return resp.json().get('access_token')
+    else:
+        raise Exception(
+            'could not get token for %s: %s' % (username, resp.text))
+
+
+def get_decoded_jwt(username, password):
+    token = get_jwt(username, password)
+    return jwt.decode(token, options={"verify_signature": False})
+
+
+def call_endpoint_with_bearer_auth(callback,
+                                   endpointUrl="",
+                                   token="",
+                                   **kwargs):
+    bearer_header = f"Bearer {token}"
+    _kwargs = dict(kwargs)
+    if 'headers' in _kwargs:
+        _kwargs['headers']['Authorization'] = bearer_header
+    else:
+        _kwargs['headers'] = {'Authorization': bearer_header}
+    return callback(endpointUrl, **_kwargs)
+
+
+def get_user_groups(username, password):
+    token = get_jwt('admin', config.USERS['admin']['password'])
+    user_token = get_decoded_jwt(username, password)
+    endpoint = f"auth/admin/realms/sf/users/{user_token['sub']}/groups"
+    urlUserGroups = f"{config.GATEWAY_URL}/{endpoint}"
+    return call_endpoint_with_bearer_auth(requests.get, urlUserGroups, token)
 
 
 def get_cookie(username, password):

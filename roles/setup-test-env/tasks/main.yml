@@ -1,9 +1,10 @@
-- name: Ensure test tools are installed
+- name: Ensure test dependencies are installed
   yum:
     name:
       - python3-nose
       - python3-nose-timer
       - python3-nose-htmloutput
+      - python3-jwt
   become: yes
 
 # TODO: remove the auto-creation of sfmanager.log and delete the task bellow

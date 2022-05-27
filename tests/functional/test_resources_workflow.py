@@ -29,6 +29,7 @@ from utils import get_gerrit_utils
 from utils import ssh_run_cmd
 from utils import get_auth_params
 from utils import is_present
+from utils import get_user_groups
 
 
 class TestResourcesWorkflow(Base):
@@ -177,7 +178,6 @@ class TestResourcesWorkflow(Base):
                                                mode='del',
                                                msg=msg)
 
-    # TODO Implement groups handling in keycloak
     def test_CUD_group(self):
         """ Check resources - ops on group work as expected """
         fpath = "resources/%s.yaml" % create_random_str()
@@ -210,23 +210,39 @@ class TestResourcesWorkflow(Base):
                                    shlex.split("cat /etc/cauth/groups.yaml"))
             return yaml.safe_load(out)
 
-        def _get_keycloak_groups():
-            raise NotImplementedError('Keycloak does not support groups yet')
+        def _test_kc_groups(members=[], non_members=[]):
+            for user in members:
+                usergroups = get_user_groups(user,
+                                             config.USERS[user]['password'])
+                self.assertTrue(usergroups.status_code == requests.codes.ok,
+                                "Assertion for getting groups with user: %s, \
+                                  failed." % (user))
+                groupsname = [group['name'] for group in usergroups.json()]
+                self.assertTrue(name in groupsname,
+                                "Group %s does not exist in %s."
+                                % (name, groupsname))
+            for user in non_members:
+                usergroups = get_user_groups(user,
+                                             config.USERS[user]['password'])
+                self.assertTrue(usergroups.status_code == requests.codes.ok,
+                                "Assertion for getting groups with user: %s, \
+                                  failed." % (user))
+                groupsname = [group['name'] for group in usergroups.json()]
+                self.assertFalse(name in groupsname,
+                                 "Group %s does not exist in %s."
+                                 % (name, groupsname))
 
-        def _get_groups():
-            if is_present('keycloak'):
-                return _get_keycloak_groups()
-            elif is_present('cauth'):
-                return _get_cauth_groups()
-            else:
-                raise Exception('Unknown SSO service')
-
-        groups = _get_groups()
-        self.assertTrue(name in groups['groups'], groups)
-        self.assertTrue(config.USERS['user2']['email'] in
-                        groups['groups'][name]['members'], groups)
-        self.assertTrue(config.USERS['user3']['email'] in
-                        groups['groups'][name]['members'], groups)
+        if is_present('keycloak'):
+            _test_kc_groups(members=['user2', 'user3'])
+        elif is_present('cauth'):
+            groups = _get_cauth_groups()
+            self.assertTrue(name in groups['groups'], groups)
+            self.assertTrue(config.USERS['user2']['email'] in
+                            groups['groups'][name]['members'], groups)
+            self.assertTrue(config.USERS['user3']['email'] in
+                            groups['groups'][name]['members'], groups)
+        else:
+            raise Exception('Unknown SSO service')
 
         # Modify resources Add/Remove members w/o review
         resources = """resources:
@@ -249,15 +265,20 @@ class TestResourcesWorkflow(Base):
         self.assertIn(config.USERS['user2']['email'], members)
         self.assertNotIn(config.USERS['user3']['email'], members)
         # check SSO groups
-        groups = _get_groups()
-        self.assertTrue(name in groups['groups'], groups)
-        self.assertTrue(config.USERS['user2']['email'] in
-                        groups['groups'][name]['members'], groups)
-        self.assertTrue(config.USERS['user4']['email'] in
-                        groups['groups'][name]['members'], groups)
-        self.assertTrue(config.USERS['user3']['email'] not in
-                        groups['groups'][name]['members'], groups)
-
+        if is_present('cauth'):
+            groups = _get_cauth_groups()
+            self.assertTrue(name in groups['groups'], groups)
+            self.assertTrue(config.USERS['user2']['email'] in
+                            groups['groups'][name]['members'], groups)
+            self.assertTrue(config.USERS['user4']['email'] in
+                            groups['groups'][name]['members'], groups)
+            self.assertTrue(config.USERS['user3']['email'] not in
+                            groups['groups'][name]['members'], groups)
+        elif is_present('keycloak'):
+            _test_kc_groups(members=['user2', 'user4'],
+                            non_members=['user3'])
+        else:
+            raise Exception('Unknown SSO service')
         # Del the resources file w/o review
         self.set_resources_then_direct_push(fpath,
                                             mode='del')
@@ -265,8 +286,14 @@ class TestResourcesWorkflow(Base):
         self.assertFalse(
             self.gu.get_group_id(name))
         # check SSO groups
-        groups = _get_groups()
-        self.assertTrue(name not in groups['groups'], groups)
+        if is_present('cauth'):
+            groups = _get_cauth_groups()
+            self.assertTrue(name not in groups['groups'], groups)
+        elif is_present('keycloak'):
+            # TODO check keycloak API to test for group's existence directly
+            _test_kc_groups(non_members=config.USERS.keys())
+        else:
+            raise Exception('Unknown SSO service')
 
     def test_CD_repo(self):
         """ Check resources - ops on git repositories work as expected """

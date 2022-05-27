@@ -2,7 +2,7 @@
 - name: Backup all Kibana objects
   command: >
     /usr/local/bin/kibana-backup.py
-    --kibana-url "http://{{ kibana_host }}:5601"
+    --kibana-url "https://{{ fqdn }}/analytics"
     --backup-dir {{ backup_dest }} {{ additional_params | default('') }}
     --extension yaml
     backup
@@ -28,7 +28,7 @@
 - name: Run restore script for index-pattern
   command: >
     /usr/local/bin/kibana-backup.py
-    --kibana-url "http://{{ kibana_host }}:5601"
+    --kibana-url "https://{{ fqdn }}/analytics"
     --restore-file {{ backup_dest }}/index-pattern.yaml {{ additional_params | default('') }}
     --extension yaml
     restore
@@ -37,7 +37,7 @@
 - name: Run restore script for dashboard
   command: >
     /usr/local/bin/kibana-backup.py
-    --kibana-url "http://{{ kibana_host }}:5601"
+    --kibana-url "https://{{ fqdn }}/analytics"
     --restore-file {{ backup_dest }}/dashboard.yaml {{ additional_params | default('') }}
     restore
   register: restore_dashboard
@@ -45,7 +45,7 @@
 - name: Run restore script for visualization
   command: >
     /usr/local/bin/kibana-backup.py
-    --kibana-url "http://{{ kibana_host }}:5601"
+    --kibana-url "https://{{ fqdn }}/analytics"
     --restore-file {{ backup_dest }}/visualization.yaml {{ additional_params | default('') }}
     restore
   register: restore_visualization
@@ -89,7 +89,7 @@
 
 - name: Get Opensearch indices
   uri:
-    url: "http://localhost:5601/api/saved_objects/_find?type=index-pattern&search_fields=title&search=logstash-test-*"
+    url: "https://{{ fqdn }}/analytics/api/saved_objects/_find?type=index-pattern&search_fields=title&search=logstash-test-*"
     user: "admin"
     password: "{{ elasticsearch_password | default(elk_kibanaserver_pass.stdout) | default('admin') }}"
     force_basic_auth: true
@@ -105,7 +105,7 @@
 - name: Create new backup of Kibana objects
   command: >
     /usr/local/bin/kibana-backup.py
-    --kibana-url "http://{{ kibana_host }}:5601"
+    --kibana-url "https://{{ fqdn }}/analytics"
     --backup-dir {{ backup_dest }} {{ additional_params | default('') }}
     --extension yaml
     backup
