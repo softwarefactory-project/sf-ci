@@ -26,6 +26,11 @@ fi
 # Authorize gerrit reindex from local-test netns
 sql_file='/var/lib/software-factory/sql/databases.sql'
 sql_command=$(grep gerrit.*sftests.com $sql_file | sed -e "s/\(gerrit'@'\).*sftests.com/\1192.168.42.2/g")
-mysql -e "$sql_command"
+
+if which mysql &>/dev/null; then
+    mysql -e "$sql_command"
+else
+    podman exec -t mysql sh -c "mysql --defaults-file=/etc/mysql/conf.d/client.cnf -e '$sql_command'"
+fi
 
 ip netns exec local-test sudo -E -u $SUDO_USER "$@"
