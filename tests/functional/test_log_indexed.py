@@ -261,7 +261,8 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
         head = self.gitu_admin.direct_push_branch(clone, 'master')
         return head
 
-    @skipIfServiceMissing('job-logs-gearman-worker')
+    @skipIfServiceMissing('logscraper')
+    @skipIfServiceMissing('logsender')
     def test_zuul_job_console_log_indexation(self):
         """ Test job console logs are exported in Elasticsearch
         """
