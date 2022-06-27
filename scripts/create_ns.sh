@@ -30,7 +30,7 @@ sql_command=$(grep gerrit.*sftests.com $sql_file | sed -e "s/\(gerrit'@'\).*sfte
 if which mysql &>/dev/null; then
     mysql -e "$sql_command"
 else
-    podman exec -t mysql sh -c "mysql --defaults-file=/etc/mysql/conf.d/client.cnf -e '$sql_command'"
+    podman exec -t mysql sh -c "mysql -uroot -p\$MYSQL_ROOT_PASSWORD -e '$sql_command'"
 fi
 
 ip netns exec local-test sudo -E -u $SUDO_USER "$@"
