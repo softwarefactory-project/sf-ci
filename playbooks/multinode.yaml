@@ -60,6 +60,7 @@
       vars:
         sf_arch: multinode
         add_component:
+          # FIXME: change to opensearch when 25354 is merged.
           - component: elasticsearch
           - component: hound
 
@@ -106,6 +107,7 @@
           - component: gerrit
             insertafter: cauth
           - component: gitweb
+          # FIXME: change to opensearch when 25354 is merged.
           - component: elasticsearch
           - component: hound
         sf_tenant_instance: true
@@ -161,6 +163,7 @@
         static_hostname_ip: '{{ tenant_ip }}'
         static_hostname_fqdn: tenant.sftests.com
         add_component:
+          # FIXME: change to opensearch when 25354 is merged.
           - component: elasticsearch
           - component: hound
 

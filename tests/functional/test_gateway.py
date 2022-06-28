@@ -32,7 +32,7 @@ import os
 import requests
 
 bootstrap_dir = '/var/lib/software-factory/bootstrap-data'
-elasticsearch_credential_file = '%s/secrets.yaml' % bootstrap_dir
+opensearch_credential_file = '%s/secrets.yaml' % bootstrap_dir
 sfconfig_file = '/etc/software-factory/sfconfig.yaml'
 
 
@@ -48,28 +48,37 @@ class TestGateway(Base):
         self.assertTrue(resp.status_code > 399, resp.status_code)
 
     def _check_if_auth_required(self, gateway):
-        resp = requests.get("%s/elasticsearch/_cat/indices" % gateway)
+        resp = requests.get("%s/opensearch/_cat/indices" % gateway)
+        # FIXME: Remove after changing name to Opensearch
+        if resp.status_code == 404:
+            resp = requests.get("%s/elasticsearch/_cat/indices" % gateway)
         return resp.status_code == 401
 
-    def _get_elastic_admin_pass(self, file_path):
+    def _get_opensearch_admin_pass(self, file_path):
         if not os.path.exists(file_path):
             return
 
         with open(file_path, 'r') as f:
             for line in f.readlines():
-                if line.split(':')[0].strip() == 'elasticsearch_password':
+                # FIXME: Change conditiona after rename to opensearch
+                if (line.split(':')[0].strip() == 'opensearch_password' or
+                        line.split(':')[0].strip(
+                        ) == 'elasticsearch_password'):
                     return line.split(':')[1].strip()
 
-    def _get_ext_elastic_creds(self):
+    def _get_ext_opensearch_creds(self):
         if not os.path.exists(sfconfig_file):
             return
         with open(sfconfig_file, 'r') as ext_users:
             parsed_file = yaml.safe_load(ext_users)
+            if 'external_opensearch' in parsed_file:
+                return parsed_file['external_opensearch']
+            # FIXME: Remove condition after renaming to Opensearch
             if 'external_elasticsearch' in parsed_file:
                 return parsed_file['external_elasticsearch']
 
-    def _get_ext_elastic_admin_pass(self, username):
-        ext_creds = self._get_ext_elastic_creds()
+    def _get_ext_opensearch_admin_pass(self, username):
+        ext_creds = self._get_ext_opensearch_creds()
         if not ext_creds.get('users'):
             return
         for user, creds in ext_creds['users'].items():
@@ -80,6 +89,13 @@ class TestGateway(Base):
         with open(file_path, 'r') as sf_config:
             parsed_file = yaml.safe_load(sf_config)
             return parsed_file.get('kibana', {}).get('host_url')
+
+    def _determine_elasticsearch_url(self, gateway):
+        opensearch_url = '%s/opensearch' % gateway
+        r = requests.get(opensearch_url)
+        if r.status_code != 404:
+            return opensearch_url
+        return '%s/elasticsearch' % gateway
 
     def test_managesf_is_secure(self):
         """Test if managesf config.py file is not world readable"""
@@ -222,16 +238,16 @@ class TestGateway(Base):
             return skipReason("Skipping test due external Kibana host is "
                               "configured")
 
-        elastic_url = '%s/elasticsearch' % config.GATEWAY_URL
+        url = self._determine_elasticsearch_url(config.GATEWAY_URL)
         if self._check_if_auth_required(config.GATEWAY_URL):
-            admin_password = self._get_elastic_admin_pass(
-                elasticsearch_credential_file)
+            admin_password = self._get_opensearch_admin_pass(
+                opensearch_credential_file)
             data = json.loads(
-                requests.get(elastic_url,
+                requests.get(url,
                              auth=HTTPBasicAuth('admin', admin_password)
                              ).text)
         else:
-            data = json.loads(urllib.request.urlopen(elastic_url).read())
+            data = json.loads(urllib.request.urlopen(url).read())
 
         if data['version']['number'] == '2.4.6':
             url = config.GATEWAY_URL + "/app/kibana"
@@ -248,24 +264,24 @@ class TestGateway(Base):
         if not self._is_kibana_external(sfconfig_file):
             return skipReason("Skipping test due external Kibana host is not "
                               "configured")
-        elastic_url = '%s/elasticsearch' % config.GATEWAY_URL
+        url = self._determine_elasticsearch_url(config.GATEWAY_URL)
         verify = True
         if self._check_if_auth_required(config.GATEWAY_URL):
             user = 'admin'
-            if self._get_ext_elastic_creds():
+            if self._get_ext_opensearch_creds():
                 user = 'admin_sftests_com'
-                admin_password = self._get_ext_elastic_admin_pass(user)
+                admin_password = self._get_ext_opensearch_admin_pass(user)
                 verify = False
             else:
-                admin_password = self._get_elastic_admin_pass(
-                        elasticsearch_credential_file)
+                admin_password = self._get_opensearch_admin_pass(
+                        opensearch_credential_file)
 
             data = json.loads(
-                requests.get(elastic_url,
+                requests.get(url,
                              auth=HTTPBasicAuth(user, admin_password),
                              verify=verify).text)
         else:
-            data = json.loads(urllib.request.urlopen(elastic_url).read())
+            data = json.loads(urllib.request.urlopen(url).read())
 
         if data['version']['number'] == '2.4.6':
             url = config.GATEWAY_URL + "/app/kibana"

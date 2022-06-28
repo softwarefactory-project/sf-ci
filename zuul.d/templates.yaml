@@ -28,6 +28,7 @@
               - sf-rpm-build
             files:
               - ^ansible/roles/sf-log-processing/.*$
+              - ^ansible/roles/sf-opensearch/.*$
               - ^ansible/roles/sf-elasticsearch/.*$
               - ^ansible/roles/sf-kibana/.*$
               - ^defaults/sfconfig.yaml$
@@ -57,6 +58,7 @@
               - sf-rpm-build
             files:
               - ^ansible/roles/sf-log-processing/.*$
+              - ^ansible/roles/sf-opensearch/.*$
               - ^ansible/roles/sf-elasticsearch/.*$
               - ^ansible/roles/sf-kibana/.*$
               - ^defaults/sfconfig.yaml$

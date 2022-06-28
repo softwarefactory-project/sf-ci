@@ -13,7 +13,7 @@
 
 - name: Run health-check ISM
   import_playbook: ism.yaml
-  when: '"elasticsearch" in roles'
+  when: '"opensearch" in roles or "elasticsearch" in roles'
 
 - name: Run health-check kibana
   import_playbook: kibana.yaml

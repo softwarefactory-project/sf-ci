@@ -12,15 +12,15 @@
 
 - name: Get Opendistro or Opensearch admin password
   shell: |
-    awk '/elasticsearch_password/ {print $2}' /var/lib/software-factory/bootstrap-data/secrets.yaml
+    awk '/elasticsearch_password|opensearch_password/ {print $2}' /var/lib/software-factory/bootstrap-data/secrets.yaml | head -n1
   register: elk_kibanaserver_pass
-  when: elasticsearch_password is not defined
+  when: opensearch_password is not defined
 
 - name: Set proper facts for Opendistro or Opensearch
   set_fact:
-    additional_params: "--user admin --password {{ elasticsearch_password | default(elk_kibanaserver_pass.stdout) | default('admin') }}"
+    additional_params: "--user admin --password {{ opensearch_password | default(elk_kibanaserver_pass.stdout) | default('admin') }}"
 
-- name: Determine if Elasticsearch distro is Opendistro
+- name: Determine if opensearch distro is Opendistro
   set_fact:
     opendistro_elk: true
   when: "'opendistroforelasticsearch' in ansible_facts.packages"

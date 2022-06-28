@@ -91,7 +91,7 @@
   uri:
     url: "https://{{ fqdn }}/analytics/api/saved_objects/_find?type=index-pattern&search_fields=title&search=logstash-test-*"
     user: "admin"
-    password: "{{ elasticsearch_password | default(elk_kibanaserver_pass.stdout) | default('admin') }}"
+    password: "{{ opensearch_password | default(elasticsearch_password) | default(elk_kibanaserver_pass.stdout) | default('admin') }}"
     force_basic_auth: true
     method: GET
     validate_certs: false

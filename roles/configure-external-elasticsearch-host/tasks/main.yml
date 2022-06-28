@@ -1,12 +1,13 @@
 ---
-- name: Configure external_elasticsearch and kibana
+### For Opensearch
+- name: Configure external_opensearch and kibana
   become: true
   block:
-    - name: Uncomment external_elasticsearch parameter
+    - name: Uncomment external_opensearch parameter
       lineinfile:
         path: /etc/software-factory/sfconfig.yaml
-        regexp: '^#external_elasticsearch:$'
-        line: 'external_elasticsearch:'
+        regexp: '^#external_opensearch:$'
+        line: 'external_opensearch:'
 
     - name: Uncomment kibana parameter
       lineinfile:
@@ -14,13 +15,13 @@
         regexp: '^#kibana:$'
         line: 'kibana:'
 
-    - name: Configure credentials to connect to remote Elasticsearch host
+    - name: Configure credentials to connect to remote opensearch host
       blockinfile:
         path: /etc/software-factory/sfconfig.yaml
-        insertafter: '^external_elasticsearch:$'
-        marker: "# {mark} ANSIBLE MANAGED BLOCK elasticsearch_external"
+        insertafter: '^external_opensearch:$'
+        marker: "# {mark} ANSIBLE MANAGED BLOCK opensearch_external"
         block: |2
-            host: "{{ elasticsearch_host }}"
+            host: "{{ opensearch_host }}"
             cacert_path: "{{ cacert_path }}"
             suffix: "{{ suffix }}"
             users:
@@ -34,6 +35,41 @@
         block: |2
             host_url: "{{ kibana_host_url }}"
             readonly_user_autologin: "{{ readonly_user_autologin }}"
+
+    - name: Configure Zuul opensearch_connections
+      blockinfile:
+        path: /etc/software-factory/sfconfig.yaml
+        insertafter: '  opensearch_connections: \[\]$'
+        marker: "# {mark} ANSIBLE MANAGED BLOCK opensearch_connections"
+        block: |2
+            opensearch_connections:
+              {{ opensearch_connections | to_nice_yaml(indent=2) | indent(4, False) }}
+
+    - name: Remove empty opensearch_connections
+      lineinfile:
+        path: /etc/software-factory/sfconfig.yaml
+        regexp: '  opensearch_connections: \[\]$'
+        state: absent
+
+    ### For Elasticsearch
+    # FIXME: Remove after changing role name
+    - name: Uncomment external_elasticsearch parameter
+      lineinfile:
+        path: /etc/software-factory/sfconfig.yaml
+        regexp: '^#external_elasticsearch:$'
+        line: 'external_elasticsearch:'
+
+    - name: Configure credentials to connect to remote Elasticsearch host
+      blockinfile:
+        path: /etc/software-factory/sfconfig.yaml
+        insertafter: '^external_elasticsearch:$'
+        marker: "# {mark} ANSIBLE MANAGED BLOCK elasticsearch_external"
+        block: |2
+            host: "{{ elasticsearch_host }}"
+            cacert_path: "{{ cacert_path }}"
+            suffix: "{{ suffix }}"
+            users:
+              {{ users | to_nice_yaml(indent=2) | indent(4, False) }}
 
     - name: Configure Zuul elasticsearch_connections
       blockinfile:

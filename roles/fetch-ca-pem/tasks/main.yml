@@ -6,30 +6,30 @@
   become: yes
   when: sf_deployment | default(true)
 
-- name: Get pem from Elasticsearch instance
+- name: Get pem from opensearch instance
   become: yes
   block:
-    - name: Recognize Elasticsearch distro
-      stat:
-        path: /etc/elasticsearch/certs
-      delegate_to: '{{ instance }}'
-      register: _elk_distro
-
     - name: Create cert directories
       file:
         path: "{{ item }}"
         state: directory
         recurse: true
       loop:
-        - /etc/elasticsearch/certs
+        - /etc/opensearch/certs/opensearch
         - /etc/zuul/ssl
+        # FIXME: remove entry when rename to opensearch is done
+        - /etc/elasticsearch/certs
 
-    - name: Get elasticsearch CA
+    - name: Get opensearch CA
       synchronize:
-        src: "/etc/{{ 'elasticsearch' if _elk_distro.stat.exists else 'opensearch' }}/certs/localCA.pem"
+        src: "/etc/opensearch/certs/localCA.pem"
         dest: "{{ item }}"
       delegate_to: '{{ instance }}'
       loop:
+        - /etc/pki/ca-trust/source/anchors/opensearch.pem
+        - /etc/opensearch/certs/opensearch/localCA.pem
+        - /etc/zuul/ssl/opensearch.pem
+          # FIXME: remove entry when rename to opensearch is done
         - /etc/pki/ca-trust/source/anchors/elasticsearch.pem
         - /etc/elasticsearch/certs/localCA.pem
         - /etc/zuul/ssl/elasticsearch.pem

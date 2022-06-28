@@ -21,9 +21,9 @@
         source scl_source enable rh-nodejs10 ;
         npm install -g "@elastic/makelogs"
 
-    - name: Get Elasticsearch admin password
+    - name: Get opensearch admin password
       shell: |
-        awk '/elasticsearch_password/ {print $2}' /var/lib/software-factory/bootstrap-data/secrets.yaml
+        awk '/elasticsearch_password|opensearch_password/ {print $2}' /var/lib/software-factory/bootstrap-data/secrets.yaml | head -n1
       register: elastic_admin_pass
 
     - name: Set proper facts for Opendistro and Opensearch

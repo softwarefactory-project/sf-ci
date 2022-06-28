@@ -186,7 +186,7 @@
 
 - job:
     name: sf-ci-functional-external-elk
-    description: The sf functional tests of the Elasticsearch multitenants
+    description: The sf functional tests of the opensearch multitenants
     parent: sf-ci-multinode
     run: playbooks/multinode-elasticsearch.yaml
     required-projects:
