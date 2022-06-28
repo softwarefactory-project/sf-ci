@@ -7,7 +7,6 @@
     fqdn: elasticsearch.sftests.com
     tenant_configuration:
       sftests.com:
-        logstash_input_port: 9998
         kibana_autologin: "basic"
     internal_users:
       - user: "admin"
@@ -25,9 +24,6 @@
         role: "logstash"
         password: "logstash"
         tenant: "sftests.com"
-        # NOTE: remove after merging:
-        # https://softwarefactory-project.io/r/c/software-factory/ansible-role-elastic-recheck/+/22512
-        input_port: 9998
       - user: "kibana"
         role: "readonly"
         password: "kibana"
@@ -132,8 +128,6 @@
             use_ssl: true
             ca_certs: /etc/zuul/ssl/elasticsearch.pem
             index: "zuul"
-        logstash_host: elasticsearch.sftests.com
-        logstash_port: 9998
 
     - name: Fetch master CA pem file and elasticsearch certs
       include_role:
