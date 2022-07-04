@@ -29,7 +29,6 @@
             files:
               - ^ansible/roles/sf-elasticsearch/.*$
               - ^ansible/roles/sf-kibana/.*$
-              - ^ansible/roles/sf-logstash/.*$
               - ^defaults/sfconfig.yaml$
               - ^playbooks/multinode-elasticsearch.yaml$
               - ^roles/configure-external-elasticsearch-host/.*$
@@ -58,7 +57,6 @@
             files:
               - ^ansible/roles/sf-elasticsearch/.*$
               - ^ansible/roles/sf-kibana/.*$
-              - ^ansible/roles/sf-logstash/.*$
               - ^defaults/sfconfig.yaml$
               - ^playbooks/multinode-elasticsearch.yaml$
               - ^roles/configure-external-elasticsearch-host/.*$
