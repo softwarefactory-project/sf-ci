@@ -27,6 +27,7 @@
             dependencies:
               - sf-rpm-build
             files:
+              - ^ansible/roles/sf-log-processing/.*$
               - ^ansible/roles/sf-elasticsearch/.*$
               - ^ansible/roles/sf-kibana/.*$
               - ^defaults/sfconfig.yaml$
@@ -55,6 +56,7 @@
             dependencies:
               - sf-rpm-build
             files:
+              - ^ansible/roles/sf-log-processing/.*$
               - ^ansible/roles/sf-elasticsearch/.*$
               - ^ansible/roles/sf-kibana/.*$
               - ^defaults/sfconfig.yaml$
