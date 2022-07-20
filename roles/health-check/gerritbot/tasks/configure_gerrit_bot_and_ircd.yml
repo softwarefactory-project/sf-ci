@@ -28,12 +28,22 @@
       args:
         chdir: /tmp/miniircd
 
+- name: Check if container exists
+  command: "podman container exists gerritbot"
+  register: _gerritbot_container_exists
+  failed_when: _gerritbot_container_exists.rc not in [0, 1]
+
 - name: Setup gerritbot and start service
   block:
     - name: Setup configuration
       template:
         src: gerritbot.conf.j2
         dest: /etc/gerritbot/gerritbot.conf
+
+    - name: Setup logging
+      template:
+        src: logging.conf.j2
+        dest: /etc/gerritbot/logging.conf
 
     - name: Setup channels
       copy:
@@ -47,7 +57,16 @@
 
 - name: Check gerritbot connect to gerrit and irc
   block:
-    - name: Wait for gerritbot to connect to gerrit
+    - name: Wait for gerritbot process to connect to gerrit
       wait_for:
         path: /var/log/gerritbot/gerritbot.log
         search_regex: "INFO gerritbot{{':'}} Start watching Gerrit event stream."
+      when: _gerritbot_container_exists.rc != 0
+
+    - name: Wait for gerritbot container to connect to gerrit
+      shell: podman logs gerritbot
+      register: _gerritbotlog
+      until: -1 != _gerritbotlog.stdout.find('INFO gerritbot{{':'}} Start watching Gerrit event stream.')
+      retries: 100
+      delay: 3
+      when: _gerritbot_container_exists.rc == 0
