@@ -10,20 +10,15 @@
 - name: Get available service facts
   service_facts:
 
-- name: Get Opendistro or Opensearch admin password
+- name: Get Opensearch admin password
   shell: |
-    awk '/elasticsearch_password|opensearch_password/ {print $2}' /var/lib/software-factory/bootstrap-data/secrets.yaml | head -n1
+    awk '/opensearch_password|elasticsearch_password/ {print $2}' /var/lib/software-factory/bootstrap-data/secrets.yaml | head -n1
   register: elk_kibanaserver_pass
   when: opensearch_password is not defined
 
-- name: Set proper facts for Opendistro or Opensearch
+- name: Set proper facts for Opensearch
   set_fact:
     additional_params: "--user admin --password {{ opensearch_password | default(elk_kibanaserver_pass.stdout) | default('admin') }}"
-
-- name: Determine if opensearch distro is Opendistro
-  set_fact:
-    opendistro_elk: true
-  when: "'opendistroforelasticsearch' in ansible_facts.packages"
 
 - name: Ensure that Kibana backup_dest dir exist
   file:
@@ -31,7 +26,3 @@
     state: directory
 
 - include_tasks: opensearch.yml
-  when: opendistro_elk is not defined
-
-- include_tasks: opendistro.yml
-  when: opendistro_elk is defined and opendistro_elk

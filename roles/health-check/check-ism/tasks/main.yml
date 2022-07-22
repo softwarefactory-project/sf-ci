@@ -1,10 +1,4 @@
 ---
-# NOTE: Remove that condition after moving to ISM
-- name: Check if job should use curator
-  stat:
-    path: "{{ curator_config_dir | default('/etc/logstash/curator.d') }}"
-  register: _curator_config_dir
-
 - name: Check ISM functionality
   block:
     # NOTE: move to the Opensearch package when none service
@@ -23,7 +17,7 @@
 
     - name: Get opensearch admin password
       shell: |
-        awk '/elasticsearch_password|opensearch_password/ {print $2}' /var/lib/software-factory/bootstrap-data/secrets.yaml | head -n1
+        awk '/opensearch_password|elasticsearch_password/ {print $2}' /var/lib/software-factory/bootstrap-data/secrets.yaml | head -n1
       register: elastic_admin_pass
 
     - name: Set proper facts for Opendistro and Opensearch
@@ -86,5 +80,3 @@
         /tmp/cleanup-indices.py --username admin \
           --password {{ elastic_admin_pass.stdout}} \
           --insecure
-
-  when: not _curator_config_dir.stat.exists

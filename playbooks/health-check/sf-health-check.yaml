@@ -11,9 +11,12 @@
   import_playbook: gerritbot.yaml
   when: '"gerritbot" in roles'
 
+# NOTE: ISM is a functionality of Opensearch, not Opensearch Dashboards,
+# but in the ism tests, it has been used a kibana-backup.py script,
+# which is not available when Kibana role is not in roles.
 - name: Run health-check ISM
   import_playbook: ism.yaml
-  when: '"opensearch" in roles or "elasticsearch" in roles'
+  when: '"kibana" in roles'
 
 - name: Run health-check kibana
   import_playbook: kibana.yaml
