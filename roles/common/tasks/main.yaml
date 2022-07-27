@@ -1,0 +1,6 @@
+---
+- name: Change mirror url
+  become: true
+  shell: |
+    sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/Cent*.repo
+    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://mirror.regionone.vexxhost.rdoproject.org|g' /etc/yum.repos.d/Cent*.repo

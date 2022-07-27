@@ -1,4 +1,8 @@
 ---
+- hosts: all
+  roles:
+    - common
+
 - hosts: master
   tasks:
     - name: Get tenant ip in /etc/hosts files (configured by multinode parent)
