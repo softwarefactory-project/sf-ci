@@ -22,7 +22,7 @@
 
     - name: Get opensearch CA
       synchronize:
-        src: "/etc/opensearch/certs/localCA.pem"
+        src: "/etc/opensearch/certs/opensearch/localCA.pem"
         dest: "{{ item }}"
       delegate_to: '{{ instance }}'
       loop:
