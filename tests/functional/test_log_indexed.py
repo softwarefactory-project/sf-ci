@@ -80,7 +80,9 @@ class TestLogExportedInElasticSearch(Base):
 
         with open(file_path, 'r') as f:
             for line in f.readlines():
-                if line.split(':')[0].strip() == credential:
+                # FIXME: Remove after renaming Elasticsearch to Opensearch
+                if line.split(':')[0].strip() == credential or \
+                        line.split(':')[0].strip() == 'opensearch_password':
                     return line.split(':')[1].strip()
 
     def _get_ext_elastic_creds(self):

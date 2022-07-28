@@ -109,7 +109,7 @@
       vars:
         # NOTE: ansible-elastic-recheck project does not provide https for
         # Opensearch Dashboards.
-        kibana_host_url: "http://opensearch.sftests.com:5601"
+        kibana_host: "https://opensearch.sftests.com:5601"
         readonly_user_autologin: "basic"
         # FIXME: Change line after renaming elasticsearch to opensearh
         elasticsearch_host: "https://opensearch.sftests.com:9200"
