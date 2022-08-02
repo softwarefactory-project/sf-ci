@@ -1,4 +1,8 @@
 ---
+# NOTE(dpawlik): Goal of this role is to deploy on ELK node services:
+# Opensearch and Opensearch Dashboards.
+# On the second node would be deployed all roles that are in
+# sf-config project, except opensearch, opensearch-dashboards.
 - hosts: all
   roles:
     - common
@@ -11,7 +15,7 @@
     fqdn: opensearch.sftests.com
     tenant_configuration:
       sftests.com:
-        kibana_autologin: "basic"
+        opensearch_dashboards_autologin: "basic"
     internal_users:
       - user: "admin"
         role: "admin"
@@ -113,13 +117,12 @@
       vars:
         sf_arch: allinone
         static_hostname_ip: '{{ elk_ip }}'
-        # FIXME: Change line after renaming elasticsearch to opensearch
         static_hostname_fqdn: "opensearch.sftests.com elasticsearch.sftests.com"
         remove_component:
-          # FIXME: change to opensearch when 25354 is merged.
-          - component: elasticsearch
+          - component: opensearch
+          # FIXME: change to opensearch when 25596 is merged.
           - component: kibana
-          - component: logstash
+          - component: opensearch-dashboards
 
     - name: Configure external_opensearch users
       include_role:
@@ -127,6 +130,8 @@
       vars:
         # NOTE: ansible-elastic-recheck project does not provide https for
         # Opensearch Dashboards.
+        opensearch_dashboards_host: "https://opensearch.sftests.com:5601"
+        # FIXME: remove kibana_host after renamming to opensearch dashboards is done
         kibana_host: "https://opensearch.sftests.com:5601"
         readonly_user_autologin: "basic"
         # FIXME: Change line after renaming elasticsearch to opensearh

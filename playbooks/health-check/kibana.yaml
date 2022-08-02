@@ -1,6 +1,6 @@
 ---
 - hosts: install-server
   tasks:
-    - name: Check Kibana
+    - name: Check Opensearch Dashboards
       include_role:
-        name: health-check/kibana-backup-restore
+        name: health-check/opensearch-dashboards-backup-restore

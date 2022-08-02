@@ -1,5 +1,5 @@
 ---
-- name: Backup all Kibana objects
+- name: Backup all Opensearch Dashboards objects
   command: >
     /usr/local/bin/kibana-backup.py
     --kibana-url "https://{{ fqdn }}/analytics"
@@ -82,7 +82,7 @@
 
 - name: Check if Kibana service is alive
   wait_for:
-    host: "{{ kibana_host }}"
+    host: "{{ opensearch_dashboards_host | default(kibana_host) }}"
     port: 5601
     timeout: 300
     delay: 20
@@ -102,7 +102,7 @@
   retries: 30
   delay: 10
 
-- name: Create new backup of Kibana objects
+- name: Create new backup of Opensearch Dashboards objects
   command: >
     /usr/local/bin/kibana-backup.py
     --kibana-url "https://{{ fqdn }}/analytics"

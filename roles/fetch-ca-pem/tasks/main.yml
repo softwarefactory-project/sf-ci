@@ -17,22 +17,22 @@
       loop:
         - /etc/opensearch/certs/opensearch
         - /etc/zuul/ssl
-        # FIXME: remove entry when rename to opensearch is done
-        - /etc/elasticsearch/certs
 
     - name: Get opensearch CA
       synchronize:
         src: "/etc/opensearch/certs/opensearch/localCA.pem"
-        dest: "{{ item }}"
+        dest: "/tmp/opensearch-localCA.pem"
       delegate_to: '{{ instance }}'
+
+    - name: Copy opensearch CA pem to the directories
+      copy:
+        src: "/tmp/opensearch-localCA.pem"
+        dest: "{{ item }}"
+        remote_src: true
       loop:
         - /etc/pki/ca-trust/source/anchors/opensearch.pem
         - /etc/opensearch/certs/opensearch/localCA.pem
         - /etc/zuul/ssl/opensearch.pem
-          # FIXME: remove entry when rename to opensearch is done
-        - /etc/pki/ca-trust/source/anchors/elasticsearch.pem
-        - /etc/elasticsearch/certs/localCA.pem
-        - /etc/zuul/ssl/elasticsearch.pem
 
   when: "not sf_deployment | default(true) "
 

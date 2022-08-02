@@ -1,5 +1,5 @@
 ---
-- name: Set kibana backup directory
+- name: Set Opensearch dashboards backup directory
   set_fact:
     backup_dest: /var/lib/software-factory/backup/kibana
 
@@ -20,7 +20,7 @@
   set_fact:
     additional_params: "--user admin --password {{ opensearch_password | default(elk_kibanaserver_pass.stdout) | default('admin') }}"
 
-- name: Ensure that Kibana backup_dest dir exist
+- name: Ensure that Opensearch dashboards backup_dest dir exist
   file:
     path: "{{ backup_dest }}"
     state: directory

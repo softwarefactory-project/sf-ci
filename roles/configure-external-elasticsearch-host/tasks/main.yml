@@ -1,6 +1,6 @@
 ---
 ### For Opensearch
-- name: Configure external_opensearch and kibana
+- name: Configure external opensearch and opensearch dashboards
   become: true
   block:
     - name: Uncomment external_opensearch parameter
@@ -9,11 +9,11 @@
         regexp: '^#external_opensearch:$'
         line: 'external_opensearch:'
 
-    - name: Uncomment kibana parameter
+    - name: Uncomment opensearch dashboards parameter
       lineinfile:
         path: /etc/software-factory/sfconfig.yaml
-        regexp: '^#kibana:$'
-        line: 'kibana:'
+        regexp: '^#opensearch_dashboards:$'
+        line: 'opensearch_dashboards:'
 
     - name: Configure credentials to connect to remote opensearch host
       blockinfile:
@@ -27,13 +27,13 @@
             users:
               {{ users | to_nice_yaml(indent=2) | indent(4, False) }}
 
-    - name: Configure external Kibana
+    - name: Configure external Opensearch Dashboards
       blockinfile:
         path: /etc/software-factory/sfconfig.yaml
-        insertafter: '^kibana:$'
-        marker: "# {mark} ANSIBLE MANAGED BLOCK kibana external"
+        insertafter: '^opensearch_dashboards:$'
+        marker: "# {mark} ANSIBLE MANAGED BLOCK opensearch dashboards external"
         block: |2
-            host_url: "{{ kibana_host }}"
+            host_url: "{{ opensearch_dashboards_host }}"
             readonly_user_autologin: "{{ readonly_user_autologin }}"
 
     - name: Configure Zuul opensearch_connections
@@ -80,8 +80,24 @@
             elasticsearch_connections:
               {{ elasticsearch_connections | to_nice_yaml(indent=2) | indent(4, False) }}
 
+    ## For Kibana - remove after renaming
     - name: Remove empty elasticsearch_connections
       lineinfile:
         path: /etc/software-factory/sfconfig.yaml
         regexp: '  elasticsearch_connections: \[\]$'
         state: absent
+
+    - name: Uncomment kibana parameter
+      lineinfile:
+        path: /etc/software-factory/sfconfig.yaml
+        regexp: '^#kibana:$'
+        line: 'kibana:'
+
+    - name: Configure external Kibana
+      blockinfile:
+        path: /etc/software-factory/sfconfig.yaml
+        insertafter: '^kibana:$'
+        marker: "# {mark} ANSIBLE MANAGED BLOCK kibana external"
+        block: |2
+            host_url: "{{ kibana_host }}"
+            readonly_user_autologin: "{{ readonly_user_autologin }}"
