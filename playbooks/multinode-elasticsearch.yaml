@@ -46,6 +46,24 @@
         name: rsync
         state: present
 
+    ## Workaround for rsync issue
+    # More info: https://pagure.io/centos-infra/issue/872
+    # https://bugzilla.redhat.com/show_bug.cgi?id=2043753
+    - name: Workaround - install rsync package
+      become: true
+      block:
+        - name: Install rsync package
+          yum:
+            name: rsync-3.1.3-14.el8.x86_64
+            state: present
+            allow_downgrade: true
+
+        - name: Add rsync package to be excluded from upgrade
+          lineinfile:
+            path: /etc/yum.conf
+            regexp: '^exclude'
+            line: 'exclude=rsync'
+
     - name: Set hostname
       hostname:
         name: "{{ fqdn }}"
