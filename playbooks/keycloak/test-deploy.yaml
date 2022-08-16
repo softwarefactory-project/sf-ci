@@ -92,6 +92,20 @@
       when: github_ssh_mapper_jar_path.rc == 0
       become: true
 
+    - name: "Check if mosquitto container exists"
+      command: "podman container exists mosquitto"
+      ignore_errors: yes
+      register: _mosquitto_container_exists
+      changed_when: no
+      failed_when: _mosquitto_container_exists.rc not in [0, 1]
+      become: true
+
+    - name: "Get mosquitto image name"
+      command: "podman inspect -t container mosquitto -f {{ '{{' }}.ImageName{{ '}}' }}"
+      register: _mosquitto_image_name
+      when: _mosquitto_container_exists.rc == 0
+      become: true
+
     - name: Install SF master repository to install mosquitto
       become: true
       yum_repository:
@@ -99,12 +113,14 @@
         description: SF master repository
         baseurl: https://softwarefactory-project.io/kojifiles/repos/sf-master-el7/
         gpgcheck: no
+      when: _mosquitto_container_exists.rc != 0
 
     - name: install mosquitto
       package:
         name: mosquitto
         state: present
       become: true
+      when: _mosquitto_container_exists.rc != 0
 
     - name: Start MQTT service
       systemd:
@@ -118,6 +134,23 @@
         src: mosquitto-client-tests.service
         dest: /lib/systemd/system/mosquitto-client-tests.service
         mode: 0640
+      become: true
+
+    - name: Changing mosquitto_sub service ExecStart command
+      lineinfile:
+        path: /lib/systemd/system/mosquitto-client-tests.service
+        regexp: "^(ExecStart=[^']*').+/bin/(mosquitto_sub.*)"
+        line: '\1/usr/bin/podman run --rm -t --name mosquitto_sub {{ _mosquitto_image_name.stdout }} \2'
+        backrefs: true
+      when: _mosquitto_container_exists.rc == 0
+      become: true
+
+    - name: Adding mosquitto_sub service Restart condition
+      lineinfile:
+        path: /lib/systemd/system/mosquitto-client-tests.service
+        insertafter: "^ExecStart=.*"
+        line: 'Restart=on-failure'
+      when: _mosquitto_container_exists.rc == 0
       become: true
 
     - name: Start mosquitto_sub service
