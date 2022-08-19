@@ -36,9 +36,6 @@
         role: "readonly"
         password: "kibana"
         tenant: "sftests.com"
-        # NOTE: remove after merging:
-        # https://softwarefactory-project.io/r/c/software-factory/ansible-role-elastic-recheck/+/22512
-        autologin: "basic"
       - user: "zuul"
         role: "admin"
         password: "zuul"
@@ -72,13 +69,12 @@
       hostname:
         name: "{{ fqdn }}"
 
-    # FIXME: Change line when rename to Opensearch is done
     - name: Ensure that correct hostname is set in hosts file
       become: true
       lineinfile:
         dest: '/etc/hosts'
         regexp: "^{{ fqdn }}.+$"
-        line: "{{ ansible_host }} {{ inventory_hostname_short }} {{ fqdn }} elasticsearch.sftests.com elasticsearch"
+        line: "{{ ansible_host }} {{ inventory_hostname_short }} {{ fqdn }}"
 
     - name: Setup ES stack
       include_role:
@@ -117,25 +113,17 @@
       vars:
         sf_arch: allinone
         static_hostname_ip: '{{ elk_ip }}'
-        static_hostname_fqdn: "opensearch.sftests.com elasticsearch.sftests.com"
+        static_hostname_fqdn: "opensearch.sftests.com"
         remove_component:
           - component: opensearch
-          # FIXME: change to opensearch when 25596 is merged.
-          - component: kibana
           - component: opensearch-dashboards
 
     - name: Configure external_opensearch users
       include_role:
-        name: configure-external-elasticsearch-host
+        name: configure-external-opensearch-host
       vars:
-        # NOTE: ansible-elastic-recheck project does not provide https for
-        # Opensearch Dashboards.
         opensearch_dashboards_host: "https://opensearch.sftests.com:5601"
-        # FIXME: remove kibana_host after renamming to opensearch dashboards is done
-        kibana_host: "https://opensearch.sftests.com:5601"
         readonly_user_autologin: "basic"
-        # FIXME: Change line after renaming elasticsearch to opensearh
-        elasticsearch_host: "https://opensearch.sftests.com:9200"
         opensearch_host: "https://opensearch.sftests.com:9200"
         cacert_path: "/etc/opensearch/certs/opensearch/localCA.pem"
         suffix: sftests_com
@@ -154,16 +142,6 @@
             role: zuul
             password: zuul
         opensearch_connections:
-          - name: opensearch_sftest_com
-            username: zuul_sftests_com
-            password: zuul
-            host: opensearch.sftests.com
-            port: 9200
-            use_ssl: true
-            ca_certs: /etc/zuul/ssl/opensearch.pem
-            index: "zuul"
-        # FIXME: change Change line after renaming elasticsearch to opensearch
-        elasticsearch_connections:
           - name: opensearch_sftest_com
             username: zuul_sftests_com
             password: zuul

@@ -16,8 +16,8 @@
 # which is not available when Kibana role is not in roles.
 - name: Run health-check ISM
   import_playbook: ism.yaml
-  when: '"kibana" in roles or "opensearch-dashboards" in roles'
+  when: '"opensearch-dashboards" in roles'
 
-- name: Run health-check kibana
-  import_playbook: kibana.yaml
-  when: '"kibana" in roles or "opensearch-dashboards" in roles'
+- name: Run health-check opensearch dashboards
+  import_playbook: opensearch-dashboards.yaml
+  when: '"opensearch-dashboards" in roles'

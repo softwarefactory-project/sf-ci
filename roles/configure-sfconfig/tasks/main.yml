@@ -78,7 +78,7 @@
             insertafter: '^  external_authenticators:$'
             marker: "# {mark} ANSIBLE MANAGED BLOCK external_authenticator"
             block: |2
-                - name: "dummy_sso"
+                - name: dummy_sso
                   realm: dummy_sso
                   issuer_id: https://keycloak/auth/realms/dummy
                   client_id: zuul_dummy

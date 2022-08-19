@@ -49,7 +49,7 @@ class TestGateway(Base):
 
     def _check_if_auth_required(self, gateway):
         resp = requests.get("%s/opensearch/_cat/indices" % gateway)
-        # FIXME: Remove after changing name to Opensearch
+        # NOTE: Remove condition below when SF 3.8 released.
         if resp.status_code == 404:
             resp = requests.get("%s/elasticsearch/_cat/indices" % gateway)
         return resp.status_code == 401
@@ -60,7 +60,7 @@ class TestGateway(Base):
 
         with open(file_path, 'r') as f:
             for line in f.readlines():
-                # FIXME: Change conditiona after rename to opensearch
+                # NOTE: Change condition below when SF 3.8 released.
                 if (line.split(':')[0].strip() == 'opensearch_password' or
                         line.split(':')[0].strip(
                         ) == 'elasticsearch_password'):
@@ -73,7 +73,7 @@ class TestGateway(Base):
             parsed_file = yaml.safe_load(ext_users)
             if 'external_opensearch' in parsed_file:
                 return parsed_file['external_opensearch']
-            # FIXME: Remove condition after renaming to Opensearch
+            # NOTE: Remove condition below when SF 3.8 released.
             if 'external_elasticsearch' in parsed_file:
                 return parsed_file['external_elasticsearch']
 
@@ -230,7 +230,7 @@ class TestGateway(Base):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(search in resp.text)
 
-    @skipIfServiceMissing('kibana')
+    @skipIfServiceMissing('opensearch-dashboards')
     def test_kibana_accessible(self):
         """ Test if Kibana is accessible on gateway host
         """

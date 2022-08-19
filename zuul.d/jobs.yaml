@@ -188,7 +188,7 @@
     name: sf-ci-functional-external-elk
     description: The sf functional tests of the opensearch multitenants
     parent: sf-ci-multinode
-    run: playbooks/multinode-elasticsearch.yaml
+    run: playbooks/multinode-opensearch.yaml
     required-projects:
       - software-factory/ansible-role-elastic-recheck
     vars:

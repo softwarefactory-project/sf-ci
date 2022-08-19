@@ -29,11 +29,10 @@
             files:
               - ^ansible/roles/sf-log-processing/.*$
               - ^ansible/roles/sf-opensearch/.*$
-              - ^ansible/roles/sf-elasticsearch/.*$
-              - ^ansible/roles/sf-kibana/.*$
+              - ^ansible/roles/sf-opensearch-dashboards/.*$
               - ^defaults/sfconfig.yaml$
-              - ^playbooks/multinode-elasticsearch.yaml$
-              - ^roles/configure-external-elasticsearch-host/.*$
+              - ^playbooks/multinode-opensearch.yaml$
+              - ^roles/configure-external-opensearch-host/.*$
         - sf-tenants:
             dependencies:
               - sf-rpm-build
@@ -59,11 +58,10 @@
             files:
               - ^ansible/roles/sf-log-processing/.*$
               - ^ansible/roles/sf-opensearch/.*$
-              - ^ansible/roles/sf-elasticsearch/.*$
-              - ^ansible/roles/sf-kibana/.*$
+              - ^ansible/roles/sf-opensearch-dashboards/.*$
               - ^defaults/sfconfig.yaml$
-              - ^playbooks/multinode-elasticsearch.yaml$
-              - ^roles/configure-external-elasticsearch-host/.*$
+              - ^playbooks/multinode-opensearch.yaml$
+              - ^roles/configure-external-opensearch-host/.*$
         - wait-for-changes-ahead:
             dependencies:
               - name: sf-ci-functional-minimal

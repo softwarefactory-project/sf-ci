@@ -66,14 +66,6 @@
     - visualization.yaml
     - index-pattern.yaml
 
-# FIXME: After restoring Index pattern with the script, Kibana does not refresh
-# all objects. So far, only restart or manual index-pattern creation works.
-- name: Restart Kibana service
-  systemd:
-    name: kibana
-    state: restarted
-  when: "'kibana' in services"
-
 - name: Restart Opensearch dashboards service
   systemd:
     name: opensearch-dashboards

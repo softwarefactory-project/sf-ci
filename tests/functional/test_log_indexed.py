@@ -80,7 +80,8 @@ class TestLogExportedInElasticSearch(Base):
 
         with open(file_path, 'r') as f:
             for line in f.readlines():
-                # FIXME: Remove after renaming Elasticsearch to Opensearch
+                # NOTE: leave just opensearch_password in condition when
+                # SF 3.8 released.
                 if line.split(':')[0].strip() == credential or \
                         line.split(':')[0].strip() == 'opensearch_password':
                     return line.split(':')[1].strip()
