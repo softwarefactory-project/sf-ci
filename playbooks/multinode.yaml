@@ -32,6 +32,7 @@
 
     - set_fact:
         zm_ip: '{{ host_zm_ip.stdout }}'
+        zuul_ws_url: ws://zs.sftests.com:9000
 
 - hosts: tenant
   tasks:

@@ -1,0 +1,2 @@
+zuul_web_url: https://sftests.com/zuul/
+zuul_ws_url: ws://managesf.sftests.com:9000
