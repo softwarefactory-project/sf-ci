@@ -1,3 +1,10 @@
+- name: Install packages to validate zuul-console
+  yum:
+    name:
+      - jq
+      - python-websocket-client
+  become: yes
+
 - name: Submit and approve config change
   command: /usr/share/sf-config/scripts/submit_and_wait.py --approve
   args:
@@ -11,13 +18,6 @@
     chdir: "{{ config_path }}"
   register: commitsha
 
-- name: Install packages to validate zuul-console
-  yum:
-    name:
-      - jq
-      - python-websocket-client
-  become: yes
-
 - name: grab job uuid
   shell: |
     curl -s {{ zuul_web_url }}/api/tenant/local/status | jq -r '.pipelines[].change_queues[].heads[][].jobs[].uuid'
@@ -29,20 +29,10 @@
 
 - name: connect to console-stream
   shell: |
-    (sleep 60; echo "") | wsdump -r -t '{"uuid":"{{ _job_uuid.stdout_lines[0] }}","logfile":"console.log"}' {{ zuul_ws_url }}/api/tenant/local/console-stream
+    (sleep 20 && echo "") | wsdump -r -t '{"uuid":"{{ _job_uuid.stdout_lines[0] }}","logfile":"console.log"}' {{ zuul_ws_url }}/api/tenant/local/console-stream
   register: console_stream
-  failed_when: false
-
-- name: show console stream
-  debug:
-    var: console_stream
-
-- name: fail if console stream does not contains expected job output
-  when: "'Job console starting...' not in console_stream.stdout"
-  # It seems like wsdump.py doesn't always stay connected for the whole job duration
-  # when: "'Demo job is running' not in console_stream.stdout"
-  fail:
-    msg: "Task output is missing from: {{ console_stream.stdout }}"
+  failed_when: "'Job console starting...' not in console_stream.stdout"
+  retries: 10
 
 - name: Wait config-update result using zuul-web API
   uri:
