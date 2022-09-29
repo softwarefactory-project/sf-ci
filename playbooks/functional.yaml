@@ -82,3 +82,14 @@
 #    - name: Validate backup recovery
 #      include_role:
 #        name: run-checker
+
+    - name: Deploy a new service with a database
+      include_role:
+        name: '{{ item }}'
+      loop:
+        - configure-sfconfig
+        - run-sfconfig
+      vars:
+        add_component:
+          - component: etherpad
+      when: sf_arch == "minimal"
