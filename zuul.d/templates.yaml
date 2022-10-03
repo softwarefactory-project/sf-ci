@@ -13,13 +13,6 @@
         - sf-ci-functional-allinone:
             dependencies:
               - sf-rpm-build
-        # - sf-ci-functional-minimal-keycloak:
-        #     dependencies:
-        #       - sf-rpm-build
-        - sf-ci-functional-allinone-keycloak:
-            voting: false
-            dependencies:
-              - sf-rpm-build
         - sf-ci-upgrade-allinone:
             dependencies:
               - sf-rpm-build
