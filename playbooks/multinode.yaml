@@ -10,28 +10,28 @@
       register: host_tenant_ip
 
     - set_fact:
-        tenant_ip: '{{ host_tenant_ip.stdout }}'
+        tenant_ip: "{{ host_tenant_ip.stdout }}"
 
     - name: Get zs ip in /etc/hosts files (configured by multinode parent)
       command: awk '/zs/ {print $1}' /etc/hosts
       register: host_zs_ip
 
     - set_fact:
-        zs_ip: '{{ host_zs_ip.stdout }}'
+        zs_ip: "{{ host_zs_ip.stdout }}"
 
     - name: Get ze ip in /etc/hosts files (configured by multinode parent)
       command: awk '/ze/ {print $1}' /etc/hosts
       register: host_ze_ip
 
     - set_fact:
-        ze_ip: '{{ host_ze_ip.stdout }}'
+        ze_ip: "{{ host_ze_ip.stdout }}"
 
     - name: Get zm ip in /etc/hosts files (configured by multinode parent)
       command: awk '/zm/ {print $1}' /etc/hosts
       register: host_zm_ip
 
     - set_fact:
-        zm_ip: '{{ host_zm_ip.stdout }}'
+        zm_ip: "{{ host_zm_ip.stdout }}"
         zuul_ws_url: ws://zs.sftests.com:9000
 
 - hosts: tenant
@@ -41,13 +41,13 @@
       register: host_master_ip
 
     - set_fact:
-        master_ip: '{{ host_master_ip.stdout }}'
+        master_ip: "{{ host_master_ip.stdout }}"
 
 - hosts: all
   tasks:
     - name: Prepare instance
       include_role:
-        name: '{{ item }}'
+        name: "{{ item }}"
       loop:
         - prepare-test-env
         - install-ci-repository
@@ -102,6 +102,27 @@
       vars:
         domain: tenant.sftests.com
 
+    - name: Check Keycloak in default tenant arch
+      command: grep -q keycloak /usr/share/sf-config/refarch/tenant-minimal.yaml
+      register: kc_in_arch
+      ignore_errors: true
+
+    - name: Configure sfconfig
+      include_role:
+        name: configure-sfconfig
+      vars:
+        sf_arch: tenant-minimal
+        add_component:
+          - component: gerrit
+            insertafter: keycloak
+          - component: gitweb
+          - component: opensearch
+          - component: hound
+        sf_tenant_instance: true
+        static_hostname_ip: "{{ master_ip }}"
+        static_hostname_fqdn: sftests.com
+      when: kc_in_arch.rc == 0
+
     - name: Configure sfconfig
       include_role:
         name: configure-sfconfig
@@ -114,8 +135,9 @@
           - component: opensearch
           - component: hound
         sf_tenant_instance: true
-        static_hostname_ip: '{{ master_ip }}'
+        static_hostname_ip: "{{ master_ip }}"
         static_hostname_fqdn: sftests.com
+      when: kc_in_arch.rc == 1
 
     - name: Run sfconfig
       include_role:
@@ -163,7 +185,7 @@
       vars:
         sf_arch: multinode
         sf_main_instance: true
-        static_hostname_ip: '{{ tenant_ip }}'
+        static_hostname_ip: "{{ tenant_ip }}"
         static_hostname_fqdn: tenant.sftests.com
         add_component:
           - component: opensearch
@@ -224,5 +246,5 @@
       include_role:
         name: health-check/validate_project
       vars:
-        service_uri: 'http://managesf.tenant.sftests.com:6080/api/v1/search?q=TestHello&i=nope&files=&repos=ichiban-compute'
+        service_uri: "http://managesf.tenant.sftests.com:6080/api/v1/search?q=TestHello&i=nope&files=&repos=ichiban-compute"
         service_until_condition: _result.json['Results']['ichiban-compute']['FilesWithMatch'] == 1
