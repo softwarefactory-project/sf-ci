@@ -1,0 +1,9 @@
+- hosts: all
+  pre_tasks:
+    - package:
+        name: dstat
+        state: present
+      become: true
+  roles:
+    - ensure-dstat-graph
+    - run-dstat
