@@ -6,7 +6,7 @@
   become: yes
 
 - name: Submit and approve config change
-  command: /usr/share/sf-config/scripts/submit_and_wait.py --approve
+  command: /usr/share/sf-config/scripts/submit_and_wait.py --approve --delay 1200
   args:
     chdir: "{{ config_path }}"
   register: submit_status
@@ -24,7 +24,7 @@
   register: _job_uuid
   # Wait until the executor start the job
   until: _job_uuid.stdout != "" and "null" not in _job_uuid.stdout
-  retries: 60
+  retries: 180
   delay: 1
 
 - name: connect to console-stream
