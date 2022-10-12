@@ -3,7 +3,9 @@
     name: sf-ci
     parent: base
     description: The sf ci tests
-    pre-run: playbooks/dstat-pre.yaml
+    pre-run:
+        - playbooks/dstat-pre.yaml
+        - playbooks/setup-utilization-stats.yaml
     post-run:
       - playbooks/dstat-post.yaml
       - playbooks/get-logs.yaml
@@ -20,6 +22,7 @@
       logclassify_logserver_dir: logs/
       logclassify_debug: true
       logclassify_report: true
+      configure_podman_stats: false
 
 - job:
     name: sf-ci-multinode

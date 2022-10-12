@@ -1,0 +1,57 @@
+---
+- hosts: install-server:master
+  vars:
+    stat_file: "{{ ansible_user_dir }}/zuul-output/logs/stats_file.txt"
+  tasks:
+    - name: Setup podman utilization stats service
+      block:
+        - name: Create empty stats file
+          file:
+            path: "{{ stat_file }}"
+            state: touch
+            owner: 'zuul-worker'
+            group: 'zuul-worker'
+
+        - name: Create utilization script
+          become: true
+          copy:
+            content: |
+              #!/bin/bash
+              while true; do
+                  if ! command -v podman &> /dev/null; then
+                      sleep 120;
+                  else
+                      break;
+                  fi;
+              done
+              while true; do
+                  date >> {{ stat_file }};
+                  podman stats -a --no-stream | sort -k4 -h >> {{ stat_file }};
+                  echo -e "\n\n" >> {{ stat_file }};
+                  sleep 10;
+              done
+            dest: /usr/local/bin/get_podman_stats.sh
+            mode: "0755"
+
+        - name: Create systemd unit
+          become: true
+          copy:
+            content: |
+              [Unit]
+              Description=Get podman stats
+
+              [Service]
+              ExecStart=/usr/local/bin/get_podman_stats.sh
+
+              [Install]
+              WantedBy=multi-user.target
+            dest: /lib/systemd/system/podman_stats.service
+
+        - name: Enable podman stats service
+          become: true
+          systemd:
+            name: podman_stats
+            state: started
+            enabled: true
+            daemon_reload: true
+      when: configure_podman_stats | default(False)
