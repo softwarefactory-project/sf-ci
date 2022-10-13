@@ -23,7 +23,7 @@
     parent: multinode
     description: The sf ci multinode tests
     post-run: playbooks/get-logs.yaml
-    timeout: 8000
+    timeout: 10800
     required-projects:
       - software-factory/sf-ci
       - software-factory/sfinfo
