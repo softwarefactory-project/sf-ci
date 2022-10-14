@@ -3,7 +3,10 @@
     name: sf-ci
     parent: base
     description: The sf ci tests
-    post-run: playbooks/get-logs.yaml
+    pre-run: playbooks/dstat-pre.yaml
+    post-run:
+      - playbooks/dstat-post.yaml
+      - playbooks/get-logs.yaml
     timeout: 10800
     required-projects:
       - software-factory/sf-ci
@@ -28,27 +31,27 @@
       - software-factory/sf-ci
       - software-factory/sfinfo
     nodeset:
-        nodes:
-          - name: master
-            label: cloud-centos-7
-          - name: zs
-            label: cloud-centos-7
-          - name: ze
-            label: cloud-centos-7
-          - name: zm
-            label: cloud-centos-7
-          - name: tenant
-            label: cloud-centos-7
-        groups:
-          - name: switch
-            nodes:
-              - master
-          - name: peers
-            nodes:
-              - zs
-              - ze
-              - zm
-              - tenant
+      nodes:
+        - name: master
+          label: cloud-centos-7
+        - name: zs
+          label: cloud-centos-7
+        - name: ze
+          label: cloud-centos-7
+        - name: zm
+          label: cloud-centos-7
+        - name: tenant
+          label: cloud-centos-7
+      groups:
+        - name: switch
+          nodes:
+            - master
+        - name: peers
+          nodes:
+            - zs
+            - ze
+            - zm
+            - tenant
     vars:
       sf_version: master
       multinode: true
@@ -163,15 +166,15 @@
     vars:
       show_hidden_logs: false
     nodeset:
-        nodes:
-          - name: master
-            label: cloud-centos-7
-          - name: elk
-            label: cloud-centos-8-stream
-        groups:
-          - name: switch
-            nodes:
-              - master
-          - name: peers
-            nodes:
-              - elk
+      nodes:
+        - name: master
+          label: cloud-centos-7
+        - name: elk
+          label: cloud-centos-8-stream
+      groups:
+        - name: switch
+          nodes:
+            - master
+        - name: peers
+          nodes:
+            - elk
