@@ -72,11 +72,6 @@
       include_role:
         name: run-sfconfig
 
-    - name: Ensure that current podman package is not broken
-      include_role:
-        name: workarounds
-        tasks_from: podman.yml
-
     - name: Reset the config repo
       become: yes
       import_role:
@@ -143,18 +138,8 @@
       include_role:
         name: run-sfconfig
 
-    - name: Ensure that current podman package is not broken
-      include_role:
-        name: workarounds
-        tasks_from: podman.yml
-
 - hosts: zs,ze
   tasks:
-    - name: Ensure that current podman package is not broken
-      include_role:
-        name: workarounds
-        tasks_from: podman.yml
-
     - name: Fetch tenant CA pem file
       include_role:
         name: fetch-ca-pem
@@ -197,11 +182,6 @@
       vars:
         sfconfig_args: --skip-install
 
-    - name: Ensure that current podman package is not broken
-      include_role:
-        name: workarounds
-        tasks_from: podman.yml
-
     - name: Add resources in the config repo
       include_role:
         name: configure-resource
@@ -213,11 +193,6 @@
         name: run-sfconfig
       vars:
         sfconfig_args: --skip-install
-
-    - name: Ensure that current podman package is not broken
-      include_role:
-        name: workarounds
-        tasks_from: podman.yml
 
 - hosts: zs
   tasks:
