@@ -113,12 +113,12 @@
     check:
       jobs:
         - tox-pep8
-        - tox-py27
+        - tox-py36
     gate:
       queue: sf-master
       jobs:
         - tox-pep8
-        - tox-py27
+        - tox-py36
 
 - project-template:
     name: sf-ci-noop
