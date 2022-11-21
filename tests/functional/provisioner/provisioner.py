@@ -22,10 +22,11 @@ import subprocess
 import config
 import logging
 
-from utils import ManageSfUtils
 from utils import ResourcesUtils
 from utils import GerritGitUtils
+from utils import KeycloakUtils
 from utils import get_auth_params
+from utils import get_gerrit_utils
 from utils import is_present
 
 
@@ -51,11 +52,12 @@ class SFProvisioner(object):
                 config.ADMIN_USER, config.USERS[config.ADMIN_USER]['password'])
             cookie = auth['cookies']['auth_pubtkt']
             config.USERS[config.ADMIN_USER]['auth_cookie'] = cookie
-        self.msu = ManageSfUtils(config.GATEWAY_URL)
         self.ru = ResourcesUtils()
+        self.ku = KeycloakUtils(config.GATEWAY_URL)
         self.ggu = GerritGitUtils(config.ADMIN_USER,
                                   config.ADMIN_PRIV_KEY_PATH,
                                   config.USERS[config.ADMIN_USER]['email'])
+        self.gerrit_admin_client = get_gerrit_utils("admin")
 
     def create_resources(self):
         self.ru.create_resources("provisioner",
@@ -115,7 +117,9 @@ class SFProvisioner(object):
                            issue[0], issue[1]), 'branch_%s' % str(issue[0]))
 
     def create_local_user(self, username, password, email):
-        self.msu.create_user(username, password, email)
+        if is_present("keycloak"):
+            self.ku.create_user(username, password, email)
+        self.gerrit_admin_client.create_account(username, password, email)
 
     def command(self, cmd):
         return subprocess.check_output(cmd, shell=True)

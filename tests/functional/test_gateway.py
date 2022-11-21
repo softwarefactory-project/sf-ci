@@ -20,7 +20,6 @@ import yaml
 from utils import Base
 from utils import skipIfServiceMissing
 from utils import skipReason
-from utils import ManageSfUtils
 from utils import skipIfProvisionVersionLesserThan
 from utils import skipIf
 from utils import GerritClient
@@ -159,28 +158,6 @@ class TestGateway(Base):
         for url in urls:
             resp = requests.get(url, allow_redirects=False)
             self.assertEqual(resp.status_code, 404)
-
-    @skipIfServiceMissing("cauth")
-    def test_gerrit_api_accessible_cauth(self):
-        """ Test if Gerrit API is accessible on gateway hosts (SSO: cauth)
-        """
-        m = ManageSfUtils(config.GATEWAY_URL)
-        url = config.GATEWAY_URL + "/r/a/"
-
-        a = GerritClient(url, auth=HTTPBasicAuth("admin", "password"))
-        self.assertRaises(RuntimeError, a.get_account, config.USER_1)
-
-        api_passwd = m.create_gerrit_api_password("user3")
-        auth = HTTPBasicAuth("user3", api_passwd)
-        a = GerritClient(url, auth=auth)
-        self.assertTrue(a.get_account("user3"))
-
-        m.delete_gerrit_api_password("user3")
-        a = GerritClient(url, auth=auth)
-        self.assertRaises(RuntimeError, a.get_account, "user3")
-
-        a = GerritClient(url, auth=HTTPBasicAuth("admin", "password"))
-        self.assertRaises(RuntimeError, a.get_account, 'john')
 
     @skipIfServiceMissing("keycloak")
     def test_gerrit_api_accessible_keycloak(self):

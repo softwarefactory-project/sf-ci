@@ -266,58 +266,22 @@ class Tool:
         return output
 
 
-class ManageSfUtils(Tool):
+class KeycloakUtils():
     def __init__(self, url):
-        Tool.__init__(self)
-        self.base_cmd = "sfmanager --url %s --auth-server-url " \
-            "%s --auth %%s:%%s " % (url, config.GATEWAY_URL)
+        self.url = url.rstrip('/') + '/auth/admin/realms/sf/users'
+        self.admin_user = config.ADMIN_USER
+        self.admin_password = config.USERS[config.ADMIN_USER]['password']
 
-    def register_user(self, auth_user, username, email):
-        passwd = config.USERS[auth_user]['password']
-        cmd = self.base_cmd % (auth_user, passwd) + " sf_user create "
-        cmd += "--username %s --email %s --fullname %s" % (username, email,
-                                                           username)
-        output = self.exe(cmd)
-        return output
-
-    def deregister_user(self, auth_user, username=None, email=None):
-        passwd = config.USERS[auth_user]['password']
-        cmd = self.base_cmd % (auth_user, passwd) + "sf_user delete"
-        if username:
-            cmd += " --username %s" % username
-        else:
-            cmd += " --email %s" % email
-        output = self.exe(cmd)
-        return output
-
-    def create_gerrit_api_password(self, user):
-        passwd = config.USERS[user]['password']
-        kwargs = get_auth_params(user, passwd)
-        r = requests.get(config.GATEWAY_URL + "/auth/apikey/", **kwargs)
-        if r.status_code != 200:
-            r = requests.post(config.GATEWAY_URL + "/auth/apikey/",
-                              **kwargs)
-        return r.json()['api_key']
-
-    def delete_gerrit_api_password(self, user):
-        passwd = config.USERS[user]['password']
-        kwargs = get_auth_params(user, passwd)
-        requests.delete(config.GATEWAY_URL + "/auth/apikey/", **kwargs)
-
-    def create_user(self, user, password, email, fullname=None, key=None):
-        subcmd = " --debug "
-        if is_on_master():
-            subcmd += "--gerrit-admin-key=%s " % config.ADMIN_PRIV_KEY_PATH
-        subcmd += ("user create --username=%s "
-                   "--password=%s --email=%s "
-                   "--fullname=%s" % (user, password, email, fullname or user))
-        if key is not None:
-            subcmd += " --ssh-key=%s" % key
-        auth_user = config.ADMIN_USER
-        auth_password = config.USERS[config.ADMIN_USER]['password']
-        cmd = self.base_cmd % (auth_user, auth_password) + subcmd
-        output = self.exe(cmd)
-        return output
+    def create_user(self, username, password, email):
+        auth_params = get_auth_params(self.admin_user, self.admin_password)
+        userInfo = {"username": username,
+                    "email": email,
+                    "credentials": [
+                        {"type": "password",
+                         "value": password}],
+                    "enabled": True}
+        resp = requests.post(self.url, json=userInfo, **auth_params)
+        return resp.ok
 
 
 class NotFound(Exception):
@@ -368,12 +332,25 @@ class GerritClient:
             return None
         return self.decode(resp)
 
+    def put(self, url, json_data=None):
+        resp = self.request(
+            "put", os.path.join(self.url, url), json_data)
+        if resp.status_code >= 400:
+            return None
+        return self.decode(resp)
+
     def delete(self, url):
         resp = self.request("delete", os.path.join(self.url, url))
         if not resp.ok:
             raise RuntimeError("Couldn't delete %s" % url)
 
     # Account
+    def create_account(self, username, password, email):
+        account = {
+            "email": email,
+            "http_password": password}
+        return self.put("accounts/%s" % self.quote(username), account)
+
     def get_account(self, username):
         return self.get('accounts/%s' % self.quote(username))
 

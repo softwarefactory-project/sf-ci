@@ -12,16 +12,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import config
-import shutil
-
-import requests
 
 from utils import Base
-from utils import ManageSfUtils
-from utils import ResourcesUtils
 from utils import skipIfServiceMissing, skipIfServicePresent
-from utils import get_gerrit_utils
 
 
 class TestConditionalTesting(Base):
@@ -36,44 +29,3 @@ class TestConditionalTesting(Base):
     @skipIfServicePresent('gerrit')
     def test_skip_if_service_present(self):
         self.fail('Failure to detect that a service is present')
-
-
-class TestManageSF(Base):
-    """ Functional tests that validate managesf features.
-    """
-    def setUp(self):
-        super(TestManageSF, self).setUp()
-        self.projects = []
-        self.dirs_to_delete = []
-        self.ru = ResourcesUtils()
-        self.msu = ManageSfUtils(config.GATEWAY_URL)
-        self.gu = get_gerrit_utils("admin")
-
-    def tearDown(self):
-        super(TestManageSF, self).tearDown()
-        for name in self.projects:
-            self.ru.direct_delete_repo(name)
-        for dirs in self.dirs_to_delete:
-            shutil.rmtree(dirs)
-
-    def create_project(self, name):
-        self.ru.direct_create_repo(name)
-        self.projects.append(name)
-
-    @skipIfServicePresent("keycloak")
-    def test_api_key_auth_with_sfmanager(self):
-        """Test the api key auth workflow"""
-        user2_cookies = dict(
-            auth_pubtkt=config.USERS[config.USER_2]['auth_cookie'])
-        url = "https://%s%s" % (config.GATEWAY_HOST, "/auth/apikey/")
-        create_key = requests.post(url, cookies=user2_cookies)
-        self.assertIn(create_key.status_code, (201, 409))
-        key = requests.get(url, cookies=user2_cookies).json().get('api_key')
-        # call a simple command that needs authentication
-        cmd = "sfmanager --url %s --auth-server-url " \
-            "%s --api-key %s sf_user list" % (config.GATEWAY_URL,
-                                              config.GATEWAY_URL,
-                                              key)
-        users = self.msu.exe(cmd)
-        self.assertTrue(config.USER_2 in users,
-                        "'%s' returned %s" % (cmd, users))
