@@ -101,11 +101,6 @@ class TestGateway(Base):
         url = "%s/managesf/config.py" % config.GATEWAY_URL
         self._url_is_not_world_readable(url)
 
-    def test_cauth_is_secure(self):
-        """Test if managesf config.py file is not world readable"""
-        url = "%s/cauth/config.py" % config.GATEWAY_URL
-        self._url_is_not_world_readable(url)
-
     @skipIfProvisionVersionLesserThan("2.4.0")
     def test_dashboard_data(self):
         """ Test if dashboard data are created
@@ -134,16 +129,9 @@ class TestGateway(Base):
 
         # Authenticated URL that requires login
         url = config.GATEWAY_URL + "/r/a/projects/?"
-        if is_present("cauth"):
-            resp = requests.get(
-                url,
-                auth=HTTPBasicAuth("user2", config.USERS["user2"]["api_key"]))
-        elif is_present("keycloak"):
-            resp = requests.get(
-                url,
-                auth=HTTPBasicAuth("user2", config.USERS["user2"]["password"]))
-        else:
-            raise Exception("This deployment has no SSO?!")
+        resp = requests.get(
+            url,
+            auth=HTTPBasicAuth("user2", config.USERS["user2"]["password"]))
         self.assertEqual(resp.status_code, 200)
         # /r/a/projects returns JSON list of projects
         self.assertTrue('All-Users' in resp.text)
@@ -159,7 +147,6 @@ class TestGateway(Base):
             resp = requests.get(url, allow_redirects=False)
             self.assertEqual(resp.status_code, 404)
 
-    @skipIfServiceMissing("keycloak")
     def test_gerrit_api_accessible_keycloak(self):
         """ Test if Gerrit API is accessible on gateway hosts (SSO: keycloak)
         """
@@ -351,10 +338,7 @@ class TestGateway(Base):
         """ Test if Etherpad is accessible on gateway host
         """
         url = config.GATEWAY_URL + "/etherpad/"
-        resp = requests.get(
-            url,
-            cookies=dict(
-                auth_pubtkt=config.USERS[config.USER_1]['auth_cookie']))
+        resp = requests.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('<title>SF - Etherpad</title>' in resp.text)
 
@@ -363,10 +347,7 @@ class TestGateway(Base):
         """ Test if Paste is accessible on gateway host
         """
         url = config.GATEWAY_URL + "/paste/"
-        resp = requests.get(
-            url,
-            cookies=dict(
-                auth_pubtkt=config.USERS[config.USER_1]['auth_cookie']))
+        resp = requests.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('<title>New Paste | LodgeIt!</title>' in resp.text)
 
@@ -375,10 +356,7 @@ class TestGateway(Base):
         """ Test if captcha in Paste service is accessible
         """
         url = config.GATEWAY_URL + "/paste/_captcha.png"
-        resp = requests.get(
-            url,
-            cookies=dict(
-                auth_pubtkt=config.USERS[config.USER_1]['auth_cookie']))
+        resp = requests.get(url)
         self.assertEqual(resp.status_code, 200)
         # Check if image header "PNG" will be in response
         self.assertTrue('PNG' in resp.text)

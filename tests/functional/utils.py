@@ -641,8 +641,6 @@ class GerritGitUtils(Tool):
 class JobUtils(Tool):
     def __init__(self):
         Tool.__init__(self)
-        # self.cookies = {'auth_pubtkt': get_cookie(config.USER_1,
-        #                                           config.USER_1_PASSWORD)}
 
     def wait_for_config_update(self, revision, return_result=False):
         base_url = "%s/zuul/api/tenant/local/builds" % config.GATEWAY_URL
