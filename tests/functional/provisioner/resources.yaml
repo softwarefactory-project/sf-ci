@@ -1,10 +1,10 @@
 local_users:
- - username: adev
-   password: adevpass
-   email: adev@softwarefactory-project.io
- - username: alead
-   password: aleadpass
-   email: alead@softwarefactory-project.io
+  - username: adev
+    password: adevpass
+    email: adev@softwarefactory-project.io
+  - username: alead
+    password: aleadpass
+    email: alead@softwarefactory-project.io
 resources:
   projects:
     tdpw-project:
@@ -12,15 +12,15 @@ resources:
       description: The is a demo RPM distribution project to experiment
       review-dashboard: default
       source-repositories:
-      - tdpw/python-readerlib
-      - tdpw/python-readerlib-distgit
-      - tdpw/reader
-      - tdpw/reader-distgit
-      - tdpw/reader-ansible
-      - tdpw/reader-ansible-distgit
-      - tdpw/tdpw-installer
-      - tdpw/tdpw-installer-distgit
-      - tdpw/tdpw-info
+        - tdpw/python-readerlib
+        - tdpw/python-readerlib-distgit
+        - tdpw/reader
+        - tdpw/reader-distgit
+        - tdpw/reader-ansible
+        - tdpw/reader-ansible-distgit
+        - tdpw/tdpw-installer
+        - tdpw/tdpw-installer-distgit
+        - tdpw/tdpw-info
   acls:
     tdpw-acl:
       file: |
@@ -46,20 +46,20 @@ resources:
             mergeContent = false
             action = rebase if necessary
       groups:
-      - tdpw-core
-      - tdpw-ptl
+        - tdpw-core
+        - tdpw-ptl
   groups:
     tdpw-core:
       name: tdpw-core
       description: Core developers for project tdpw
       members:
-      - adev@softwarefactory-project.io
-      - alead@softwarefactory-project.io
+        - adev@softwarefactory-project.io
+        - alead@softwarefactory-project.io
     tdpw-ptl:
       name: tdpw-ptl
       description: Project team lead for project tdpw
       members:
-      - alead@softwarefactory-project.io
+        - alead@softwarefactory-project.io
   repos:
     tdpw/python-readerlib:
       name: tdpw/python-readerlib
@@ -98,20 +98,7 @@ resources:
       acl: tdpw-acl
       description: tdpw Distribution info repository
 projects:
- - name: dummy_project1
-   issues:
-    - name: Issue1
-      review: true
-    - name: Issue2
-      review: false
-   files:
-    - name: file1
-    - name: file2
-users:
- - name: admin
- - name: user2
- - name: user3
-commands: []
-checksum:
-  - file: /etc/gerrit/ssh_host_rsa_key.pub
-  - file: /etc/gerrit/ssh_host_rsa_key
+  - name: dummy_project1
+    files:
+      - name: file1
+      - name: file2
