@@ -23,7 +23,6 @@ import logging
 from utils import ResourcesUtils
 from utils import GerritGitUtils
 from utils import KeycloakUtils
-from utils import get_auth_params
 from utils import get_gerrit_utils
 from utils import is_present
 
@@ -45,11 +44,6 @@ class SFProvisioner(object):
     def __init__(self):
         with open("%s/resources.yaml" % os.getcwd(), 'r') as rsc:
             self.resources = yaml.load(rsc)
-        if not config.KC_AUTH:
-            auth = get_auth_params(
-                config.ADMIN_USER, config.USERS[config.ADMIN_USER]['password'])
-            cookie = auth['cookies']['auth_pubtkt']
-            config.USERS[config.ADMIN_USER]['auth_cookie'] = cookie
         self.ru = ResourcesUtils()
         self.ku = KeycloakUtils(config.GATEWAY_URL)
         self.ggu = GerritGitUtils(config.ADMIN_USER,
@@ -84,16 +78,6 @@ class SFProvisioner(object):
         self.ggu.add_commit_for_all_new_additions(self.clone_dir)
         self.ggu.direct_push_branch(self.clone_dir, 'master')
 
-    def simple_login(self, user, password):
-        """log as user to make the user listable"""
-        try:
-            params = get_auth_params(user, password)
-            if params['cookies'] == params['headers'] == {}:
-                raise Exception('no auth')
-        except Exception:
-            self.log.error("Couldn't log in as %s" % user)
-            exit(1)
-
     def create_review(self, project, commit_message, branch='master'):
         """Very basic review creator for statistics and restore tests
         purposes."""
@@ -115,11 +99,6 @@ class SFProvisioner(object):
             self.create_local_user(user['username'],
                                    user['password'],
                                    user['email'])
-            if not is_present("keycloak"):
-                # Is the simple_login usefull as we do
-                # a user provisioning in gerrit
-                self.simple_login(user['username'], user['password'])
-                self.log.info("log in as %s" % user['username'])
         for project in self.resources['projects']:
             self.log.info("Create project %s" % project['name'])
             self.create_project(project['name'])

@@ -19,7 +19,6 @@ import yaml
 
 import config
 
-from utils import get_cookie
 from utils import get_gerrit_utils
 from utils import GerritGitUtils
 
@@ -34,8 +33,6 @@ class SFchecker:
     def __init__(self):
         with open("%s/resources.yaml" % os.getcwd(), 'r') as rsc:
             self.resources = yaml.load(rsc)
-        config.USERS[config.ADMIN_USER]['auth_cookie'] = get_cookie(
-            config.ADMIN_USER, config.USERS[config.ADMIN_USER]['password'])
         self.gu = get_gerrit_utils("admin")
         self.ggu = GerritGitUtils(config.ADMIN_USER,
                                   config.ADMIN_PRIV_KEY_PATH,
