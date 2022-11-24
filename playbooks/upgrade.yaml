@@ -9,7 +9,7 @@
   tasks:
     - name: Prepare instance
       include_role:
-        name: '{{ item }}'
+        name: "{{ item }}"
       loop:
         - prepare-test-env
         - install-stable-repository
@@ -19,7 +19,7 @@
 
     - name: Deploy sf and setup test env
       include_role:
-        name: '{{ item }}'
+        name: "{{ item }}"
       loop:
         - run-sfconfig
         - restore-ci-repo
@@ -46,18 +46,18 @@
 
     - name: Wait for scheduler reconfiguration
       register: _zuul_status
-      retries: '900'
-      until: '''json'' in _zuul_status and _zuul_status.json and ''periodic'' in _zuul_status.content'
+      retries: "900"
+      until: "'json' in _zuul_status and _zuul_status.json and 'periodic' in _zuul_status.content"
       uri:
-        return_content: 'yes'
-        status_code: '200'
-        url: 'http://managesf.sftests.com:9000/api/tenant/local/pipelines'
+        return_content: "yes"
+        status_code: "200"
+        url: "http://managesf.sftests.com:9000/api/tenant/local/pipelines"
 
     - name: Run functional tests and health-check
       include_role:
-        name: '{{ item }}'
+        name: "{{ item }}"
       loop:
         - setup-test-env
-#        - run-checker
+        - run-checker
         - run-health-check
         - run-functional-tests

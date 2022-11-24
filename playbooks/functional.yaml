@@ -9,7 +9,7 @@
   tasks:
     - name: Prepare instance
       include_role:
-        name: '{{ item }}'
+        name: "{{ item }}"
       loop:
         - prepare-test-env
         - install-ci-repository
@@ -46,16 +46,16 @@
 
     - name: Wait for scheduler reconfiguration
       register: _zuul_status
-      retries: '900'
-      until: '''json'' in _zuul_status and _zuul_status.json and ''periodic'' in _zuul_status.content'
+      retries: "900"
+      until: "'json' in _zuul_status and _zuul_status.json and 'periodic' in _zuul_status.content"
       uri:
-        return_content: 'yes'
-        status_code: '200'
-        url: 'http://managesf.sftests.com:9000/api/tenant/local/pipelines'
+        return_content: "yes"
+        status_code: "200"
+        url: "http://managesf.sftests.com:9000/api/tenant/local/pipelines"
 
     - name: Run functional tests and health-check
       include_role:
-        name: '{{ item }}'
+        name: "{{ item }}"
       loop:
         - setup-test-env
         - run-provisioner
@@ -79,13 +79,13 @@
       vars:
         sfconfig_args: --recover
 
-#    - name: Validate backup recovery
-#      include_role:
-#        name: run-checker
+    - name: Validate backup recovery
+      include_role:
+        name: run-checker
 
     - name: Deploy a new service with a database
       include_role:
-        name: '{{ item }}'
+        name: "{{ item }}"
       loop:
         - configure-sfconfig
         - run-sfconfig

@@ -15,9 +15,7 @@
 # under the License.
 
 import os
-import random
 import yaml
-import subprocess
 
 import config
 import logging
@@ -86,12 +84,6 @@ class SFProvisioner(object):
         self.ggu.add_commit_for_all_new_additions(self.clone_dir)
         self.ggu.direct_push_branch(self.clone_dir, 'master')
 
-    def create_issues_on_project(self, name, issues):
-        self.log.info(" Create %s issue(s) for that project ..." % len(issues))
-        for i in issues:
-            issue = (random.randint(1, 100), random.randint(1, 100))
-            yield issue, i['review']
-
     def simple_login(self, user, password):
         """log as user to make the user listable"""
         try:
@@ -112,66 +104,27 @@ class SFProvisioner(object):
             commit=commit_message)
         self.ggu.review_push_branch(self.clone_dir, branch)
 
-    def create_review_for_issue(self, project, issue):
-        self.create_review(project, 'test\n\nTask: #%s\nStory: #%s' % (
-                           issue[0], issue[1]), 'branch_%s' % str(issue[0]))
-
     def create_local_user(self, username, password, email):
         if is_present("keycloak"):
             self.ku.create_user(username, password, email)
         self.gerrit_admin_client.create_account(username, password, email)
 
-    def command(self, cmd):
-        return subprocess.check_output(cmd, shell=True)
-
-    def compute_checksum(self, f):
-        out = self.command("md5sum %s" % f)
-        if out:
-            return out.split()[0]
-
-    def read_file(self, f):
-        return open(f).read()
-
     def provision(self):
-        for cmd in self.resources['commands']:
-            self.log.info("Execute command %s" % cmd['cmd'])
-            out = self.command(cmd['cmd'])
-            if out:
-                self.log.info(out)
-        checksum_list = {}
-        for checksum in self.resources['checksum']:
-            self.log.info("Compute checksum for file %s" % checksum['file'])
-            checksum_list[checksum['file']] = self.compute_checksum(
-                checksum['file'])
-            checksum_list['content_' + checksum['file']] = self.read_file(
-                checksum['file'])
-        yaml.dump(checksum_list, open('pc_checksums.yaml', 'w'),
-                  default_flow_style=False)
         for user in self.resources['local_users']:
             self.log.info("Create local user %s" % user['username'])
             self.create_local_user(user['username'],
                                    user['password'],
                                    user['email'])
             if not is_present("keycloak"):
+                # Is the simple_login usefull as we do
+                # a user provisioning in gerrit
                 self.simple_login(user['username'], user['password'])
                 self.log.info("log in as %s" % user['username'])
-        for u in self.resources['users']:
-            if not is_present("keycloak"):
-                self.log.info("log in as %s" % u['name'])
-                self.simple_login(u['name'],
-                                  config.USERS[u['name']]['password'])
         for project in self.resources['projects']:
-            self.log.info("Create user datas for %s" % project['name'])
+            self.log.info("Create project %s" % project['name'])
             self.create_project(project['name'])
             self.push_files_in_project(project['name'],
                                        [f['name'] for f in project['files']])
-            for i, review in self.create_issues_on_project(project['name'],
-                                                           project['issues']):
-                if review:
-                    self.log.info("Create review for bug %s in %s" %
-                                  (i, project['name']))
-                    self.create_review_for_issue(project['name'], i)
-
         self.create_resources()
 
 
