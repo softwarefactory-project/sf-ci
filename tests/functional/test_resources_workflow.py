@@ -16,9 +16,7 @@ import os
 import re
 import config
 import shutil
-import shlex
 import requests
-import yaml
 
 from utils import Base
 from utils import set_private_key
@@ -26,9 +24,7 @@ from utils import GerritGitUtils
 from utils import JobUtils
 from utils import create_random_str
 from utils import get_gerrit_utils
-from utils import ssh_run_cmd
 from utils import get_auth_params
-from utils import is_present
 from utils import get_user_groups
 
 
@@ -201,16 +197,8 @@ class TestResourcesWorkflow(Base):
         members = [m['email'] for m in self.gu.get_group_members(gid)]
         self.assertIn(config.USERS['user2']['email'], members)
         self.assertIn(config.USERS['user3']['email'], members)
-        # check cauth groups
 
-        def _get_cauth_groups():
-            out, err = ssh_run_cmd(config.SERVICE_PRIV_KEY_PATH,
-                                   "root",
-                                   config.GATEWAY_HOST,
-                                   shlex.split("cat /etc/cauth/groups.yaml"))
-            return yaml.safe_load(out)
-
-        def _test_kc_groups(members=[], non_members=[]):
+        def test_kc_groups(members=[], non_members=[]):
             for user in members:
                 usergroups = get_user_groups(user,
                                              config.USERS[user]['password'])
@@ -232,17 +220,7 @@ class TestResourcesWorkflow(Base):
                                  "Group %s does not exist in %s."
                                  % (name, groupsname))
 
-        if is_present('keycloak'):
-            _test_kc_groups(members=['user2', 'user3'])
-        elif is_present('cauth'):
-            groups = _get_cauth_groups()
-            self.assertTrue(name in groups['groups'], groups)
-            self.assertTrue(config.USERS['user2']['email'] in
-                            groups['groups'][name]['members'], groups)
-            self.assertTrue(config.USERS['user3']['email'] in
-                            groups['groups'][name]['members'], groups)
-        else:
-            raise Exception('Unknown SSO service')
+        test_kc_groups(members=['user2', 'user3'])
 
         # Modify resources Add/Remove members w/o review
         resources = """resources:
@@ -265,20 +243,8 @@ class TestResourcesWorkflow(Base):
         self.assertIn(config.USERS['user2']['email'], members)
         self.assertNotIn(config.USERS['user3']['email'], members)
         # check SSO groups
-        if is_present('cauth'):
-            groups = _get_cauth_groups()
-            self.assertTrue(name in groups['groups'], groups)
-            self.assertTrue(config.USERS['user2']['email'] in
-                            groups['groups'][name]['members'], groups)
-            self.assertTrue(config.USERS['user4']['email'] in
-                            groups['groups'][name]['members'], groups)
-            self.assertTrue(config.USERS['user3']['email'] not in
-                            groups['groups'][name]['members'], groups)
-        elif is_present('keycloak'):
-            _test_kc_groups(members=['user2', 'user4'],
-                            non_members=['user3'])
-        else:
-            raise Exception('Unknown SSO service')
+        test_kc_groups(members=['user2', 'user4'],
+                       non_members=['user3'])
         # Del the resources file w/o review
         self.set_resources_then_direct_push(fpath,
                                             mode='del')
@@ -286,14 +252,7 @@ class TestResourcesWorkflow(Base):
         self.assertFalse(
             self.gu.get_group_id(name))
         # check SSO groups
-        if is_present('cauth'):
-            groups = _get_cauth_groups()
-            self.assertTrue(name not in groups['groups'], groups)
-        elif is_present('keycloak'):
-            # TODO check keycloak API to test for group's existence directly
-            _test_kc_groups(non_members=config.USERS.keys())
-        else:
-            raise Exception('Unknown SSO service')
+        test_kc_groups(non_members=config.USERS.keys())
 
     def test_CD_repo(self):
         """ Check resources - ops on git repositories work as expected """

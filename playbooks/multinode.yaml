@@ -97,11 +97,6 @@
       vars:
         domain: tenant.sftests.com
 
-    - name: Check Keycloak in default tenant arch
-      command: grep -q keycloak /usr/share/sf-config/refarch/tenant-minimal.yaml
-      register: kc_in_arch
-      ignore_errors: true
-
     - name: Configure sfconfig
       include_role:
         name: configure-sfconfig
@@ -116,23 +111,6 @@
         sf_tenant_instance: true
         static_hostname_ip: "{{ master_ip }}"
         static_hostname_fqdn: sftests.com
-      when: kc_in_arch.rc == 0
-
-    - name: Configure sfconfig
-      include_role:
-        name: configure-sfconfig
-      vars:
-        sf_arch: tenant-minimal
-        add_component:
-          - component: gerrit
-            insertafter: cauth
-          - component: gitweb
-          - component: opensearch
-          - component: hound
-        sf_tenant_instance: true
-        static_hostname_ip: "{{ master_ip }}"
-        static_hostname_fqdn: sftests.com
-      when: kc_in_arch.rc == 1
 
     - name: Run sfconfig
       include_role:
