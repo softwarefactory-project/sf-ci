@@ -12,6 +12,7 @@
             nodeset: linters-pod
     periodic:
       jobs:
+        - sf-ci-functional-allinone
         - sf-deploy-stable:
             branches: master
         - sf-deploy-stable-cr:
