@@ -37,14 +37,35 @@
         - {src: test-file-good.yaml, dst: file.yaml}
       register: good_project_status
 
-    - name: Update change and check for SUCCESS
-      command: "{{ item }}"
+    - name: Commit good YAML file
+      command: "git commit -a --amend"
       args:
         chdir: /var/lib/software-factory/health-check/python-readerlib/
-      loop:
-        - git commit -a --amend
-        - /usr/share/sf-config/scripts/submit_and_wait.py --delay 1200 --approve
-        - git fetch --all
+      environment: {'EDITOR':'test'}
+      when: good_project_status is changed
+
+    - name: Update change and check for SUCCESS
+      command: "/usr/share/sf-config/scripts/submit_and_wait.py --delay 600 --approve"
+      args:
+        chdir: /var/lib/software-factory/health-check/python-readerlib/
+      environment: {'EDITOR':'test'}
+      register: success_result
+      when: good_project_status is changed
+      ignore_errors: true
+
+    - name: Update change and check for SUCCESS (second attempt)
+      command: "/usr/share/sf-config/scripts/submit_and_wait.py --delay 600 --approve"
+      args:
+        chdir: /var/lib/software-factory/health-check/python-readerlib/
+      environment: {'EDITOR':'test'}
+      when:
+        - good_project_status is changed
+        - success_result.rc == 1
+
+    - name: Update remote refs
+      command: "git fetch --all"
+      args:
+        chdir: /var/lib/software-factory/health-check/python-readerlib/
       environment: {'EDITOR':'test'}
       when: good_project_status is changed
 
