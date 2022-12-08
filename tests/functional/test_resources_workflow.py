@@ -25,7 +25,6 @@ from utils import JobUtils
 from utils import create_random_str
 from utils import get_gerrit_utils
 from utils import get_auth_params
-from utils import get_user_groups
 
 
 class TestResourcesWorkflow(Base):
@@ -198,30 +197,6 @@ class TestResourcesWorkflow(Base):
         self.assertIn(config.USERS['user2']['email'], members)
         self.assertIn(config.USERS['user3']['email'], members)
 
-        def test_kc_groups(members=[], non_members=[]):
-            for user in members:
-                usergroups = get_user_groups(user,
-                                             config.USERS[user]['password'])
-                self.assertTrue(usergroups.status_code == requests.codes.ok,
-                                "Assertion for getting groups with user: %s, \
-                                  failed." % (user))
-                groupsname = [group['name'] for group in usergroups.json()]
-                self.assertTrue(name in groupsname,
-                                "Group %s does not exist in %s."
-                                % (name, groupsname))
-            for user in non_members:
-                usergroups = get_user_groups(user,
-                                             config.USERS[user]['password'])
-                self.assertTrue(usergroups.status_code == requests.codes.ok,
-                                "Assertion for getting groups with user: %s, \
-                                  failed." % (user))
-                groupsname = [group['name'] for group in usergroups.json()]
-                self.assertFalse(name in groupsname,
-                                 "Group %s does not exist in %s."
-                                 % (name, groupsname))
-
-        test_kc_groups(members=['user2', 'user3'])
-
         # Modify resources Add/Remove members w/o review
         resources = """resources:
   groups:
@@ -242,17 +217,13 @@ class TestResourcesWorkflow(Base):
         self.assertIn(config.USERS['user4']['email'], members)
         self.assertIn(config.USERS['user2']['email'], members)
         self.assertNotIn(config.USERS['user3']['email'], members)
-        # check SSO groups
-        test_kc_groups(members=['user2', 'user4'],
-                       non_members=['user3'])
+
         # Del the resources file w/o review
         self.set_resources_then_direct_push(fpath,
                                             mode='del')
         # Check the group has been deleted
         self.assertFalse(
             self.gu.get_group_id(name))
-        # check SSO groups
-        test_kc_groups(non_members=config.USERS.keys())
 
     def test_CD_repo(self):
         """ Check resources - ops on git repositories work as expected """
