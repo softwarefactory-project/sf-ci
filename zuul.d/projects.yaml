@@ -1,20 +1,25 @@
 ---
+- job:
+    name: sf-ci-functional-allinone-periodic
+    parent: sf-ci-functional-allinone
+    post-run:
+      - playbooks/merge-output-to-logs.yaml
 
 - job:
     name: sf-ci-functional-allinone-1
-    parent: sf-ci-functional-allinone
+    parent: sf-ci-functional-allinone-periodic
 - job:
     name: sf-ci-functional-allinone-2
-    parent: sf-ci-functional-allinone
+    parent: sf-ci-functional-allinone-periodic
 - job:
     name: sf-ci-functional-allinone-3
-    parent: sf-ci-functional-allinone
+    parent: sf-ci-functional-allinone-periodic
 - job:
     name: sf-ci-functional-allinone-4
-    parent: sf-ci-functional-allinone
+    parent: sf-ci-functional-allinone-periodic
 - job:
     name: sf-ci-functional-allinone-5
-    parent: sf-ci-functional-allinone
+    parent: sf-ci-functional-allinone-periodic
 
 - project:
     templates:
