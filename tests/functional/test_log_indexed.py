@@ -21,10 +21,9 @@ import requests
 import string
 import subprocess
 import time
-import urllib.request
 import yaml
 
-from utils import Base, skipIfServiceMissing, skipReason, is_present
+from utils import Base, skipIfServiceMissing, skipReason
 from utils import set_private_key
 from utils import GerritGitUtils
 
@@ -51,27 +50,6 @@ class TestLogExportedInElasticSearch(Base):
     def _check_if_auth_required(self, gateway):
         resp = requests.get("%s/elasticsearch/_cat/indices" % gateway)
         return resp.status_code == 401
-
-    def _get_elastic_access_token(self, username):
-        client_secret = self._get_elastic_credential(
-            elasticsearch_credential_file,
-            credential='keycloak_elasticsearch_client_secret'
-        )
-        req = requests.post(
-            '%s/auth/realms/SF/protocol/'
-            'openid-connect/token' % config.GATEWAY_URL,
-            data={
-                'username': username,
-                'password': config.USERS[username]['password'],
-                'client_id': 'elasticsearch',
-                'grant_type': 'password',
-                'client_secret': client_secret,
-            }
-        )
-        try:
-            return req.json()['access_token']
-        except Exception:
-            req.raise_for_status()
 
     def _get_elastic_credential(self, file_path,
                                 credential='opensearch_password'):
@@ -145,36 +123,12 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
             password = self._get_elastic_credential(
                 elasticsearch_credential_file)
 
-        additional_params = ''
+        additional_params = "--user %s:%s" % (user, password)
+        extra_headers = " -H 'Content-Type: application/json'"
 
-        if self._check_if_auth_required(config.GATEWAY_URL):
-            if is_present('keycloak') and user == 'admin':
-                token = self._get_elastic_access_token(user)
-                data = requests.get(
-                    elastic_url,
-                    headers={
-                        'Authorization': 'Bearer %s' % token,
-                    }
-                ).json()
-                additional_params = '-H "Authorization: Bearer %s"' % token
-            else:
-                password_mgr = urllib.request.HTTPPasswordMgrWithDefaultRealm()
-                password_mgr.add_password(None, elastic_url, user, password)
-                handler = urllib.request.HTTPBasicAuthHandler(password_mgr)
-                opener = urllib.request.build_opener(handler)
-                opener.open(elastic_url)
-                urllib.request.install_opener(opener)
-                data = json.loads(urllib.request.urlopen(elastic_url).read())
-                additional_params = "--user %s:%s" % (user, password)
-        else:
-            data = json.loads(urllib.request.urlopen(elastic_url).read())
-
-        if data['version']['number'] == '2.4.6':
-            extra_headers = " -H 'kbn-version:4.5.4'"
-        else:
-            extra_headers = " -H 'Content-Type: application/json'"
         content = create_script(
             index, newhash, elastic_url, extra_headers, additional_params)
+
         with open('/tmp/test_request.sh', 'w') as fd:
             fd.write(content)
 
@@ -199,27 +153,20 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
                     '%s:%s' % (user, admin_password)
                 ]
             else:
-                if is_present('keycloak'):
-                    token = self._get_elastic_access_token('admin')
-                    auth_args = [
-                        '-H',
-                        'Authorization: Bearer %s' % token
-                    ]
-                else:
-                    user = 'admin'
-                    admin_password = self._get_elastic_credential(
-                        elasticsearch_credential_file)
-                    auth_args = [
-                        '--user',
-                        '%s:%s' % (user, admin_password)
-                    ]
+                user = 'admin'
+                admin_password = self._get_elastic_credential(
+                    elasticsearch_credential_file)
+                auth_args = [
+                    '--user',
+                    '%s:%s' % (user, admin_password)
+                ]
 
             subcmd += auth_args
 
         # Here we fetch the index name, but also we wait for
         # it to appears in ElasticSearch for 5 mins
         index = []
-        for retry in range(300):
+        for _ in range(300):
             outlines = subprocess.check_output(
                 subcmd).decode("utf-8").split('\n')
             indexes = list(filter(
@@ -237,7 +184,7 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
 
     def verify_logs_exported(self):
         subcmd = ["bash", "/tmp/test_request.sh"]
-        for retry in range(300):
+        for _ in range(300):
             out = subprocess.check_output(subcmd)
             ret = json.loads(out)
             if len(ret['hits']['hits']) >= 1:
@@ -261,10 +208,9 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
         head = self.gitu_admin.direct_push_branch(clone, 'master')
         return head
 
-    @skipIfServiceMissing('logscraper')
-    @skipIfServiceMissing('logsender')
+    @skipIfServiceMissing('log-processing')
     def test_zuul_job_console_log_indexation(self):
-        """ Test job console logs are exported in Elasticsearch
+        """ Test job console logs are exported in Opensearch
         """
         head = self.direct_push_in_config_repo(
             'ssh://%s@%s:29418' % (
@@ -276,7 +222,7 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
         log = self.verify_logs_exported()
         self.assertEqual(log['_source']["build_name"], "config-update")
 
-    @skipIfServiceMissing('elasticsearch')
+    @skipIfServiceMissing('opensearch')
     def test_zuul_job_indexation(self):
         """ Test job logs are exported in Elasticsearch
         """
