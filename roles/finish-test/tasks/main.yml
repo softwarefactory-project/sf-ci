@@ -3,6 +3,17 @@
   register: get_logs_playbook
   become: yes
 
+- name: Set artifacts facts
+  set_fact:
+    artifacts: "{{ ansible_user_dir }}/zuul-output/logs/sf-artifacts"
+
+- name: Ensure zuul-output sf artifacts exists
+  file:
+    path: "{{ artifacts }}"
+    owner: "{{ sf_user }}"
+    state: directory
+  become: yes
+
 - block:
     - name: Run get-logs playbook
       command: ansible-playbook /var/lib/software-factory/ansible/get_logs.yml
@@ -15,13 +26,6 @@
       command: "rsync -a --chmod=Duog+rx,Fuog+r --no-links /root/sf-logs/ {{ artifacts }}/"
       become: yes
   when: get_logs_playbook.stat.exists
-
-- name: Check for ara database
-  stat:
-    path: /var/lib/software-factory/ansible/ara/ansible.sqlite
-  become: yes
-  when: not zuul_success | default(false) | bool
-  register: _ara_database
 
 - name: Ensure artifacts are owned by user
   file:

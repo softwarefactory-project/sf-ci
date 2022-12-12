@@ -7,4 +7,3 @@
       loop:
         - fetch-instance-status
         - finish-test
-        - fetch-artifacts

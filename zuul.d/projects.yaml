@@ -2,8 +2,6 @@
 - job:
     name: sf-ci-functional-allinone-periodic
     parent: sf-ci-functional-allinone
-    post-run:
-      - playbooks/merge-output-to-logs.yaml
 
 - job:
     name: sf-ci-functional-allinone-1
