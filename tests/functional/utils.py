@@ -152,11 +152,11 @@ def get_auth_params(username, password):
     return params
 
 
-def get_jwt(username, password):
+def get_jwt(username, password, client=None):
     token_endpoint = "auth/realms/sf/protocol/openid-connect/token"
     url = "%(auth_url)s/%(endpoint)s" % {'auth_url': config.GATEWAY_URL,
                                          'endpoint': token_endpoint}
-    resp = requests.post(url, data={'client_id': 'managesf',
+    resp = requests.post(url, data={'client_id': client or 'managesf',
                                     'grant_type': 'password',
                                     'username': username,
                                     'password': password})
@@ -185,12 +185,22 @@ def call_endpoint_with_bearer_auth(callback,
     return callback(endpointUrl, **_kwargs)
 
 
-def get_user_groups(username, password):
+def _get_user_attribute(username, password, attribute):
     token = get_jwt('admin', config.USERS['admin']['password'])
     user_token = get_decoded_jwt(username, password)
-    endpoint = f"auth/admin/realms/sf/users/{user_token['sub']}/groups"
-    urlUserGroups = f"{config.GATEWAY_URL}/{endpoint}"
-    return call_endpoint_with_bearer_auth(requests.get, urlUserGroups, token)
+    endpoint = f"auth/admin/realms/sf/users/{user_token['sub']}/{attribute}"
+    urlUserAttribute = f"{config.GATEWAY_URL}/{endpoint}"
+    return call_endpoint_with_bearer_auth(
+        requests.get, urlUserAttribute, token
+    )
+
+
+def get_user_groups(username, password):
+    return _get_user_attribute(username, password, "groups")
+
+
+def get_user_roles(username, password):
+    return _get_user_attribute(username, password, "roles")
 
 
 def get_cookie(username, password):
@@ -265,7 +275,7 @@ class Tool:
 
 class KeycloakUtils():
     def __init__(self, url):
-        self.url = url.rstrip('/') + '/auth/admin/realms/sf/users'
+        self.url = url.rstrip('/')
         self.admin_user = config.ADMIN_USER
         self.admin_password = config.USERS[config.ADMIN_USER]['password']
 
@@ -277,12 +287,65 @@ class KeycloakUtils():
                         {"type": "password",
                          "value": password}],
                     "enabled": True}
-        resp = requests.post(self.url, json=userInfo, **auth_params)
+        url = self.url + '/auth/admin/realms/sf/users'
+        resp = requests.post(url, json=userInfo, **auth_params)
+        if resp.ok:
+            location = resp.headers['Location']
+            return requests.get(location, **auth_params).json()
+        else:
+            resp.raise_for_status()
+
+    def roles(self):
+        auth_params = get_auth_params(self.admin_user, self.admin_password)
+        url = self.url + '/auth/admin/realms/sf/roles'
+        return requests.get(url, **auth_params).json()
+
+    def add_role_to_user(self, userid, role):
+        auth_params = get_auth_params(self.admin_user, self.admin_password)
+        url = self.url + '/auth/admin/realms/sf/users/' +\
+            '%s/role-mappings/realm' % userid
+        payload = [
+            {
+                'clientRole': False,
+                'composite': False,
+                'containerId': role['containerId'],
+                'id': role['id'],
+                'name': role['name'],
+            }
+        ]
+        resp = requests.post(url, json=payload, **auth_params)
         return resp.ok
 
 
 class NotFound(Exception):
     pass
+
+
+class ZuulClient():
+    def __init__(self, url, token):
+        self.base_url = url.strip('/')
+        self.token = token
+
+    @property
+    def headers(self):
+        return {"Authorization": "bearer " + self.token}
+
+    def authorizations(self, tenant):
+        url = self.base_url + f'/tenant/{tenant}/authorizations'
+        return requests.get(url, headers=self.headers)
+
+    def tenants(self):
+        url = self.base_url + '/tenants'
+        tenants = requests.get(url).json()
+        return [t['name'] for t in tenants]
+
+
+def get_zuul_client(username, password):
+    z_token = get_jwt(
+        username, password, 'zuul'
+    )
+    z_url = config.GATEWAY_URL + "/zuul/api"
+    return ZuulClient(z_url, z_token)
 
 
 class GerritClient:

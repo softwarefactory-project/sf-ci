@@ -22,9 +22,11 @@ from utils import Base
 from utils import set_private_key
 from utils import GerritGitUtils
 from utils import JobUtils
+from utils import KeycloakUtils
 from utils import create_random_str
 from utils import get_gerrit_utils
 from utils import get_auth_params
+from utils import get_zuul_client
 
 
 class TestResourcesWorkflow(Base):
@@ -429,3 +431,67 @@ class TestResourcesWorkflow(Base):
         ret = requests.get("%s/manage/v2/resources/" % config.GATEWAY_URL,
                            **params)
         self.assertIn('resources', ret.json())
+
+    def test_create_zuul_tenant(self):
+        """Test creating a new zuul tenant, ensure admin is admin on it"""
+        new_tenant = create_random_str() + '_tenant'
+        fpath = "resources/%s.yaml" % new_tenant
+        resources = """resources:
+  tenants:
+    %s:
+      description: a new tenant
+      url: %s/manage
+      default-connection: gerrit
+      tenant-options:
+        zuul/report-build-page: True
+        zuul/max-job-timeout: 3600
+"""
+        resources = resources % (new_tenant, config.GATEWAY_URL)
+        self.set_resources_then_direct_push(fpath,
+                                            resources=resources,
+                                            mode='add')
+        # At this point we should have a tenant in Zuul.
+        zc = get_zuul_client('admin', config.USERS['admin']['password'])
+        tenants = zc.tenants()
+        self.assertTrue(new_tenant in tenants, tenants)
+        # Check admin authz
+        authorizations = zc.authorizations(new_tenant)
+        authorizations.raise_for_status()
+        authz = authorizations.json()
+        self.assertTrue(authz.get('zuul', False).
+                        get('admin', False), authorizations)
+        # Check tenant admin role was created in keycloak
+        kc = KeycloakUtils(config.GATEWAY_URL)
+        roles = kc.roles()
+        self.assertTrue(
+            ('%s_zuul_admin' % new_tenant) in [r['name'] for r in roles],
+            roles
+        )
+        admin_role = [
+            r for r in roles
+            if r['name'] == ('%s_zuul_admin' % new_tenant)
+        ][0]
+        # Create a user in keycloak and assign admin role to her
+        tenant_admin = kc.create_user(
+            '%s_admin' % new_tenant,
+            'password',
+            'tenant_user@%s.com' % new_tenant
+        )
+        kc.add_role_to_user(
+            tenant_admin['id'],
+            admin_role
+        )
+        zc = get_zuul_client(
+            '%s_admin' % new_tenant, 'password'
+        )
+        # Check admin authz
+        authorizations = zc.authorizations(new_tenant)
+        authorizations.raise_for_status()
+        authz = authorizations.json()
+        self.assertTrue(authz.get('zuul', False).
+                        get('admin', False), authorizations)
+        authorizations = zc.authorizations('local')
+        authorizations.raise_for_status()
+        authz = authorizations.json()
+        self.assertTrue(not authz.get('zuul', False).
+                        get('admin', False), authorizations)
