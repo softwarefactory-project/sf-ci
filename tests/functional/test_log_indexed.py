@@ -74,16 +74,13 @@ class TestLogExportedInElasticSearch(Base):
             req.raise_for_status()
 
     def _get_elastic_credential(self, file_path,
-                                credential='elasticsearch_password'):
+                                credential='opensearch_password'):
         if not os.path.exists(file_path):
             return
 
         with open(file_path, 'r') as f:
             for line in f.readlines():
-                # NOTE: leave just opensearch_password in condition when
-                # SF 3.8 released.
-                if line.split(':')[0].strip() == credential or \
-                        line.split(':')[0].strip() == 'opensearch_password':
+                if line.split(':')[0].strip() == credential:
                     return line.split(':')[1].strip()
 
     def _get_ext_elastic_creds(self):

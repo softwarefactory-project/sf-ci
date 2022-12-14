@@ -12,7 +12,7 @@
 
 - name: Get Opensearch admin password
   shell: |
-    awk '/opensearch_password|elasticsearch_password/ {print $2}' /var/lib/software-factory/bootstrap-data/secrets.yaml | head -n1
+    awk '/opensearch_password/ {print $2}' /var/lib/software-factory/bootstrap-data/secrets.yaml | head -n1
   register: elk_kibanaserver_pass
   when: opensearch_password is not defined
 

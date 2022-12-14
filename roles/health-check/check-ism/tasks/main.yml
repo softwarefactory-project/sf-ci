@@ -17,7 +17,7 @@
 
     - name: Get opensearch admin password
       shell: |
-        awk '/opensearch_password|elasticsearch_password/ {print $2}' /var/lib/software-factory/bootstrap-data/secrets.yaml | head -n1
+        awk '/opensearch_password/ {print $2}' /var/lib/software-factory/bootstrap-data/secrets.yaml | head -n1
       register: elastic_admin_pass
 
     - name: Set proper facts for Opendistro and Opensearch

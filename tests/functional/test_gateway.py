@@ -60,9 +60,7 @@ class TestGateway(Base):
         with open(file_path, 'r') as f:
             for line in f.readlines():
                 # NOTE: Change condition below when SF 3.8 released.
-                if (line.split(':')[0].strip() == 'opensearch_password' or
-                        line.split(':')[0].strip(
-                        ) == 'elasticsearch_password'):
+                if line.split(':')[0].strip() == 'opensearch_password':
                     return line.split(':')[1].strip()
 
     def _get_ext_opensearch_creds(self):
