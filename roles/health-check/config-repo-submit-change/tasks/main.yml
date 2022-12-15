@@ -40,6 +40,11 @@
     return_content: yes
     body_format: json
   register: _result
-  until: _result.json != [] and _result.json[0]["result"] == 'SUCCESS'
+  until: _result.json != [] and _result.json[0]["result"] != None
   retries: 180
   delay: 30
+
+- name: Check config-update result using zuul-web API
+  fail:
+    msg: config-update result was {{ _result.json[0]["result"] }}
+  when: _result.json != [] and _result.json[0]["result"] != 'SUCCESS'
