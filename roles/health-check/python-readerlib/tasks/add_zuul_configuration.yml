@@ -41,7 +41,6 @@
       command: "git commit -a --amend --no-edit"
       args:
         chdir: /var/lib/software-factory/health-check/python-readerlib/
-      environment: {'EDITOR':'test'}
       when: good_project_status is changed
 
     - name: Update change and check for SUCCESS
@@ -52,6 +51,15 @@
       register: success_result
       when: good_project_status is changed
       ignore_errors: true
+
+    # This force the change-id to updated resulting in a new review in Gerrit
+    - name: Update change-id before second attempt
+      command: "git commit --amend -m 'New change'"
+      args:
+        chdir: /var/lib/software-factory/health-check/python-readerlib/
+      when:
+        - good_project_status is changed
+        - success_result.rc == 1
 
     - name: Update change and check for SUCCESS (second attempt)
       command: "/usr/share/sf-config/scripts/submit_and_wait.py --delay 600 --approve"
@@ -66,7 +74,6 @@
       command: "git fetch --all"
       args:
         chdir: /var/lib/software-factory/health-check/python-readerlib/
-      environment: {'EDITOR':'test'}
       when: good_project_status is changed
 
     - name: Check change was merged
