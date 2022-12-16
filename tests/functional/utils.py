@@ -203,14 +203,11 @@ def get_cookie(username, password):
 
 
 def get_gerrit_utils(user):
-    if is_present("cauth"):
+    # TODO admin user should not be a special case
+    if user == config.USER_1:
         http_password = config.USERS[user]['api_key']
-    elif is_present("keycloak"):
-        # TODO admin user should not be a special case
-        if user == config.USER_1:
-            http_password = config.USERS[user]['api_key']
-        else:
-            http_password = config.USERS[user]['password']
+    else:
+        http_password = config.USERS[user]['password']
     return GerritClient(
         config.GATEWAY_URL + "/r/a",
         auth=HTTPBasicAuth(user, http_password))
