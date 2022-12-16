@@ -38,7 +38,7 @@
       register: good_project_status
 
     - name: Commit good YAML file
-      command: "git commit -a --amend"
+      command: "git commit -a --amend --no-edit"
       args:
         chdir: /var/lib/software-factory/health-check/python-readerlib/
       environment: {'EDITOR':'test'}
