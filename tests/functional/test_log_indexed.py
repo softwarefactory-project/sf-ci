@@ -27,7 +27,7 @@ from utils import Base, skipIfServiceMissing, skipReason
 from utils import set_private_key
 from utils import GerritGitUtils
 
-elasticsearch_credential_file = \
+opensearch_credential_file = \
     '/var/lib/software-factory/bootstrap-data/secrets.yaml'
 sfconfig_file = '/etc/software-factory/sfconfig.yaml'
 
@@ -35,12 +35,12 @@ sfconfig_file = '/etc/software-factory/sfconfig.yaml'
 # TODO move all HTTP queries to requests, instead of creating cURL scripts.
 
 
-class TestLogExportedInElasticSearch(Base):
-    """ Functional tests to verify job logs are exported in ElasticSearch
+class TestLogExportedInOpenSearch(Base):
+    """ Functional tests to verify job logs are exported in OpenSearch
     """
 
     def setUp(self):
-        super(TestLogExportedInElasticSearch, self).setUp()
+        super(TestLogExportedInOpenSearch, self).setUp()
         priv_key_path = set_private_key(
             config.USERS[config.ADMIN_USER]["privkey"])
         self.gitu_admin = GerritGitUtils(
@@ -48,7 +48,7 @@ class TestLogExportedInElasticSearch(Base):
             config.USERS[config.ADMIN_USER]['email'])
 
     def _check_if_auth_required(self, gateway):
-        resp = requests.get("%s/elasticsearch/_cat/indices" % gateway)
+        resp = requests.get("%s/opensearch/_cat/indices" % gateway)
         return resp.status_code == 401
 
     def _get_elastic_credential(self, file_path,
@@ -66,8 +66,8 @@ class TestLogExportedInElasticSearch(Base):
             return
         with open(sfconfig_file, 'r') as ext_users:
             parsed_file = yaml.safe_load(ext_users)
-            if 'external_elasticsearch' in parsed_file:
-                return parsed_file['external_elasticsearch']
+            if 'external_opensearch' in parsed_file:
+                return parsed_file['external_opensearch']
 
     def _get_ext_elastic_admin_pass(self, username):
         ext_creds = self._get_ext_elastic_creds()
@@ -113,7 +113,7 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
 
     def copy_request_script(self, index, newhash, create_script):
         newhash = newhash.rstrip()
-        elastic_url = '%s/elasticsearch' % config.GATEWAY_URL
+        elastic_url = '%s/opensearch' % config.GATEWAY_URL
 
         if self._get_ext_elastic_creds():
             user = 'admin_sftests_com'
@@ -121,7 +121,7 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
         else:
             user = 'admin'
             password = self._get_elastic_credential(
-                elasticsearch_credential_file)
+                opensearch_credential_file)
 
         additional_params = "--user %s:%s" % (user, password)
         extra_headers = " -H 'Content-Type: application/json'"
@@ -134,19 +134,19 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
 
     def find_index(self, prefix, include_suffix=True):
         subcmd = ["curl", "-s",
-                  "%s/elasticsearch/_cat/indices" % config.GATEWAY_URL]
+                  "%s/opensearch/_cat/indices" % config.GATEWAY_URL]
 
         # A logstash index is created by day
         today_str = datetime.datetime.utcnow().strftime('%Y.%m.%d')
         index_name = '%s-%s' % (prefix, today_str)
 
         if self._check_if_auth_required(config.GATEWAY_URL):
-            external_elasticsearch = self._get_ext_elastic_creds()
-            if external_elasticsearch:
+            external_opensearch = self._get_ext_elastic_creds()
+            if external_opensearch:
                 user = 'admin_sftests_com'
                 admin_password = self._get_ext_elastic_admin_pass(user)
                 if include_suffix:
-                    es_suffix = external_elasticsearch.get('suffix')
+                    es_suffix = external_opensearch.get('suffix')
                     index_name = '%s-%s-%s' % (prefix, es_suffix, today_str)
                 auth_args = [
                     '--user',
@@ -155,7 +155,7 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
             else:
                 user = 'admin'
                 admin_password = self._get_elastic_credential(
-                    elasticsearch_credential_file)
+                    opensearch_credential_file)
                 auth_args = [
                     '--user',
                     '%s:%s' % (user, admin_password)
@@ -164,8 +164,9 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
             subcmd += auth_args
 
         # Here we fetch the index name, but also we wait for
-        # it to appears in ElasticSearch for 5 mins
+        # it to appears in OpenSearch for 5 mins
         index = []
+        indexes = []
         for _ in range(300):
             outlines = subprocess.check_output(
                 subcmd).decode("utf-8").split('\n')
@@ -184,7 +185,7 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
 
     def verify_logs_exported(self):
         subcmd = ["bash", "/tmp/test_request.sh"]
-        for _ in range(300):
+        for _ in range(600):
             out = subprocess.check_output(subcmd)
             ret = json.loads(out)
             if len(ret['hits']['hits']) >= 1:
@@ -224,7 +225,7 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
 
     @skipIfServiceMissing('opensearch')
     def test_zuul_job_indexation(self):
-        """ Test job logs are exported in Elasticsearch
+        """ Test job logs are exported in OpenSearch
         """
         head = self.direct_push_in_config_repo(
             'ssh://%s@%s:29418' % (
@@ -236,12 +237,12 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
         log = self.verify_logs_exported()
         self.assertEqual(log['_source']["job_name"], "config-update")
 
-    def test_zuul_job_indexation_external_elasticsearch(self):
-        """ Test job logs are exported in external Elasticsearch
+    def test_zuul_job_indexation_external_opensearch(self):
+        """ Test job logs are exported in external OpenSearch
         """
         if not self._get_ext_elastic_creds():
             return skipReason("There is no configuration set for "
-                              "external_elasticsearch. Skipping.")
+                              "external_opensearch. Skipping.")
         head = self.direct_push_in_config_repo(
             'ssh://%s@%s:29418' % (
                 config.ADMIN_USER,

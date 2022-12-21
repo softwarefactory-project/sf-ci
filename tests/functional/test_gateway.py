@@ -48,9 +48,6 @@ class TestGateway(Base):
 
     def _check_if_auth_required(self, gateway):
         resp = requests.get("%s/opensearch/_cat/indices" % gateway)
-        # NOTE: Remove condition below when SF 3.8 released.
-        if resp.status_code == 404:
-            resp = requests.get("%s/elasticsearch/_cat/indices" % gateway)
         return resp.status_code == 401
 
     def _get_opensearch_admin_pass(self, file_path):
@@ -70,9 +67,6 @@ class TestGateway(Base):
             parsed_file = yaml.safe_load(ext_users)
             if 'external_opensearch' in parsed_file:
                 return parsed_file['external_opensearch']
-            # NOTE: Remove condition below when SF 3.8 released.
-            if 'external_elasticsearch' in parsed_file:
-                return parsed_file['external_elasticsearch']
 
     def _get_ext_opensearch_admin_pass(self, username):
         ext_creds = self._get_ext_opensearch_creds()
@@ -86,13 +80,6 @@ class TestGateway(Base):
         with open(file_path, 'r') as sf_config:
             parsed_file = yaml.safe_load(sf_config)
             return parsed_file.get('kibana', {}).get('host_url')
-
-    def _determine_elasticsearch_url(self, gateway):
-        opensearch_url = '%s/opensearch' % gateway
-        r = requests.get(opensearch_url)
-        if r.status_code != 404:
-            return opensearch_url
-        return '%s/elasticsearch' % gateway
 
     def test_managesf_is_secure(self):
         """Test if managesf config.py file is not world readable"""
@@ -200,7 +187,7 @@ class TestGateway(Base):
             return skipReason("Skipping test due external Kibana host is "
                               "configured")
 
-        url = self._determine_elasticsearch_url(config.GATEWAY_URL)
+        url = '%s/opensearch' % config.GATEWAY_URL
         if self._check_if_auth_required(config.GATEWAY_URL):
             admin_password = self._get_opensearch_admin_pass(
                 opensearch_credential_file)
@@ -226,7 +213,7 @@ class TestGateway(Base):
         if not self._is_kibana_external(sfconfig_file):
             return skipReason("Skipping test due external Kibana host is not "
                               "configured")
-        url = self._determine_elasticsearch_url(config.GATEWAY_URL)
+        url = '%s/opensearch' % config.GATEWAY_URL
         verify = True
         if self._check_if_auth_required(config.GATEWAY_URL):
             user = 'admin'
