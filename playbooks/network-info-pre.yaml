@@ -1,0 +1,5 @@
+- hosts: all
+  tasks:
+    - name: Launch rtmon
+      shell: rtmon file /var/log/rtmon.log >& /dev/null &
+      become: true
