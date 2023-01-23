@@ -1,3 +1,5 @@
 - hosts: all
-  roles:
-    - dstat-graph
+  tasks:
+    - include_role:
+        name: dstat-graph
+      when: ansible_distribution == "CentOS"
