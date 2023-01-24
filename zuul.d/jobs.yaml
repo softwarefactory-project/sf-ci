@@ -4,9 +4,11 @@
     parent: base
     description: The sf ci tests
     pre-run:
-        - playbooks/dstat-pre.yaml
-        - playbooks/setup-utilization-stats.yaml
+      - playbooks/network-info-pre.yaml
+      - playbooks/dstat-pre.yaml
+      - playbooks/setup-utilization-stats.yaml
     post-run:
+      - playbooks/network-info-post.yaml
       - playbooks/dstat-post.yaml
       - playbooks/get-logs.yaml
     timeout: 10800

@@ -1,0 +1,20 @@
+- hosts: all
+  tasks:
+    - name: Get network statistics
+      block:
+        - set_fact:
+            network_log_directory: "{{ ansible_user_dir }}/zuul-output/logs/networks_stats"
+        - name: Create networks_stats directory
+          file:
+            name: "{{ network_log_directory }}"
+            state: directory
+
+        - name: Get interfaces stats
+          shell: "ip -s link > {{ network_log_directory }}/ip_link_stats.txt"
+
+        - name: Get netstat statistics
+          shell: "netstat -s > {{ network_log_directory }}/netstat_stats.txt"
+
+        - name: Get rtmon data
+          shell: "ip monitor file /var/log/rtmon.log > {{ network_log_directory }}/rtmon_stats.txt"
+      become: yes
