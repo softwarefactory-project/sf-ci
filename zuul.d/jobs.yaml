@@ -89,7 +89,7 @@
     run: playbooks/upgrade.yaml
     vars:
       sf_arch: minimal
-      sf_version: 3.7
+      sf_version: 3.8
       show_hidden_logs: false
 
 - job:
@@ -99,7 +99,7 @@
     run: playbooks/upgrade.yaml
     vars:
       sf_arch: allinone
-      sf_version: 3.7
+      sf_version: 3.8
       show_hidden_logs: false
 
 - job:
@@ -125,18 +125,8 @@
     run: playbooks/stable.yaml
     vars:
       sf_arch: allinone
-      sf_version: 3.7
+      sf_version: 3.8
       centos_cr: false
-
-- job:
-    name: sf-deploy-stable-cr
-    description: The sf deploy lastest stable with CentOS CR
-    parent: sf-ci
-    run: playbooks/stable.yaml
-    vars:
-      sf_arch: allinone
-      sf_version: 3.7
-      centos_cr: true
 
 - job:
     name: keycloak-test-deploy
