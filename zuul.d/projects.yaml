@@ -30,17 +30,6 @@
       jobs:
         - linters:
             nodeset: linters-pod
-    periodic:
-      jobs:
-        - sf-ci-functional-allinone-1
-        - sf-ci-functional-allinone-2
-        - sf-ci-functional-allinone-3
-        - sf-ci-functional-allinone-4
-        - sf-ci-functional-allinone-5
-        - sf-deploy-stable:
-            branches: master
-        - sf-deploy-stable-cr:
-            branches: master
     experimental:
       jobs:
         - sf-rpm-build
