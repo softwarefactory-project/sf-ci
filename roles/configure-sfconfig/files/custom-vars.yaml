@@ -13,3 +13,10 @@ opensearch_minimum_heap_size: 128m
 
 # NOTE(nhicher): Reduce min session timeout for CI jobs
 zookeeper_minSessionTimeout: 10000
+
+# Due to upstream signing key rotation https://github.com/influxdata/influxdb/issues/24066
+# this override is needed for sf-config (3.7) upgrade jobs from 3.7 to 3.8.
+# Here is the InfluxDB blog post: https://www.influxdata.com/blog/linux-package-signing-key-rotation/
+# This will not be a problem for SF 3.8.
+# In future releases InfluxDB is containarized.
+influxdb_repo_gpgkey: https://repos.influxdata.com/influxdata-archive_compat.key
