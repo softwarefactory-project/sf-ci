@@ -1,6 +1,7 @@
 ---
 - project-template:
     name: sf-ci-jobs
+    queue: sf-master
     check:
       jobs:
         - sf-rpm-build
@@ -30,7 +31,6 @@
             dependencies:
               - sf-rpm-build
     gate:
-      queue: sf-master
       jobs:
         - sf-rpm-build
         - sf-ci-functional-minimal:
@@ -66,11 +66,11 @@
 
 - project-template:
     name: sf-ci-jobs-light
+    queue: sf-master
     check:
       jobs:
         - sf-rpm-build
     gate:
-      queue: sf-master
       jobs:
         - sf-rpm-build
         - sf-ci-functional-allinone:
@@ -86,11 +86,11 @@
 
 - project-template:
     name: sf-ci-no-jobs
+    queue: sf-master
     check:
       jobs:
         - noop
     gate:
-      queue: sf-master
       jobs:
         - sf-rpm-build
         - wait-for-changes-ahead:
@@ -110,12 +110,12 @@
 
 - project-template:
     name: sf-ci-python-jobs
+    queue: sf-master
     check:
       jobs:
         - tox-pep8
         - tox-py36
     gate:
-      queue: sf-master
       jobs:
         - tox-pep8
         - tox-py36
