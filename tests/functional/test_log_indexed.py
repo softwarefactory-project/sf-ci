@@ -171,7 +171,7 @@ curl -s -XPOST '%s/%s/_search?pretty&size=1' %s -d '{
             outlines = subprocess.check_output(
                 subcmd).decode("utf-8").split('\n')
             indexes = list(filter(
-                lambda l: l.find(index_name) >= 0,
+                lambda idx: idx.find(index_name) >= 0,
                 outlines))
             if indexes:
                 break

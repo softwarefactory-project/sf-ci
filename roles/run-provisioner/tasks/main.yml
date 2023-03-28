@@ -1,5 +1,8 @@
 - command: "logger --tag ci-sfconfig provisioner: starting"
 
+- command: "python3 -mpip install 'pyjwt>=2,<3.0'"
+  become: yes
+
 - name: Run data provisionner
   command: python3 provisioner.py
   environment:
