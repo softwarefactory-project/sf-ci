@@ -44,3 +44,19 @@
   command: yum-config-manager --enable cr
   become: yes
   when: centos_cr is defined and centos_cr
+
+# NOTE: workaround after decommissioning registry.centos.org. More info:
+# https://lists.centos.org/pipermail/centos-devel/2023-May/142956.html
+- name: Install podman package
+  become: true
+  yum:
+    name: podman
+    state: present
+
+- name: Pull Centos 7 image
+  become: true
+  command: podman pull quay.io/centos/centos:7
+
+- name: Add Centos 7 tag to registry.centos.org
+  become: true
+  command: podman tag quay.io/centos/centos:7 registry.centos.org/centos:7
