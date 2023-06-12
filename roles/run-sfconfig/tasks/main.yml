@@ -28,7 +28,7 @@
   copy:
     content: |
       [registries.search]
-      registries = ['registry.fedoraproject.org', 'registry.centos.org', 'docker.io']
+      registries = ['registry.fedoraproject.org', 'quay.io', 'docker.io']
       [registries.insecure]
       registries = []
       [registries.block]
