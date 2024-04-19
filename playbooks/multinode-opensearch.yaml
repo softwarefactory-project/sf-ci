@@ -3,10 +3,6 @@
 # Opensearch and Opensearch Dashboards.
 # On the second node would be deployed all roles that are in
 # sf-config project, except opensearch, opensearch-dashboards.
-- hosts: all
-  roles:
-    - common
-
 - hosts: elk
   become: true
   vars:
@@ -45,25 +41,7 @@
       become: true
       package:
         name: rsync
-        state: present
-
-    ## Workaround for rsync issue
-    # More info: https://pagure.io/centos-infra/issue/872
-    # https://bugzilla.redhat.com/show_bug.cgi?id=2043753
-    - name: Workaround - install rsync package
-      become: true
-      block:
-        - name: Install rsync package
-          yum:
-            name: rsync-3.1.3-14.el8.x86_64
-            state: present
-            allow_downgrade: true
-
-        - name: Add rsync package to be excluded from upgrade
-          lineinfile:
-            path: /etc/yum.conf
-            regexp: '^exclude'
-            line: 'exclude=rsync'
+        state: latest
 
     - name: Set hostname
       hostname:
@@ -72,7 +50,7 @@
     - name: Ensure that correct hostname is set in hosts file
       become: true
       lineinfile:
-        dest: '/etc/hosts'
+        dest: "/etc/hosts"
         regexp: "^{{ fqdn }}.+$"
         line: "{{ ansible_host }} {{ inventory_hostname_short }} {{ fqdn }}"
 
@@ -101,7 +79,7 @@
   tasks:
     - name: Prepare instance
       include_role:
-        name: '{{ item }}'
+        name: "{{ item }}"
       loop:
         - prepare-test-env
         - install-ci-repository
@@ -112,7 +90,7 @@
         name: configure-sfconfig
       vars:
         sf_arch: allinone
-        static_hostname_ip: '{{ elk_ip }}'
+        static_hostname_ip: "{{ elk_ip }}"
         static_hostname_fqdn: "opensearch.sftests.com"
         remove_component:
           - component: opensearch
@@ -166,7 +144,7 @@
 
     - name: Run functional tests and health-check
       include_role:
-        name: '{{ item }}'
+        name: "{{ item }}"
       loop:
         - setup-test-env
         - run-provisioner

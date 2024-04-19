@@ -1,13 +1,9 @@
 ---
-- hosts: all
-  roles:
-    - common
-
 - hosts: install-server
   tasks:
     - name: Deploy stable sf instance
       include_role:
-        name: '{{ item }}'
+        name: "{{ item }}"
       loop:
         - install-stable-repository
         - install-sfconfig

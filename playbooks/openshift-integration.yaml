@@ -1,13 +1,9 @@
 ---
-- hosts: all
-  roles:
-    - common
-
 - hosts: install-server
   tasks:
     - name: Prepare instance
       include_role:
-        name: '{{ item }}'
+        name: "{{ item }}"
       loop:
         - prepare-test-env
         - install-ci-repository
