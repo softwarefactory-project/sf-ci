@@ -87,6 +87,7 @@
     description: The sf upgrade tests of the minimal architecture
     parent: sf-ci
     run: playbooks/upgrade.yaml
+    voting: false
     vars:
       sf_arch: minimal
       sf_version: 3.7
@@ -97,9 +98,21 @@
     description: The sf upgrade tests of the allinone architecture
     parent: sf-ci
     run: playbooks/upgrade.yaml
+    voting: false
     vars:
       sf_arch: allinone
       sf_version: 3.7
+      show_hidden_logs: false
+
+- job:
+    name: sf-ci-upgrade-minimal-from-38-release
+    description: The sf upgrade tests of the minimal architecture
+    parent: sf-ci
+    run: playbooks/upgrade.yaml
+    vars:
+      sf_arch: minimal
+      # Upgrade from sf-38-release to validate sf-38-build upgrade from sf-38-release
+      sf_version: 3.8
       show_hidden_logs: false
 
 - job:

@@ -26,6 +26,10 @@
       include_role:
         name: run-provisioner
 
+    - name: Perform a SF backup
+      include_role:
+        name: run-backup-create
+
     - name: Update mirrors to use sfmaster
       include_role:
         name: install-ci-repository

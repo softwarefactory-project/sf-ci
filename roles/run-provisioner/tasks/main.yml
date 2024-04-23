@@ -1,5 +1,11 @@
 - command: "logger --tag ci-sfconfig provisioner: starting"
 
+- name: Ensure provisioner deps
+  yum:
+    name:
+      - python3-jwt
+  become: yes
+
 - name: Run data provisionner
   command: python3 provisioner.py
   environment:

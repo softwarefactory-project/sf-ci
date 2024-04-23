@@ -1,7 +1,7 @@
 ---
 - project-template:
     name: sf-ci-jobs
-    queue: sf-master
+    queue: sf-38
     check:
       jobs:
         - sf-rpm-build
@@ -15,6 +15,9 @@
             dependencies:
               - sf-rpm-build
         - sf-ci-upgrade-allinone:
+            dependencies:
+              - sf-rpm-build
+        - sf-ci-upgrade-minimal-from-38-release:
             dependencies:
               - sf-rpm-build
         - sf-ci-functional-external-elk:
@@ -43,6 +46,9 @@
             dependencies:
               - sf-rpm-build
         - sf-ci-upgrade-allinone:
+            dependencies:
+              - sf-rpm-build
+        - sf-ci-upgrade-minimal-from-38-release:
             dependencies:
               - sf-rpm-build
         - sf-ci-functional-external-elk:
