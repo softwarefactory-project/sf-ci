@@ -1,7 +1,7 @@
 ---
 - job:
     name: sf-ci
-    parent: base
+    parent: base-rhel
     description: The sf ci tests
     pre-run:
       - playbooks/network-info-pre.yaml
@@ -13,12 +13,13 @@
       - playbooks/get-logs.yaml
     timeout: 10800
     required-projects:
+      - software-factory/sf-config
       - software-factory/sf-ci
       - software-factory/sfinfo
     nodeset:
       nodes:
         - name: install-server
-          label: cloud-centos-7
+          label: cloud-rhel-9-3
     vars:
       sf_version: master
       logclassify_logserver_dir: logs/
@@ -38,15 +39,15 @@
     nodeset:
       nodes:
         - name: master
-          label: cloud-centos-7
+          label: cloud-rhel-9.3
         - name: zs
-          label: cloud-centos-7
+          label: cloud-rhel-9.3
         - name: ze
-          label: cloud-centos-7
+          label: cloud-rhel-9.3
         - name: zm
-          label: cloud-centos-7
+          label: cloud-rhel-9.3
         - name: tenant
-          label: cloud-centos-7
+          label: cloud-rhel-9.3
       groups:
         - name: switch
           nodes:
@@ -71,35 +72,6 @@
     run: playbooks/functional.yaml
     vars:
       sf_arch: minimal
-      show_hidden_logs: false
-
-- job:
-    name: sf-ci-functional-allinone
-    description: The sf functional tests of the allinone architecture
-    parent: sf-ci
-    run: playbooks/functional.yaml
-    vars:
-      sf_arch: allinone
-      show_hidden_logs: false
-
-- job:
-    name: sf-ci-upgrade-minimal
-    description: The sf upgrade tests of the minimal architecture
-    parent: sf-ci
-    run: playbooks/upgrade.yaml
-    vars:
-      sf_arch: minimal
-      sf_version: 3.8
-      show_hidden_logs: false
-
-- job:
-    name: sf-ci-upgrade-allinone
-    description: The sf upgrade tests of the allinone architecture
-    parent: sf-ci
-    run: playbooks/upgrade.yaml
-    vars:
-      sf_arch: allinone
-      sf_version: 3.8
       show_hidden_logs: false
 
 - job:

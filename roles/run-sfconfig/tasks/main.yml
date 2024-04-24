@@ -14,8 +14,15 @@
     sed -e 's/k1s_default_pods.*/k1s_default_pods: false/' -i /etc/software-factory/sfconfig.yaml
   become: yes
 
+- name: Install ansible collections (the process is really slow)
+  command: >
+    ansible-galaxy collection install ansible.posix community.general community.mysql
+  become: yes
+
 - name: Run sfconfig
-  command: 'sfconfig {{ sfconfig_args }}'
+  command: '/usr/local/bin/sfconfig {{ sfconfig_args }}'
+  args:
+    chdir: /root
   become: yes
 
 - name: Create /etc/containers

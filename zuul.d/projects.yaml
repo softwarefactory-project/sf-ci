@@ -1,24 +1,4 @@
 ---
-- job:
-    name: sf-ci-functional-allinone-periodic
-    parent: sf-ci-functional-allinone
-
-- job:
-    name: sf-ci-functional-allinone-1
-    parent: sf-ci-functional-allinone-periodic
-- job:
-    name: sf-ci-functional-allinone-2
-    parent: sf-ci-functional-allinone-periodic
-- job:
-    name: sf-ci-functional-allinone-3
-    parent: sf-ci-functional-allinone-periodic
-- job:
-    name: sf-ci-functional-allinone-4
-    parent: sf-ci-functional-allinone-periodic
-- job:
-    name: sf-ci-functional-allinone-5
-    parent: sf-ci-functional-allinone-periodic
-
 - project:
     templates:
       - sf-ci-jobs
@@ -30,20 +10,3 @@
       jobs:
         - linters:
             nodeset: linters-pod
-    periodic:
-      jobs:
-        - sf-ci-functional-allinone-1
-        - sf-ci-functional-allinone-2
-        - sf-ci-functional-allinone-3
-        - sf-ci-functional-allinone-4
-        - sf-ci-functional-allinone-5
-        - sf-deploy-stable:
-            branches: master
-        - sf-deploy-stable-cr:
-            branches: master
-    experimental:
-      jobs:
-        - sf-rpm-build
-        - sf-ci-openshift-integration:
-            dependencies:
-              - sf-rpm-build

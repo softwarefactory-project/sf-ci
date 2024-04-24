@@ -7,4 +7,4 @@
     - bash -c "date '+%s' >> test_gerritbot_notif"
     - git add test_gerritbot_notif
     - git commit -m "{{ commit_message }}"
-    - git review
+    - /usr/local/bin/git-review

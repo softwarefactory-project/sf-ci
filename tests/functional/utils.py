@@ -578,8 +578,9 @@ class GerritGitUtils(Tool):
         # config repo has been initialized with another domain.
         self.exe("sed -i 's/^host=.*/host=%s/' .gitreview" %
                  config.GATEWAY_HOST, clone_dir)
-        self.exe("ssh-agent bash -c 'ssh-add %s; git review -s'" %
-                 self.priv_key_path, clone_dir)
+        self.exe(
+            "ssh-agent bash -c 'ssh-add %s; /usr/local/bin/git-review -s'" %
+            self.priv_key_path, clone_dir)
         self.exe("git reset --hard", clone_dir)
 
     def list_open_reviews(self, project, uri, port=29418):
@@ -640,7 +641,7 @@ class GerritGitUtils(Tool):
         self.exe("git commit --author '%s' -m '%s'" % (self.author, commit),
                  clone_dir)
         if publish:
-            self.exe('git review -v', clone_dir)
+            self.exe('/usr/local/bin/git-review -v', clone_dir)
         sha = open("%s/.git/refs/heads/master" % clone_dir).read()
         return sha.strip()
 
@@ -653,7 +654,7 @@ class GerritGitUtils(Tool):
 
     def review_push_branch(self, clone_dir, branch):
         self.exe('git checkout %s' % branch, clone_dir)
-        self.exe('git review', clone_dir)
+        self.exe('/usr/local/bin/git-review', clone_dir)
         sha = open("%s/.git/refs/heads/%s" % (clone_dir, branch)).read()
         self.exe('git checkout master', clone_dir)
         return sha.strip()
@@ -687,7 +688,7 @@ class GerritGitUtils(Tool):
             self.exe("git commit -C ORIG_HEAD", clone_dir)
 
         sha = open("%s/.git/refs/heads/%s" % (clone_dir, branch)).read()
-        self.exe('git review -v', clone_dir)
+        self.exe('/usr/local/bin/git-review -v', clone_dir)
         return sha
 
     def get_branches(self, clone_dir, include_remotes=False):
@@ -833,7 +834,7 @@ class ResourcesUtils(Tool):
         previous_state_yaml = yaml.dump({'resources': {}})
         open("/tmp/prev.yaml", "w").write(previous_state_yaml)
         open("/tmp/new.yaml", "w").write(wanted_state_yaml)
-        cmd = "sudo managesf-resources "
+        cmd = "sudo /usr/local/bin/managesf-resources "
         cmd += "direct-apply --prev-yaml /tmp/prev.yaml "
         cmd += "--new-yaml /tmp/new.yaml"
         self.exe(cmd)
@@ -844,7 +845,7 @@ class ResourcesUtils(Tool):
         wanted_state_yaml = yaml.dump({'resources': {}})
         open("/tmp/prev.yaml", "w").write(previous_state_yaml)
         open("/tmp/new.yaml", "w").write(wanted_state_yaml)
-        cmd = "sudo managesf-resources "
+        cmd = "sudo /usr/local/bin/managesf-resources "
         cmd += "direct-apply --prev-yaml /tmp/prev.yaml "
         cmd += "--new-yaml /tmp/new.yaml"
         self.exe(cmd)

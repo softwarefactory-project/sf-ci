@@ -1,14 +1,20 @@
-- name: Ensure test dependencies are installed
+- name: Ensure rpm test dependencies are installed
   yum:
     name:
       - python3-nose
-      - python3-nose-timer
-      - python3-nose-htmloutput
       - python3-jwt
   become: yes
 
+- name: Ensure pip test dependencies are installed
+  pip:
+    name:
+      - nose-htmloutput
+      - nose-timer
+    state: present
+  become: yes
 # TODO: remove the auto-creation of sfmanager.log and delete the task bellow
 # Remove sfmanager.log as it might be created before and owned by root
+
 - name: Remove previous sfmanager.log
   file:
     path: "{{ sf_ci }}/playbooks/sfmanager.log"

@@ -9,9 +9,7 @@
     dest: "{{ config_path }}/{{ item.dest }}"
   loop:
     - content: |
-        # FIXME: change to fedora:latest when buildah newer than
-        # version 1.11.6
-        FROM fedora:34
+        FROM fedora:latest
         RUN dnf install -y rsync findutils python3-flake8 yamllint
       dest: containers/fedora/Dockerfile
     - content: |

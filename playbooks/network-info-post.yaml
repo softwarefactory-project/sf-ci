@@ -12,8 +12,8 @@
         - name: Get interfaces stats
           shell: "ip -s link > {{ network_log_directory }}/ip_link_stats.txt"
 
-        - name: Get netstat statistics
-          shell: "netstat -s > {{ network_log_directory }}/netstat_stats.txt"
+        - name: Get ss statistics
+          shell: "ss -s > {{ network_log_directory }}/ss_stats.txt"
 
         - name: Get rtmon data
           shell: "ip monitor file /var/log/rtmon.log > {{ network_log_directory }}/rtmon_stats.txt"

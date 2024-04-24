@@ -42,7 +42,7 @@ class TestProjectReplication(Base):
         return sha
 
     def config_push(self, prev_sha, commit):
-        run("sudo sh -c 'cd /root/config; git review -s'",
+        run("sudo sh -c 'cd /root/config; /usr/local/bin/git-review -s'",
             shell=True)
         run("sudo sh -c 'cd /root/config; git add -A'",
             shell=True)

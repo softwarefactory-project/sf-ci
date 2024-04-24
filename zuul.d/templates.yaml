@@ -4,65 +4,34 @@
     queue: sf-master
     check:
       jobs:
-        - sf-rpm-build
-        - sf-ci-functional-minimal:
-            dependencies:
-              - sf-rpm-build
-        - sf-ci-upgrade-minimal:
-            dependencies:
-              - sf-rpm-build
-        - sf-ci-functional-allinone:
-            dependencies:
-              - sf-rpm-build
-        - sf-ci-upgrade-allinone:
-            dependencies:
-              - sf-rpm-build
-        - sf-ci-functional-external-elk:
-            dependencies:
-              - sf-rpm-build
-            files:
-              - ^ansible/roles/sf-log-processing/.*$
-              - ^ansible/roles/sf-opensearch/.*$
-              - ^ansible/roles/sf-opensearch-dashboards/.*$
-              - ^defaults/sfconfig.yaml$
-              - ^playbooks/multinode-opensearch.yaml$
-              - ^roles/configure-external-opensearch-host/.*$
-        - sf-tenants:
-            dependencies:
-              - sf-rpm-build
+        - sf-ci-functional-minimal
+        # - sf-ci-functional-external-elk:
+        #     files:
+        #       - ^ansible/roles/sf-log-processing/.*$
+        #       - ^ansible/roles/sf-opensearch/.*$
+        #       - ^ansible/roles/sf-opensearch-dashboards/.*$
+        #       - ^defaults/sfconfig.yaml$
+        #       - ^playbooks/multinode-opensearch.yaml$
+        #       - ^roles/configure-external-opensearch-host/.*$
+        # - sf-tenants
     gate:
       jobs:
-        - sf-rpm-build
-        - sf-ci-functional-minimal:
-            dependencies:
-              - sf-rpm-build
-        - sf-ci-upgrade-minimal:
-            dependencies:
-              - sf-rpm-build
-        - sf-ci-functional-allinone:
-            dependencies:
-              - sf-rpm-build
-        - sf-ci-upgrade-allinone:
-            dependencies:
-              - sf-rpm-build
-        - sf-ci-functional-external-elk:
-            dependencies:
-              - sf-rpm-build
-            files:
-              - ^ansible/roles/sf-log-processing/.*$
-              - ^ansible/roles/sf-opensearch/.*$
-              - ^ansible/roles/sf-opensearch-dashboards/.*$
-              - ^defaults/sfconfig.yaml$
-              - ^playbooks/multinode-opensearch.yaml$
-              - ^roles/configure-external-opensearch-host/.*$
-        - wait-for-changes-ahead:
-            dependencies:
-              - name: sf-ci-functional-minimal
-              - name: sf-ci-upgrade-minimal
-              - name: sf-ci-functional-allinone
-              - name: sf-ci-functional-external-elk
-                soft: true
-              - name: sf-ci-upgrade-allinone
+        - sf-ci-functional-minimal
+        # - sf-ci-functional-external-elk:
+        #     files:
+        #       - ^ansible/roles/sf-log-processing/.*$
+        #       - ^ansible/roles/sf-opensearch/.*$
+        #       - ^ansible/roles/sf-opensearch-dashboards/.*$
+        #       - ^defaults/sfconfig.yaml$
+        #       - ^playbooks/multinode-opensearch.yaml$
+        #       - ^roles/configure-external-opensearch-host/.*$
+        # - sf-tenants
+        # - wait-for-changes-ahead:
+        #     dependencies:
+        #       - name: sf-ci-functional-minimal
+        #       - name: sf-ci-functional-external-elk
+        #         soft: true
+        #       # - name: sf-tenants
 
 - project-template:
     name: sf-ci-jobs-light

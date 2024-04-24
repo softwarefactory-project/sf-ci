@@ -1,6 +1,29 @@
 ---
-- name: Install sf-config package
-  yum:
-    name: sf-config
-    state: latest
+- name: Get sf-config bits
+  block:
+    - name: Install packages
+      package:
+        name:
+          - ansible-core
+          - git
+          - glibc-all-langpacks
+          - langpacks-en
+          - python3-pip
+
+    - name: Install requirements pip
+      ansible.builtin.pip:
+        name:
+          - git-review
+
+    - name: Ensure packages from sf koji can be installed
+      command: update-crypto-policies --set DEFAULT:SHA1
+
+    - name: Set sfconfig_path variable
+      set_fact:
+        sfconfig_path: "/home/{{ ansible_user }}/{{ zuul.projects['softwarefactory-project.io/software-factory/sf-config'].src_dir }}"
+
+    - name: Setup sf-config
+      command: ansible-playbook --extra-vars "sfconfig_path={{ sfconfig_path }}" ansible/setup.yaml
+      args:
+        chdir: "{{ sfconfig_path }}"
   become: yes

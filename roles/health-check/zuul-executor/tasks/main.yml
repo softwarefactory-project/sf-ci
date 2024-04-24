@@ -1,12 +1,3 @@
-- name: Check if /bin/zuul-executor exists
-  stat:
-    path: /bin/zuul-executor
-  register: _is_file
-
+---
 - name: Set zuul executor mode
-  command: /bin/zuul-executor -c /etc/zuul/zuul.conf {{ action }}
-  when: _is_file.stat.exists
-
-- name: Set zuul executor mode
-  command: podman exec -ti zuul-executor zuul-executor -c /etc/zuul/zuul.conf {{ action }}
-  when: not _is_file.stat.exists
+  command: podman exec -i zuul-executor zuul-executor -c /etc/zuul/zuul.conf {{ action }}
