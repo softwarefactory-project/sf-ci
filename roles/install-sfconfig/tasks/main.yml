@@ -1,6 +1,14 @@
 ---
-- name: Install sf-config package
+- name: Install sf-config package (from repo latest)
   yum:
     name: sf-config
     state: latest
   become: yes
+  when: sf_config_package_url is undefined
+
+- name: Install sf-config package (from package url)
+  yum:
+    name: "{{ sf_config_package_url }}"
+    state: present
+  become: yes
+  when: sf_config_package_url is defined

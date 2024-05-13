@@ -3,13 +3,24 @@
   vars:
     add_k1s_hypervisor: true
   tasks:
-    - name: Prepare instance
+    - name: Prepare instance (step 1)
       include_role:
         name: "{{ item }}"
       loop:
         - prepare-test-env
         - install-stable-repository
-        - install-sfconfig
+
+    - name: Install sfconfig package (sf-config-3.8.8.16.gc8a3619-4)
+      include_role:
+        name: install-sfconfig
+      vars:
+        # We force installation of a specific sf-config package version we have on production deployments
+        sf_config_package_url: https://softwarefactory-project.io/repos/sf-config-3.8.8.16.gc8a3619-4.el7.noarch.rpm
+
+    - name: Prepare instance (step 2)
+      include_role:
+        name: "{{ item }}"
+      loop:
         - configure-sfconfig
         - configure-fqdn
 

@@ -5,19 +5,10 @@
     check:
       jobs:
         - sf-rpm-build
-        - sf-ci-functional-minimal:
-            dependencies:
-              - sf-rpm-build
-        - sf-ci-upgrade-minimal:
-            dependencies:
-              - sf-rpm-build
         - sf-ci-functional-allinone:
             dependencies:
               - sf-rpm-build
-        - sf-ci-upgrade-allinone:
-            dependencies:
-              - sf-rpm-build
-        - sf-ci-upgrade-minimal-from-38-release:
+        - sf-ci-upgrade-allinone-from-38-release:
             dependencies:
               - sf-rpm-build
         - sf-ci-functional-external-elk:
@@ -36,19 +27,10 @@
     gate:
       jobs:
         - sf-rpm-build
-        - sf-ci-functional-minimal:
-            dependencies:
-              - sf-rpm-build
-        - sf-ci-upgrade-minimal:
-            dependencies:
-              - sf-rpm-build
         - sf-ci-functional-allinone:
             dependencies:
               - sf-rpm-build
-        - sf-ci-upgrade-allinone:
-            dependencies:
-              - sf-rpm-build
-        - sf-ci-upgrade-minimal-from-38-release:
+        - sf-ci-upgrade-allinone-from-38-release:
             dependencies:
               - sf-rpm-build
         - sf-ci-functional-external-elk:
@@ -63,12 +45,10 @@
               - ^roles/configure-external-opensearch-host/.*$
         - wait-for-changes-ahead:
             dependencies:
-              - name: sf-ci-functional-minimal
-              - name: sf-ci-upgrade-minimal
               - name: sf-ci-functional-allinone
+              - name: sf-ci-upgrade-allinone-from-38-release
               - name: sf-ci-functional-external-elk
                 soft: true
-              - name: sf-ci-upgrade-allinone
 
 - project-template:
     name: sf-ci-jobs-light
