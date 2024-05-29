@@ -80,8 +80,18 @@
     run: playbooks/upgrade.yaml
     vars:
       sf_arch: allinone
-      # Upgrade from sf-38-release to validate sf-38-build upgrade from sf-38-release
       sf_version: 3.8
+      show_hidden_logs: false
+
+- job:
+    name: sf-ci-upgrade-allinone-from-38-release-plus-sf-config-package
+    description: The sf upgrade tests of the minimal architecture
+    parent: sf-ci
+    run: playbooks/upgrade.yaml
+    vars:
+      sf_arch: allinone
+      sf_version: 3.8
+      sf_config_package_url: https://softwarefactory-project.io/repos/sf-config-3.8.8.16.gc8a3619-4.el7.noarch.rpm
       show_hidden_logs: false
 
 - job:

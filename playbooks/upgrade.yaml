@@ -10,12 +10,9 @@
         - prepare-test-env
         - install-stable-repository
 
-    - name: Install sfconfig package (sf-config-3.8.8.16.gc8a3619-4)
+    - name: Install sfconfig package
       include_role:
         name: install-sfconfig
-      vars:
-        # We force installation of a specific sf-config package version we have on production deployments
-        sf_config_package_url: https://softwarefactory-project.io/repos/sf-config-3.8.8.16.gc8a3619-4.el7.noarch.rpm
 
     - name: Prepare instance (step 2)
       include_role:

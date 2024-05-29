@@ -11,6 +11,9 @@
         - sf-ci-upgrade-allinone-from-38-release:
             dependencies:
               - sf-rpm-build
+        - sf-ci-upgrade-allinone-from-38-release-plus-sf-config-package:
+            dependencies:
+              - sf-rpm-build
         - sf-ci-functional-external-elk:
             dependencies:
               - sf-rpm-build
@@ -31,6 +34,9 @@
             dependencies:
               - sf-rpm-build
         - sf-ci-upgrade-allinone-from-38-release:
+            dependencies:
+              - sf-rpm-build
+        - sf-ci-upgrade-allinone-from-38-release-plus-sf-config-package:
             dependencies:
               - sf-rpm-build
         - sf-ci-functional-external-elk:
