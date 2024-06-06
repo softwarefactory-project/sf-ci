@@ -6,10 +6,12 @@
       jobs:
         - sf-ci-functional-minimal
         - sf-ci-functional-allinone
+        - sf-tenants
     gate:
       jobs:
         - sf-ci-functional-minimal
         - sf-ci-functional-allinone
+        - sf-tenants
 
 - project-template:
     name: sf-ci-jobs-light

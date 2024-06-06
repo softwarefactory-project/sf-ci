@@ -34,20 +34,21 @@
     post-run: playbooks/get-logs.yaml
     timeout: 10800
     required-projects:
+      - software-factory/sf-config
       - software-factory/sf-ci
       - software-factory/sfinfo
     nodeset:
       nodes:
         - name: master
-          label: cloud-rhel-9.3
+          label: cloud-rhel-9-3
         - name: zs
-          label: cloud-rhel-9.3
+          label: cloud-rhel-9-3
         - name: ze
-          label: cloud-rhel-9.3
+          label: cloud-rhel-9-3
         - name: zm
-          label: cloud-rhel-9.3
+          label: cloud-rhel-9-3
         - name: tenant
-          label: cloud-rhel-9.3
+          label: cloud-rhel-9-3
       groups:
         - name: switch
           nodes:

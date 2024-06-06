@@ -50,7 +50,6 @@
         name: "{{ item }}"
       loop:
         - prepare-test-env
-        - install-ci-repository
         - install-sfconfig
 
 - hosts: master
@@ -65,7 +64,6 @@
       vars:
         sf_arch: multinode
         add_component:
-          - component: opensearch
           - component: hound
 
     - name: Run sfconfig
@@ -106,7 +104,6 @@
           - component: gerrit
             insertafter: keycloak
           - component: gitweb
-          - component: opensearch
           - component: hound
         sf_tenant_instance: true
         static_hostname_ip: "{{ master_ip }}"
@@ -151,7 +148,6 @@
         static_hostname_ip: "{{ tenant_ip }}"
         static_hostname_fqdn: tenant.sftests.com
         add_component:
-          - component: opensearch
           - component: hound
 
     - name: Run sfconfig to apply configuration

@@ -7,30 +7,6 @@
   failed_when: _container_exists.rc not in [0, 1]
   become: true
 
-# on debian container, ca extension needs to be '.crt' or
-# update-ca-certificates won't load it
-- name: "Copy CA on {{ item }} container"
-  shell: >-
-    podman cp /etc/pki/ca-trust/source/anchors/tenant.pem
-    {{ item }}:/usr/local/share/ca-certificates/tenant.crt
-    && podman cp /etc/pki/ca-trust/source/anchors/tenant.pem
-    {{ item }}:/etc/pki/ca-trust/source/anchors/tenant.pem
-  when: _container_exists.rc == 0
-  become: true
-
-- name: "Update ca certificate on {{ item }}"
-  command: "podman exec -ti {{ item }} update-ca-certificates"
-  ignore_errors: yes
-  when: _container_exists.rc == 0
-  become: true
-
-- name: "Ensure ca-bundle symlink exists on {{ item }}"
-  command: "podman exec -ti {{ item }} ln -s /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-bundle.crt"
-  when: _container_exists.rc == 0
-  ignore_errors: yes
-  become: true
-
-# rhel
 - name: "Copy CA on {{ item }} container"
   shell: >-
     podman cp /etc/pki/ca-trust/source/anchors/tenant.pem
