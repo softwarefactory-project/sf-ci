@@ -5,33 +5,11 @@
     check:
       jobs:
         - sf-ci-functional-minimal
-        # - sf-ci-functional-external-elk:
-        #     files:
-        #       - ^ansible/roles/sf-log-processing/.*$
-        #       - ^ansible/roles/sf-opensearch/.*$
-        #       - ^ansible/roles/sf-opensearch-dashboards/.*$
-        #       - ^defaults/sfconfig.yaml$
-        #       - ^playbooks/multinode-opensearch.yaml$
-        #       - ^roles/configure-external-opensearch-host/.*$
-        # - sf-tenants
+        - sf-ci-functional-allinone
     gate:
       jobs:
         - sf-ci-functional-minimal
-        # - sf-ci-functional-external-elk:
-        #     files:
-        #       - ^ansible/roles/sf-log-processing/.*$
-        #       - ^ansible/roles/sf-opensearch/.*$
-        #       - ^ansible/roles/sf-opensearch-dashboards/.*$
-        #       - ^defaults/sfconfig.yaml$
-        #       - ^playbooks/multinode-opensearch.yaml$
-        #       - ^roles/configure-external-opensearch-host/.*$
-        # - sf-tenants
-        # - wait-for-changes-ahead:
-        #     dependencies:
-        #       - name: sf-ci-functional-minimal
-        #       - name: sf-ci-functional-external-elk
-        #         soft: true
-        #       # - name: sf-tenants
+        - sf-ci-functional-allinone
 
 - project-template:
     name: sf-ci-jobs-light

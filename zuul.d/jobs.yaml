@@ -75,6 +75,14 @@
       show_hidden_logs: false
 
 - job:
+    name: sf-ci-functional-allinone
+    description: The sf functional tests of the allinone architecture
+    parent: sf-ci
+    run: playbooks/functional.yaml
+    vars:
+      sf_arch: allinone
+
+- job:
     name: sf-tenants
     parent: sf-ci-multinode
     run: playbooks/multinode.yaml
