@@ -1,7 +1,7 @@
 ---
 - job:
     name: sf-ci
-    parent: base-rhel
+    parent: base
     description: The sf ci tests
     pre-run:
       - playbooks/network-info-pre.yaml
